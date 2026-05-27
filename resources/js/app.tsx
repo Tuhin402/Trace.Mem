@@ -38,35 +38,66 @@ const appSlug = import.meta.env.VITE_APP_SLUG || 'tracemem';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    layout: (name) => {
-        switch (true) {
-            case name === 'welcome':
-                return null;
+    // layout: (name) => {
+    //     switch (true) {
+    //         case name === 'welcome':
+    //             return null;
 
-            case name.startsWith('auth/'):
-                return AuthLayout;
+    //         case name.startsWith('auth/'):
+    //             return AuthLayout;
 
-            case name.startsWith('public/api-reference'):
-                return ApiReferenceLayout;
+    //         case name.startsWith('public/api-reference'):
+    //             return ApiReferenceLayout;
 
-            case name === 'public/Docs':
-                return ApiReferenceLayout;
+    //         case name === 'public/Docs':
+    //             return ApiReferenceLayout;
 
-            case name === 'public/Pricing':
-                return ApiReferenceLayout;
+    //         case name === 'public/Pricing':
+    //             return ApiReferenceLayout;
 
-            case name.startsWith('public/'):
-                return PublicLayout;
+    //         case name.startsWith('public/'):
+    //             return PublicLayout;
 
-            case name.startsWith('settings/'):
-            case name.startsWith('teams/'):
-                return [AppLayout, SettingsLayout];
+    //         case name.startsWith('settings/'):
+    //         case name.startsWith('teams/'):
+    //             return [AppLayout, SettingsLayout];
 
-            default:
-                return AppLayout;
+    //         default:
+    //             return AppLayout;
+    //     }
+    // },
+    resolve: async (name) => {
+        const pages = import.meta.glob('./pages/**/*.tsx');
+        const page = await pages[`./pages/${name}.tsx`]();
+        const component = page.default;
+    
+        if (name.startsWith('auth/')) {
+            component.layout = (page: React.ReactNode) => (
+                <AuthLayout>{page}</AuthLayout>
+            );
+        } else if (name.startsWith('public/api-reference') || name === 'public/Docs' || name === 'public/Pricing') {
+            component.layout = (page: React.ReactNode) => (
+                <ApiReferenceLayout>{page}</ApiReferenceLayout>
+            );
+        } else if (name.startsWith('public/')) {
+            component.layout = (page: React.ReactNode) => (
+                <PublicLayout>{page}</PublicLayout>
+            );
+        } else if (name.startsWith('settings/')) {
+            component.layout = (page: React.ReactNode) => (
+                <AppLayout>
+                    <SettingsLayout>{page}</SettingsLayout>
+                </AppLayout>
+            );
+        } else {
+            component.layout = (page: React.ReactNode) => (
+                <AppLayout>{page}</AppLayout>
+            );
         }
+    
+        return component;
     },
-    strictMode: true,
+    // strictMode: true,
     withApp(app) {
         return (
             <HelmetProvider>

@@ -191,6 +191,17 @@ export default function PublicNavbar() {
                     </div>
                 </div>
             )}
+
+            {/* Fun feature marquee */}
+            <div className="fun-marquee-container" aria-hidden="true">
+                <div className="fun-marquee-content">
+                    {Array(4).fill(0).map((_, i) => (
+                        <span key={i}>
+                            Built for <b>developers</b> who double check everything anyway <b>-•-</b> Some links may currently enjoy a dramatic <b>second</b> click <b>-•-</b> Consider it <b>intentional confirmation engineering</b> <b>-•-</b> Your mouse deserves a <b>warm-up</b> too <b>-•-</b> <b>Trace.Mem</b> remembers context, even when the navbar takes a <b>second</b> to think <b>-•-</b>
+                        </span>
+                    ))}
+                </div>
+            </div>
         </header>
     );
 }

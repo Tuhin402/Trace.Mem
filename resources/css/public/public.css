@@ -32,7 +32,7 @@
     /* deep purple/fuchsia */
     --tm-secondary: #cebdff;
     /* light lavender */
-    --tm-tertiary: #ffafd3;
+    --tm-tertiary: #ffafd3;  
     /* soft pink */
 
     /* Text */
@@ -50,6 +50,7 @@
     --section-px: clamp(24px, 8vw, 160px);
     --content-max: 1200px;
     --nav-h: 76px;
+    --total-nav-h: 108px;
 }
 
 /* ============================================================
@@ -1169,4 +1170,34 @@
     color: #111;
     display: block;
     flex-shrink: 0;
+}
+
+/* --- Fun Marquee --- */
+.fun-marquee-container {
+    width: 100%;
+    overflow: hidden;
+    background: var(--tm-primary);
+    color: #41054A;
+    padding: 6px 0;
+    border-top: 1px solid rgba(162, 0, 186, 0.2);
+    display: flex;
+    white-space: nowrap;
+}
+
+.fun-marquee-content {
+    display: inline-flex;
+    animation: marquee-scroll 46s linear infinite;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.fun-marquee-content span {
+    padding-right: 0.2rem;
+}
+
+@keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }

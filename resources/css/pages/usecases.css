@@ -1,0 +1,1039 @@
+/* ============================================================
+   TraceMem — Use Cases Page Styles
+   Premium dark, sharp-edged SaaS aesthetic
+   ============================================================ */
+
+/* ── Page shell ───────────────────────────────────────────── */
+.uc-shell {
+    background-color: var(--tm-bg);
+    color: var(--tm-text);
+    font-family: var(--font-body);
+    min-height: calc(100vh - var(--nav-h));
+    position: relative;
+}
+
+/* Ambient radial glows — fixed, behind everything */
+.uc-shell::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 800px 500px at 15% 0%,   rgba(225, 78, 246, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 600px 400px at 85% 100%, rgba(206, 189, 255, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Shared layout helpers ────────────────────────────────── */
+.uc-section {
+    padding: 100px var(--section-px);
+    position: relative;
+    z-index: 1;
+}
+
+.uc-inner {
+    max-width: var(--content-max);
+    margin: 0 auto;
+}
+
+.uc-section-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tm-primary);
+    display: block;
+    margin-bottom: 16px;
+}
+
+.uc-section-title {
+    font-family: var(--font-headline);
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    color: var(--tm-text);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+}
+
+.uc-section-lead {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--tm-text-muted);
+    line-height: 1.65;
+    max-width: 580px;
+}
+
+.uc-section-lead--center {
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   1. Page Header — slim, centered, distinct from Landing hero
+   ============================================================ */
+.uc-page-header {
+    position: relative;
+    z-index: 1;
+    padding: 72px var(--section-px) 80px;
+    background: var(--tm-surface);
+    border-bottom: 1px solid var(--tm-border);
+    overflow: hidden;
+}
+
+/* Subtle angled accent line */
+.uc-page-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent 10%, var(--tm-primary-vivid) 40%, var(--tm-secondary) 70%, transparent 90%);
+    pointer-events: none;
+}
+
+.uc-page-header-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+    gap: 0;
+}
+
+/* Pill badge strip */
+.uc-page-header-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.uc-ph-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 1px solid var(--tm-border-strong);
+    background: var(--tm-surface-2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tm-text-dim);
+    border-radius: 2px;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    cursor: default;
+}
+
+.uc-ph-badge:hover {
+    border-color: var(--tm-primary);
+    color: var(--tm-primary);
+}
+
+.uc-ph-badge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--tm-primary);
+    opacity: 0.8;
+}
+
+.uc-ph-h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(34px, 5vw, 60px);
+    font-weight: 800;
+    color: var(--tm-text);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.uc-ph-accent {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--tm-primary) 0%, var(--tm-primary-deep) 55%, var(--tm-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.uc-ph-lead {
+    font-family: var(--font-body);
+    font-size: clamp(15px, 1.5vw, 17px);
+    color: var(--tm-text-muted);
+    line-height: 1.7;
+    max-width: 580px;
+    margin-bottom: 36px;
+}
+
+.uc-ph-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ============================================================
+   2. Brand Anchor
+   ============================================================ */
+.uc-brand-anchor {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 36px var(--section-px);
+    background: var(--tm-bg);
+    border-bottom: 1px solid var(--tm-border);
+    position: relative;
+    z-index: 1;
+}
+
+.uc-brand-anchor-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--tm-border-strong), transparent);
+}
+
+.uc-brand-anchor-logo {
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.uc-brand-anchor-logo:hover {
+    opacity: 1;
+}
+
+/* ============================================================
+   3 + 4. Use Case Tabs + Content
+   ============================================================ */
+.uc-tabs-section {
+    background: var(--tm-surface);
+    border-bottom: 1px solid var(--tm-border);
+}
+
+/* Horizontal scrollable tab row */
+.uc-tabs-header {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--tm-border);
+    margin-bottom: 56px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.uc-tabs-header::-webkit-scrollbar {
+    display: none;
+}
+
+.uc-tab {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 16px 28px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    color: var(--tm-text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.uc-tab.active {
+    color: var(--tm-primary);
+    border-bottom-color: var(--tm-primary);
+}
+
+.uc-tab:hover:not(.active) {
+    color: var(--tm-text);
+}
+
+/* Panel */
+.uc-panel {}
+
+.uc-panel-head {
+    margin-bottom: 48px;
+    max-width: 720px;
+}
+
+.uc-panel-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tm-primary);
+    display: block;
+    margin-bottom: 16px;
+}
+
+.uc-panel-headline {
+    font-family: var(--font-headline);
+    font-size: clamp(24px, 3.5vw, 40px);
+    font-weight: 800;
+    color: var(--tm-text);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+}
+
+.uc-panel-lead {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--tm-text-muted);
+    line-height: 1.7;
+    max-width: 600px;
+}
+
+/* Intro text block — appears above the cards */
+.uc-panel-intro {
+    margin-bottom: 28px;
+    padding: 20px 24px;
+    border-left: 2px solid var(--tm-primary-vivid);
+    background: rgba(225, 78, 246, 0.04);
+}
+
+.uc-panel-intro-text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tm-text-muted);
+    line-height: 1.7;
+    max-width: 680px;
+}
+
+/* Cards grid */
+.uc-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.uc-card {
+    border: 1px solid var(--tm-border);
+    background: var(--tm-surface-2);
+    padding: 36px 32px;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.uc-card:hover {
+    border-color: var(--tm-border-strong);
+    background: var(--tm-surface-3);
+}
+
+.uc-card-top-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--tm-primary-vivid), var(--tm-secondary), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.uc-card:hover .uc-card-top-bar {
+    opacity: 1;
+}
+
+.uc-card-icon {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--tm-border-strong);
+    background: var(--tm-surface-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--tm-primary);
+}
+
+.uc-card-title {
+    font-family: var(--font-headline);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tm-text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+.uc-card-body {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tm-text-muted);
+    line-height: 1.7;
+    flex: 1;
+}
+
+.uc-card-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tm-primary);
+    align-self: flex-start;
+}
+
+/* ============================================================
+   5. Workflow Section
+   ============================================================ */
+.uc-workflow-section {
+    background: var(--tm-bg);
+    border-top: 1px solid var(--tm-border);
+    border-bottom: 1px solid var(--tm-border);
+}
+
+.uc-workflow-header {
+    text-align: center;
+    margin-bottom: 72px;
+}
+
+.uc-workflow-header .uc-section-tag {
+    display: block;
+    text-align: center;
+}
+
+.uc-workflow-header .uc-section-title {
+    text-align: center;
+    margin: 0 auto 16px;
+}
+
+.uc-workflow-header .uc-section-lead {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.uc-workflow-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+}
+
+/* Timeline column */
+.uc-workflow-timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.uc-workflow-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--tm-primary-vivid), var(--tm-outline), transparent);
+}
+
+.uc-wf-step {
+    position: relative;
+    padding: 0 0 48px 28px;
+    cursor: pointer;
+}
+
+.uc-wf-step:last-child {
+    padding-bottom: 0;
+}
+
+.uc-wf-dot {
+    position: absolute;
+    left: -8px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--tm-outline);
+    background: var(--tm-bg);
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.uc-wf-step.active .uc-wf-dot {
+    border-color: var(--tm-primary);
+    background: var(--tm-primary-vivid);
+    box-shadow: 0 0 16px rgba(225, 78, 246, 0.45);
+}
+
+.uc-wf-phase {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tm-text-dim);
+    margin-bottom: 6px;
+    transition: color 0.3s ease;
+}
+
+.uc-wf-step.active .uc-wf-phase {
+    color: var(--tm-primary);
+}
+
+.uc-wf-title {
+    font-family: var(--font-headline);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tm-text-muted);
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+}
+
+.uc-wf-step.active .uc-wf-title {
+    color: var(--tm-text);
+}
+
+.uc-wf-desc {
+    font-size: 14px;
+    color: var(--tm-text-dim);
+    line-height: 1.65;
+    max-width: 340px;
+    transition: color 0.3s ease;
+}
+
+.uc-wf-step.active .uc-wf-desc {
+    color: var(--tm-text-muted);
+}
+
+/* Visual card */
+.uc-workflow-visual {
+    position: sticky;
+    top: calc(var(--nav-h) + 32px);
+}
+
+.uc-wf-card {
+    border: 1px solid var(--tm-border-strong);
+    background: var(--tm-surface-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.uc-wf-card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--tm-border);
+    background: var(--tm-surface-4);
+}
+
+.uc-wf-card-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--tm-text-dim);
+    margin-left: 4px;
+}
+
+.uc-wf-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 40px;
+    text-align: center;
+    gap: 20px;
+    position: relative;
+    min-height: 360px;
+}
+
+.uc-wf-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(225, 78, 246, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.uc-wf-step-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tm-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.uc-wf-step-icon {
+    color: var(--tm-primary);
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.uc-wf-step-name {
+    font-family: var(--font-headline);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--tm-text);
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: 1;
+}
+
+.uc-wf-step-visual {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tm-text-muted);
+    line-height: 1.65;
+    max-width: 280px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Progress bar */
+.uc-wf-progress {
+    display: flex;
+    border-top: 1px solid var(--tm-border);
+}
+
+.uc-wf-seg {
+    height: 3px;
+    flex: 1;
+    background: var(--tm-border);
+    transition: background 0.4s ease;
+}
+
+.uc-wf-seg.active {
+    background: var(--tm-primary);
+}
+
+/* ============================================================
+   6. Product Fit
+   ============================================================ */
+.uc-fit-section {
+    background: var(--tm-surface);
+    border-bottom: 1px solid var(--tm-border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Halftone dot texture */
+.uc-fit-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(82,66,81,0.6) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.uc-fit-header {
+    text-align: center;
+    margin-bottom: 64px;
+    position: relative;
+    z-index: 1;
+}
+
+.uc-fit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-left: 1px solid var(--tm-border);
+    border-top: 1px solid var(--tm-border);
+    position: relative;
+    z-index: 1;
+}
+
+.uc-fit-card {
+    border-right: 1px solid var(--tm-border);
+    border-bottom: 1px solid var(--tm-border);
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.uc-fit-card:hover {
+    background: var(--tm-surface-2);
+}
+
+.uc-fit-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 0% 0%, rgba(225,78,246,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.uc-fit-card:hover::before {
+    opacity: 1;
+}
+
+.uc-fit-card-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--tm-text-dim);
+    text-transform: uppercase;
+}
+
+.uc-fit-card-icon {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--tm-border-strong);
+    background: var(--tm-surface-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tm-primary);
+    flex-shrink: 0;
+}
+
+.uc-fit-card-title {
+    font-family: var(--font-headline);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--tm-text);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+}
+
+.uc-fit-card-desc {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tm-text-muted);
+    line-height: 1.65;
+}
+
+/* ============================================================
+   7. Architecture Section
+   ============================================================ */
+.uc-arch-section {
+    background: var(--tm-bg);
+    border-top: 1px solid var(--tm-border);
+    border-bottom: 1px solid var(--tm-border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle vertical boundary lines */
+.uc-arch-section::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: var(--section-px);
+    right: var(--section-px);
+    border-left: 1px solid rgba(255,255,255,0.04);
+    border-right: 1px solid rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+
+.uc-arch-split {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 80px;
+    align-items: start;
+    position: relative;
+    z-index: 1;
+}
+
+.uc-arch-title {
+    font-family: var(--font-headline);
+    font-size: clamp(26px, 3.5vw, 42px);
+    font-weight: 800;
+    color: var(--tm-text);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.uc-arch-code {
+    font-family: var(--font-mono);
+    color: var(--tm-primary);
+    font-size: 0.82em;
+}
+
+.uc-arch-lead {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--tm-text-muted);
+    line-height: 1.7;
+    margin-bottom: 36px;
+}
+
+.uc-arch-cta {}
+
+/* Pillars grid on the right */
+.uc-arch-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-left: 1px solid var(--tm-border);
+    border-top: 1px solid var(--tm-border);
+}
+
+.uc-arch-pillar {
+    border-right: 1px solid var(--tm-border);
+    border-bottom: 1px solid var(--tm-border);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background 0.2s ease;
+}
+
+.uc-arch-pillar:hover {
+    background: var(--tm-surface);
+}
+
+.uc-arch-pillar-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.uc-arch-pillar-num {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--tm-text-dim);
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.uc-arch-pillar-icon {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--tm-border-strong);
+    background: var(--tm-surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tm-primary);
+    flex-shrink: 0;
+}
+
+.uc-arch-pillar-title {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tm-text);
+    line-height: 1.2;
+}
+
+.uc-arch-pillar-desc {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--tm-text-dim);
+    line-height: 1.6;
+}
+
+/* ============================================================
+   8. CTA Strip — minimal, high-contrast horizontal band
+   ============================================================ */
+.uc-cta-strip {
+    position: relative;
+    z-index: 1;
+    background: var(--tm-surface-2);
+    border-top: 1px solid var(--tm-border-strong);
+    overflow: hidden;
+    padding: 80px var(--section-px);
+}
+
+/* Ambient glow blob */
+.uc-cta-strip-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    height: 280px;
+    background: radial-gradient(ellipse, rgba(225, 78, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.uc-cta-strip-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.uc-cta-strip-meta {
+    flex: 1;
+    max-width: 560px;
+}
+
+.uc-cta-strip-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tm-primary);
+    display: block;
+    margin-bottom: 14px;
+}
+
+.uc-cta-strip-headline {
+    font-family: var(--font-headline);
+    font-size: clamp(24px, 3.5vw, 42px);
+    font-weight: 800;
+    color: var(--tm-text);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
+
+.uc-cta-strip-accent {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--tm-primary) 0%, var(--tm-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.uc-cta-strip-desc {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--tm-text-muted);
+    line-height: 1.65;
+}
+
+.uc-cta-strip-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex-shrink: 0;
+    align-items: flex-start;
+}
+
+/* ============================================================
+   Responsive Adjustments
+   ============================================================ */
+@media (max-width: 1024px) {
+    .uc-arch-split {
+        grid-template-columns: 1fr;
+        gap: 56px;
+    }
+
+    .uc-arch-right {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .uc-workflow-layout {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    .uc-workflow-visual {
+        position: relative;
+        top: 0;
+    }
+
+    .uc-fit-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .uc-cta-strip-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 36px;
+    }
+
+    .uc-cta-strip-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .uc-section {
+        padding: 72px var(--section-px);
+    }
+
+    .uc-page-header {
+        padding: 56px 24px 64px;
+    }
+
+    .uc-ph-h1 {
+        font-size: 32px;
+    }
+
+    .uc-ph-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .uc-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .uc-fit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .uc-arch-right {
+        grid-template-columns: 1fr;
+    }
+
+    .uc-workflow-timeline::before {
+        left: 0;
+    }
+
+    .uc-brand-anchor {
+        padding: 24px var(--section-px);
+    }
+
+    .uc-cta-strip {
+        padding: 56px 24px;
+    }
+
+    .uc-cta-strip-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 28px;
+        text-align: left;
+    }
+
+    .uc-cta-strip-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .uc-ph-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .uc-page-header-badges {
+        gap: 6px;
+    }
+
+    .uc-cta-strip-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .uc-tab {
+        padding: 14px 18px;
+        font-size: 10px;
+    }
+}

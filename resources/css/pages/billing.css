@@ -1,0 +1,484 @@
+/* ============================================================
+   TraceMem — Billing Page Styles
+   Inherits from app-shell.css tokens
+   ============================================================ */
+
+/* ── Quota bars ──────────────────────────────────────────── */
+.bl-quota-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+}
+
+.bl-quota-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bl-quota-bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.bl-quota-bar-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+}
+
+.bl-quota-bar-nums {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--app-text-muted);
+}
+
+.bl-quota-bar-track {
+    height: 4px;
+    background: var(--app-surface-4);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.bl-quota-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    min-width: 2px;
+}
+
+/* ── Plan card in billing ────────────────────────────────── */
+.bl-plan-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bl-plan-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* ── Plans grid ──────────────────────────────────────────── */
+.bl-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* ── Pricing button column ───────────────────────────────── */
+.bl-pricing-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+}
+
+/* ── Current plan block ──────────────────────────────────── */
+.bl-current-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bl-current-plan-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-headline);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--app-text);
+    letter-spacing: -0.02em;
+}
+
+.bl-sub-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.bl-sub-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--app-text-dim);
+}
+
+.bl-current-limits {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ── No plan state ───────────────────────────────────────── */
+.bl-no-plan {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 8px 0;
+}
+
+.bl-no-plan-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--app-surface-3);
+    border: 1px solid var(--app-border-strong);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--app-text-dim);
+    flex-shrink: 0;
+}
+
+.bl-no-plan-text h3 {
+    font-family: var(--font-headline);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--app-text);
+    margin: 0 0 8px;
+}
+
+.bl-no-plan-text p {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 500px;
+}
+
+/* ── Stripe security note ────────────────────────────────── */
+.bl-stripe-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--app-text-subtle);
+    padding: 4px 0;
+}
+
+.bl-stripe-note svg {
+    flex-shrink: 0;
+    color: var(--app-text-subtle);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .bl-plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bl-no-plan {
+        flex-direction: column;
+    }
+}
+
+/* ============================================================
+   Cancel subscription — accordion
+   ============================================================ */
+.bl-cancel-accordion {
+    border-top: 1px solid var(--app-border);
+    margin-top: 8px;
+    padding-top: 16px;
+}
+
+.bl-cancel-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    gap: 8px;
+    color: var(--app-error, #e05260);
+    font-size: 12px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s;
+}
+
+.bl-cancel-toggle:hover { opacity: 0.75; }
+
+.bl-cancel-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bl-cancel-toggle-chevron {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.bl-cancel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 14px;
+    animation: fadeSlideDown 0.18s ease;
+}
+
+.bl-cancel-desc {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ── Danger button (app-level token) ── */
+.app-btn-danger {
+    background: rgba(224, 82, 96, 0.12);
+    border: 1px solid rgba(224, 82, 96, 0.35);
+    color: #e05260;
+    font-weight: 600;
+    gap: 6px;
+}
+
+.app-btn-danger:hover:not(:disabled) {
+    background: rgba(224, 82, 96, 0.22);
+    border-color: rgba(224, 82, 96, 0.55);
+}
+
+.app-btn-danger:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   Cancel subscription — modal
+   ============================================================ */
+.bl-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.15s ease;
+}
+
+.bl-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+.bl-modal {
+    position: relative;
+    z-index: 1;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border-strong);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    animation: slideUp 0.2s ease;
+}
+
+.bl-modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 22px 18px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.bl-modal-header-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(224, 82, 96, 0.12);
+    border: 1px solid rgba(224, 82, 96, 0.25);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e05260;
+    flex-shrink: 0;
+}
+
+.bl-modal-title {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--app-text);
+    margin: 0 0 4px;
+}
+
+.bl-modal-subtitle {
+    font-size: 12px;
+    color: var(--app-text-dim);
+    margin: 0;
+}
+
+.bl-modal-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--app-text-dim);
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.bl-modal-close:hover {
+    color: var(--app-text);
+    background: var(--app-surface-3);
+}
+
+.bl-modal-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 22px;
+    padding: 14px;
+    background: rgba(224, 82, 96, 0.08);
+    border: 1px solid rgba(224, 82, 96, 0.2);
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: #e05260;
+    line-height: 1.6;
+    margin-top: 18px;
+}
+
+.bl-modal-warning svg { flex-shrink: 0; margin-top: 2px; }
+
+.bl-modal-body {
+    padding: 20px 22px;
+}
+
+.bl-modal-reason-heading {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--app-text-muted);
+    margin: 0 0 14px;
+}
+
+.bl-reason-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bl-reason-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.bl-reason-item:hover {
+    background: var(--app-surface-3);
+    border-color: var(--app-border-strong);
+}
+
+.bl-reason-item--selected {
+    border-color: var(--app-accent) !important;
+    background: rgba(139, 92, 246, 0.07) !important;
+}
+
+.bl-reason-radio {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--app-border-strong);
+    border-radius: 50%;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.bl-reason-item--selected .bl-reason-radio {
+    border-color: var(--app-accent);
+    background: var(--app-accent);
+    box-shadow: inset 0 0 0 3px var(--app-surface);
+}
+
+.bl-reason-text {
+    font-size: 13px;
+    color: var(--app-text-muted);
+    line-height: 1.4;
+}
+
+.bl-reason-item--selected .bl-reason-text {
+    color: var(--app-text);
+}
+
+.bl-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 22px 22px;
+    border-top: 1px solid var(--app-border);
+}
+
+/* ── Cancelled subscription display ── */
+.bl-cancelled-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 0 8px;
+}
+
+.bl-cancelled-note {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    margin: 10px 0 0;
+    line-height: 1.6;
+}
+
+/* ── App-badge: revoked / cancelled ── */
+.app-badge-revoked {
+    background: rgba(224, 82, 96, 0.1);
+    border-color: rgba(224, 82, 96, 0.25);
+    color: #e05260;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

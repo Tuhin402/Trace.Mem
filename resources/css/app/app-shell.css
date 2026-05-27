@@ -1,0 +1,826 @@
+/* ============================================================
+   TraceMem — App Shell Design System
+   Premium dark SaaS control center tokens and base styles
+   ============================================================ */
+
+/* Inherits public.css font imports — no duplication needed */
+
+/* ── App-specific tokens ──────────────────────────────────── */
+:root {
+    --app-bg:              #0a0a0b;
+    --app-surface:         #111112;
+    --app-surface-2:       #18181a;
+    --app-surface-3:       #202022;
+    --app-surface-4:       #2a2a2d;
+    --app-border:          rgba(255, 255, 255, 0.07);
+    --app-border-strong:   rgba(255, 255, 255, 0.13);
+    --app-border-accent:   rgba(196, 168, 255, 0.25);
+
+    /* Accent — lavender / soft purple */
+    --app-accent:          #c4a8ff;
+    --app-accent-vivid:    #a78bfa;
+    --app-accent-glow:     rgba(167, 139, 250, 0.15);
+    --app-accent-dim:      rgba(196, 168, 255, 0.35);
+
+    /* Status colors */
+    --app-success:         #4ade80;
+    --app-success-bg:      rgba(74, 222, 128, 0.10);
+    --app-success-border:  rgba(74, 222, 128, 0.20);
+    --app-warning:         #fbbf24;
+    --app-warning-bg:      rgba(251, 191, 36, 0.10);
+    --app-warning-border:  rgba(251, 191, 36, 0.20);
+    --app-error:           #f87171;
+    --app-error-bg:        rgba(248, 113, 113, 0.10);
+    --app-error-border:    rgba(248, 113, 113, 0.20);
+    --app-info:            #60a5fa;
+    --app-info-bg:         rgba(96, 165, 250, 0.10);
+    --app-info-border:     rgba(96, 165, 250, 0.20);
+
+    /* Text */
+    --app-text:            #e4e0e5;
+    --app-text-muted:      #c9b8c8;
+    --app-text-dim:        #7e7488;
+    --app-text-subtle:     #534d5c;
+
+    /* Environment badge colors */
+    --app-test-bg:         rgba(251, 191, 36, 0.12);
+    --app-test-border:     rgba(251, 191, 36, 0.25);
+    --app-test-text:       #fbbf24;
+    --app-live-bg:         rgba(74, 222, 128, 0.10);
+    --app-live-border:     rgba(74, 222, 128, 0.22);
+    --app-live-text:       #4ade80;
+
+    /* Sidebar dimensions */
+    --sidebar-w:           240px;
+    --topbar-h:            52px;
+    --app-content-max:     1200px;
+    --app-page-px:         clamp(16px, 3vw, 40px);
+    --app-page-py:         32px;
+}
+
+/* ── Global app shell reset ──────────────────────────────── */
+.app-shell-root {
+    background: var(--app-bg);
+    color: var(--app-text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+}
+
+/* Override Tailwind/shadcn light bg for app content area — targets SidebarInset */
+[data-slot="sidebar-inset"] {
+    background: var(--app-bg) !important;
+    color: var(--app-text) !important;
+}
+
+/* Also override the sidebar wrapper that uses bg-sidebar */
+[data-slot="sidebar-wrapper"] {
+    background: var(--app-bg) !important;
+}
+
+/* Top-level inset container background */
+.has-data-\[variant\=inset\]\:bg-sidebar {
+    background: var(--app-bg) !important;
+}
+
+/* ── Page wrapper ────────────────────────────────────────── */
+.app-page {
+    max-width: var(--app-content-max);
+    margin: 0 auto;
+    padding: var(--app-page-py) var(--app-page-px);
+    display: grid;
+    gap: 28px;
+}
+
+/* ── Page title row ──────────────────────────────────────── */
+.app-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.app-page-title {
+    font-family: var(--font-headline);
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 800;
+    color: var(--app-text);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 6px;
+}
+
+.app-page-subtitle {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--app-text-dim);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ── Panel / Card ────────────────────────────────────────── */
+.app-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-panel-lg {
+    padding: 32px;
+}
+
+.app-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.app-panel-head h2 {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--app-text);
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+}
+
+.app-panel-head p {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    margin: 0;
+}
+
+.app-panel-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--app-accent);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+.app-panel-link:hover {
+    color: #fff;
+}
+
+/* ── Stats grid ──────────────────────────────────────────── */
+.app-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.app-stat-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s ease;
+}
+
+.app-stat-card:hover {
+    border-color: var(--app-border-strong);
+}
+
+.app-stat-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--app-surface-3);
+    border-radius: 6px;
+    color: var(--app-accent);
+    flex-shrink: 0;
+}
+
+.app-stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+}
+
+.app-stat-value {
+    font-family: var(--font-headline);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--app-text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.app-stat-trend {
+    font-size: 12px;
+    color: var(--app-text-subtle);
+}
+
+/* ── Two-column grid ─────────────────────────────────────── */
+.app-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.app-empty-state {
+    padding: 40px 24px;
+    text-align: center;
+    border: 1px dashed var(--app-border-strong);
+    border-radius: 6px;
+    color: var(--app-text-dim);
+}
+
+.app-empty-state-title {
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--app-text-muted);
+    margin-bottom: 6px;
+}
+
+.app-empty-state-desc {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    line-height: 1.55;
+}
+
+/* ── Badge system ────────────────────────────────────────── */
+.app-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.app-badge-test {
+    background: var(--app-test-bg);
+    border-color: var(--app-test-border);
+    color: var(--app-test-text);
+}
+
+.app-badge-live {
+    background: var(--app-live-bg);
+    border-color: var(--app-live-border);
+    color: var(--app-live-text);
+}
+
+.app-badge-neutral {
+    background: var(--app-surface-4);
+    border-color: var(--app-border-strong);
+    color: var(--app-text-muted);
+}
+
+.app-badge-active {
+    background: var(--app-success-bg);
+    border-color: var(--app-success-border);
+    color: var(--app-success);
+}
+
+.app-badge-revoked {
+    background: var(--app-error-bg);
+    border-color: var(--app-error-border);
+    color: var(--app-error);
+}
+
+.app-badge-current {
+    background: var(--app-accent-glow);
+    border-color: var(--app-border-accent);
+    color: var(--app-accent);
+}
+
+/* ── Button system ───────────────────────────────────────── */
+.app-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.app-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.app-btn-primary {
+    background: var(--app-accent);
+    border-color: var(--app-accent);
+    color: #0a0a0b;
+}
+
+.app-btn-primary:hover:not(:disabled) {
+    background: #d8bfff;
+    border-color: #d8bfff;
+}
+
+.app-btn-secondary {
+    background: var(--app-surface-3);
+    border-color: var(--app-border-strong);
+    color: var(--app-text-muted);
+}
+
+.app-btn-secondary:hover:not(:disabled) {
+    background: var(--app-surface-4);
+    border-color: var(--app-accent-dim);
+    color: var(--app-text);
+}
+
+.app-btn-ghost {
+    background: transparent;
+    border-color: var(--app-border);
+    color: var(--app-text-dim);
+}
+
+.app-btn-ghost:hover:not(:disabled) {
+    border-color: var(--app-border-strong);
+    color: var(--app-text);
+}
+
+.app-btn-danger {
+    background: var(--app-error-bg);
+    border-color: var(--app-error-border);
+    color: var(--app-error);
+}
+
+.app-btn-danger:hover:not(:disabled) {
+    background: rgba(248, 113, 113, 0.18);
+}
+
+.app-btn-sm {
+    height: 30px;
+    padding: 6px 12px;
+    font-size: 10px;
+}
+
+/* ── Mono label ──────────────────────────────────────────── */
+.app-mono-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.app-divider {
+    height: 1px;
+    background: var(--app-border);
+    margin: 20px 0;
+}
+
+/* ── Code block ──────────────────────────────────────────── */
+.app-code-block {
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.app-code-block pre {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--app-text-muted);
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ── Form field ──────────────────────────────────────────── */
+.app-field {
+    display: grid;
+    gap: 8px;
+}
+
+.app-field label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+}
+
+.app-field input {
+    height: 42px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border-strong);
+    border-radius: 6px;
+    padding: 0 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--app-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.app-field input:focus {
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 3px var(--app-accent-glow);
+}
+
+.app-field input::placeholder {
+    color: var(--app-text-subtle);
+}
+
+.app-field-error {
+    font-size: 12px;
+    color: var(--app-error);
+}
+
+/* ── Alert / notice boxes ────────────────────────────────── */
+.app-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    border: 1px solid;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.app-alert-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.app-alert-warning {
+    background: var(--app-warning-bg);
+    border-color: var(--app-warning-border);
+    color: var(--app-warning);
+}
+
+.app-alert-error {
+    background: var(--app-error-bg);
+    border-color: var(--app-error-border);
+    color: var(--app-error);
+}
+
+.app-alert-success {
+    background: var(--app-success-bg);
+    border-color: var(--app-success-border);
+    color: var(--app-success);
+}
+
+.app-alert-info {
+    background: var(--app-info-bg);
+    border-color: var(--app-info-border);
+    color: var(--app-info);
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.app-table-wrap {
+    overflow-x: auto;
+    border-radius: 6px;
+    border: 1px solid var(--app-border);
+}
+
+.app-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 640px;
+}
+
+.app-table th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+    padding: 12px 16px;
+    text-align: left;
+    background: var(--app-surface-2);
+    border-bottom: 1px solid var(--app-border);
+    white-space: nowrap;
+}
+
+.app-table td {
+    font-size: 13px;
+    color: var(--app-text-muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--app-border);
+    font-family: var(--font-mono);
+}
+
+.app-table tr:last-child td {
+    border-bottom: none;
+}
+
+.app-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.app-table tbody tr:hover {
+    background: var(--app-surface-2);
+}
+
+/* Status code chips in table */
+.app-status-2xx { color: var(--app-success); }
+.app-status-4xx { color: var(--app-warning); }
+.app-status-5xx { color: var(--app-error); }
+
+/* ── Top bar (sidebar header replacement) ────────────────── */
+.app-topbar {
+    height: var(--topbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--app-border);
+    background: var(--app-surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.app-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--app-border);
+    border-radius: 5px;
+    background: transparent;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.app-back-btn:hover {
+    color: var(--app-text);
+    border-color: var(--app-border-strong);
+    background: var(--app-surface-2);
+}
+
+.app-topbar-trigger {
+    color: rgba(255,255,255,0.30);
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.app-topbar-trigger:hover {
+    color: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.06);
+}
+
+.app-topbar-page-label {
+    font-family: var(--font-headline);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--app-text-muted);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Key reveal box ──────────────────────────────────────── */
+.app-key-reveal {
+    margin-top: 20px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border-accent);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.app-key-reveal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--app-border);
+    background: var(--app-surface-3);
+}
+
+.app-key-reveal-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--app-accent);
+}
+
+.app-key-reveal-code {
+    display: block;
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--app-text-muted);
+    word-break: break-all;
+    line-height: 1.65;
+}
+
+.app-key-reveal-warning {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--app-warning);
+    border-top: 1px solid var(--app-border);
+    background: var(--app-warning-bg);
+}
+
+/* ── Billing plan card ───────────────────────────────────── */
+.app-plan-card {
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    padding: 24px;
+    background: var(--app-surface-2);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-plan-card-active {
+    border-color: var(--app-border-accent);
+}
+
+.app-plan-card-active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--app-accent-vivid), var(--app-accent));
+}
+
+.app-plan-name {
+    font-family: var(--font-headline);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--app-text);
+    letter-spacing: -0.01em;
+}
+
+.app-plan-desc {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    line-height: 1.55;
+}
+
+.app-plan-meta {
+    display: grid;
+    gap: 8px;
+}
+
+.app-plan-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--app-border);
+    font-size: 13px;
+}
+
+.app-plan-meta-row:last-child {
+    border-bottom: none;
+}
+
+.app-plan-meta-key {
+    color: var(--app-text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.app-plan-meta-val {
+    color: var(--app-text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .app-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .app-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .app-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    :root {
+        --app-page-px: 16px;
+        --app-page-py: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .app-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Period filter bar ───────────────────────────────────── */
+.app-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    padding: 3px;
+}
+
+.app-filter-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--app-text-dim);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.app-filter-btn:hover {
+    color: var(--app-text-muted);
+    background: var(--app-surface-3);
+}
+
+.app-filter-btn--active {
+    background: var(--app-surface-4);
+    border-color: var(--app-border-strong);
+    color: var(--app-text);
+}

@@ -1,0 +1,287 @@
+/* ============================================================
+   TraceMem — API Usage Logs Page Styles
+   Inherits from app-shell.css tokens
+   ============================================================ */
+
+/* ── Breadcrumb ────────────────────────────────────────── */
+.lg-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-text-dim);
+    margin-bottom: 4px;
+}
+
+.lg-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--app-text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.lg-back-link:hover { color: var(--app-accent); }
+
+.lg-breadcrumb-sep { color: var(--app-border-strong); }
+
+/* ── Filter row ────────────────────────────────────────── */
+.lg-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lg-month-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border-strong);
+    border-radius: 6px;
+    padding: 0 10px;
+    height: 34px;
+}
+
+.lg-month-select {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-text-muted);
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.lg-month-select option {
+    background: var(--app-surface-2);
+    color: var(--app-text);
+}
+
+.lg-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border-strong);
+    border-radius: 6px;
+    padding: 0 12px;
+    height: 34px;
+    flex: 1;
+    min-width: 200px;
+    color: var(--app-text-dim);
+    transition: border-color 0.15s;
+}
+
+.lg-search-wrap:focus-within {
+    border-color: var(--app-accent);
+}
+
+.lg-search {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--app-text);
+}
+
+.lg-search::placeholder { color: var(--app-text-subtle); }
+
+/* ── Month group ───────────────────────────────────────── */
+.lg-month-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lg-month-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--app-text-dim);
+}
+
+.lg-month-count {
+    font-size: 10px;
+    color: var(--app-text-subtle);
+    font-weight: 500;
+}
+
+/* ── Log panel (card holding rows) ────────────────────── */
+.lg-log-panel {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* ── Log row ───────────────────────────────────────────── */
+.lg-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--app-border);
+    transition: background 0.12s ease;
+    cursor: default;
+}
+
+.lg-row:last-child { border-bottom: none; }
+
+.lg-row:hover { background: var(--app-surface-2); }
+
+.lg-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.lg-row-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ── Top line ──────────────────────────────────────────── */
+.lg-row-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lg-method {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    min-width: 36px;
+}
+
+.lg-endpoint {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--app-text-muted);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.lg-status {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.lg-latency {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-dim);
+    flex-shrink: 0;
+}
+
+/* ── Meta row ──────────────────────────────────────────── */
+.lg-row-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lg-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-subtle);
+    flex-shrink: 0;
+}
+
+.lg-env-badge {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+}
+
+.lg-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-subtle);
+    background: var(--app-surface-3);
+    border: 1px solid var(--app-border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Pagination ────────────────────────────────────────── */
+.lg-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+    flex-wrap: wrap;
+}
+
+.lg-pagination-info {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-text-dim);
+}
+
+.lg-pagination-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lg-total-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-text-subtle);
+    text-align: center;
+    padding: 4px;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .lg-filter-row { flex-direction: column; align-items: stretch; }
+    .lg-search-wrap { min-width: 0; }
+    .lg-row-top { gap: 8px; }
+    .lg-endpoint { font-size: 11px; }
+    .lg-row { padding: 12px 14px; }
+    .lg-meta-chip { max-width: 100px; }
+}
+
+@media (max-width: 480px) {
+    .lg-row-meta { gap: 6px; }
+    .lg-meta-chip { display: none; }
+    .lg-meta-chip:first-of-type { display: inline-flex; }
+}

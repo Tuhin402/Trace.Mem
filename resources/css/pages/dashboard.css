@@ -1,0 +1,267 @@
+/* ============================================================
+   TraceMem — Dashboard Page Styles
+   Inherits from app-shell.css tokens
+   ============================================================ */
+
+/* ── Key list in dashboard ───────────────────────────────── */
+.db-key-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.db-key-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.db-key-row:hover {
+    background: var(--app-surface-2);
+    border-color: var(--app-border);
+}
+
+.db-key-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.db-key-dot[data-env='live'] {
+    background: var(--app-live-text);
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+}
+
+.db-key-dot[data-env='test'] {
+    background: var(--app-test-text);
+    box-shadow: 0 0 6px rgba(251, 191, 36, 0.3);
+}
+
+.db-key-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.db-key-name {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--app-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.db-key-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.db-key-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* ── Usage list ──────────────────────────────────────────── */
+.db-usage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.db-usage-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--app-border);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--app-text-muted);
+}
+
+.db-usage-row:last-child {
+    border-bottom: none;
+}
+
+.db-usage-row-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Current plan mini section ───────────────────────────── */
+.db-plan-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.db-plan-mini-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.db-plan-renew {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-dim);
+    margin-top: 2px;
+}
+
+/* ── Billing plans grid ──────────────────────────────────── */
+.db-billing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* ── Price buttons ───────────────────────────────────────── */
+.db-price-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ── Recent activity list (new, shared with ApiKeys) ─────── */
+.db-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.db-activity-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--app-border);
+    transition: background 0.12s ease;
+}
+
+.db-activity-row:last-child { border-bottom: none; }
+
+.db-activity-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.db-activity-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.db-activity-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.db-activity-method {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    min-width: 32px;
+    flex-shrink: 0;
+}
+
+.db-activity-endpoint {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--app-text-muted);
+    font-weight: 600;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.db-activity-status {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.db-activity-latency {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-dim);
+    flex-shrink: 0;
+}
+
+.db-activity-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-subtle);
+}
+
+.db-activity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--app-surface-3);
+    border: 1px solid var(--app-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .db-billing-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .db-billing-grid {
+        grid-template-columns: 1fr;
+    }
+    .db-activity-chip { display: none; }
+    .db-activity-chip:first-of-type { display: inline-flex; }
+}
+
+@media (max-width: 640px) {
+    .db-key-row {
+        flex-wrap: wrap;
+    }
+}

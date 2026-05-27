@@ -1,0 +1,308 @@
+/* ============================================================
+   TraceMem — App Sidebar Styles
+   ============================================================ */
+
+/* ── Override shadcn sidebar tokens ──────────────────────── */
+[data-sidebar] {
+    --sidebar-background:        #0f0f10;
+    --sidebar-foreground:        #c9b8c8;
+    --sidebar-border:            rgba(255,255,255,0.07);
+    --sidebar-accent:            rgba(196,168,255,0.10);
+    --sidebar-accent-foreground: #e4e0e5;
+    --sidebar-primary:           #c4a8ff;
+    --sidebar-primary-foreground:#0a0a0b;
+    --sidebar-ring:              #a78bfa;
+}
+
+/* ── Sidebar wrapper ─────────────────────────────────────── */
+.tracemem-sidebar {
+    background: #0f0f10 !important;
+    border-right: 1px solid rgba(255,255,255,0.07) !important;
+    font-family: var(--font-body);
+}
+
+/* ── Header area ─────────────────────────────────────────── */
+.tracemem-sidebar-header {
+    padding: 16px 12px 12px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.tracemem-sidebar-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tracemem-sidebar-logo {
+    text-decoration: none;
+    flex: 1;
+    min-width: 0;
+    display: block;
+}
+
+.tracemem-sidebar-trigger {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.3);
+    transition: color 0.15s ease;
+}
+
+.tracemem-sidebar-trigger:hover {
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.06);
+}
+
+/* Only show the sidebar's own collapse trigger on mobile */
+/* Desktop uses the topbar trigger */
+.tracemem-sidebar-trigger--mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .tracemem-sidebar-trigger--mobile {
+        display: flex;
+    }
+}
+
+/* ── Content area ────────────────────────────────────────── */
+.tracemem-sidebar-content {
+    padding: 12px 8px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ── Group label ─────────────────────────────────────────── */
+.tracemem-nav-group-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    padding: 8px 8px 4px;
+    margin: 0;
+}
+
+/* ── Nav list ────────────────────────────────────────────── */
+.tracemem-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* ── Nav item ────────────────────────────────────────────── */
+.tracemem-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.45);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.tracemem-nav-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.8);
+    border-color: transparent;
+}
+
+.tracemem-nav-item--active {
+    background: rgba(196,168,255,0.10);
+    color: #c4a8ff;
+    border-color: rgba(196,168,255,0.18);
+}
+
+.tracemem-nav-item--active:hover {
+    background: rgba(196,168,255,0.14);
+    color: #d8c8ff;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.tracemem-sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 10px 4px;
+}
+
+/* ── Footer area ─────────────────────────────────────────── */
+.tracemem-sidebar-footer {
+    padding: 10px 8px 12px !important;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ── Back to website link ────────────────────────────────── */
+.tracemem-back-website {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.08);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.30);
+    transition: all 0.15s ease;
+}
+
+.tracemem-back-website:hover {
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.04);
+}
+
+.tracemem-back-website.collapsed {
+    justify-content: center;
+    padding: 7px;
+}
+
+/* ── User button ─────────────────────────────────────────── */
+.tracemem-sidebar-user {
+    position: relative;
+}
+
+.tracemem-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+/* Centered layout when sidebar is collapsed */
+.tracemem-user-btn--collapsed {
+    justify-content: center;
+    padding: 8px;
+    gap: 0;
+}
+
+.tracemem-user-btn:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+}
+
+.tracemem-user-avatar {
+    width: 28px;
+    height: 28px;
+    background: rgba(196,168,255,0.15);
+    border: 1px solid rgba(196,168,255,0.25);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-headline);
+    font-size: 11px;
+    font-weight: 800;
+    color: #c4a8ff;
+    flex-shrink: 0;
+}
+
+.tracemem-user-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.tracemem-user-name {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tracemem-user-email {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.28);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tracemem-user-chevron {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.25);
+}
+
+/* ── User dropdown ───────────────────────────────────────── */
+.tracemem-user-dropdown {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #1a1a1c;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 7px;
+    overflow: hidden;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    animation: ddFadeIn 0.12s ease both;
+}
+
+@keyframes ddFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tracemem-user-dd-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: rgba(255,255,255,0.60);
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    transition: all 0.12s ease;
+}
+
+.tracemem-user-dd-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.85);
+}
+
+.tracemem-user-dd-item--danger {
+    color: rgba(248,113,113,0.70);
+}
+
+.tracemem-user-dd-item--danger:hover {
+    background: rgba(248,113,113,0.08);
+    color: #f87171;
+}
+
+.tracemem-user-dd-sep {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+}

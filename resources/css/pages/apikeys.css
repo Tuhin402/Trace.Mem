@@ -1,0 +1,163 @@
+/* ============================================================
+   TraceMem — API Keys Page Styles
+   Inherits from app-shell.css tokens
+   ============================================================ */
+
+/* ── Plan badge in header ────────────────────────────────── */
+.ak-plan-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+}
+
+.ak-plan-limits {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-text-dim);
+}
+
+/* ── Generate button group ───────────────────────────────── */
+.ak-generate-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.ak-upgrade-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-warning);
+    opacity: 0.8;
+}
+
+/* ── Key expiry notice (shown under key reveal box) ──────── */
+.ak-expiry-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-info);
+    background: var(--app-info-bg);
+    border-top: 1px solid var(--app-info-border);
+}
+
+/* ── Expiring-soon badge ─────────────────────────────────── */
+.ak-badge-expiring {
+    background: var(--app-warning-bg);
+    border-color: var(--app-warning-border);
+    color: var(--app-warning);
+}
+
+/* ── Key list ────────────────────────────────────────────── */
+.ak-key-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ak-key-item {
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s ease;
+}
+
+.ak-key-item:hover {
+    border-color: var(--app-border-strong);
+}
+
+.ak-key-item--revoked {
+    opacity: 0.5;
+}
+
+.ak-key-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ak-key-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.ak-key-name {
+    font-family: var(--font-headline);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--app-text);
+}
+
+.ak-key-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.ak-key-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* ── Key meta row ────────────────────────────────────────── */
+.ak-key-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-subtle);
+}
+
+.ak-key-prefix {
+    color: var(--app-text-dim);
+    font-weight: 600;
+}
+
+.ak-key-sep {
+    color: var(--app-border-strong);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .ak-key-top {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ak-key-actions {
+        align-self: flex-start;
+    }
+
+    .ak-generate-btns {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 640px) {
+    .ak-plan-badge {
+        display: none;
+    }
+}

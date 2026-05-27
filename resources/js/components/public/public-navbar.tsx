@@ -47,6 +47,12 @@ export default function PublicNavbar() {
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, [devOpen]);
+    // navigation state controls menu state
+    useEffect(() => {
+        setDevOpen(false);
+        setMenuOpen(false);
+        setMobDevOpen(false);
+    }, [url]);
 
     const isLoggedIn     = !!props.auth?.user;
     const getStartedHref = useMemo(() => (isLoggedIn ? '/dashboard' : '/register'), [isLoggedIn]);
@@ -91,7 +97,6 @@ export default function PublicNavbar() {
                                             href={item.href}
                                             className="dev-drop-item"
                                             role="menuitem"
-                                            onClick={() => setDevOpen(false)}
                                         >
                                             <div className="dev-drop-title">{item.label}</div>
                                             <div className="dev-drop-sub">{item.subtitle}</div>
@@ -160,7 +165,6 @@ export default function PublicNavbar() {
                                         key={item.href}
                                         href={item.href}
                                         className="mob-sub-link"
-                                        onClick={() => setMenuOpen(false)}
                                     >
                                         <div className="mob-sub-title">{item.label}</div>
                                         <div className="mob-sub-sub">{item.subtitle}</div>
@@ -176,7 +180,6 @@ export default function PublicNavbar() {
                             key={item.href}
                             href={item.href}
                             className={`mob-link ${active(item.href) ? 'active' : ''}`}
-                            onClick={() => setMenuOpen(false)}
                         >
                             {item.label}
                         </Link>

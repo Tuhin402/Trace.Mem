@@ -19,6 +19,8 @@ import '../css/pages/usecases.css';
 import '../css/app/app-shell.css';
 import '../css/app/toast.css';
 import '../css/app/sidebar.css';
+import '../css/app/loader.css';
+import '../css/app/skeletons.css';
 
 // App page styles
 import '../css/pages/dashboard.css';
@@ -81,7 +83,7 @@ createInertiaApp({
     //     return resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx'))
     //         .then((page: any) => {
     //             const component = page.default || page;
-                
+
     //             if (component.layout === undefined) {
     //                 if (name.startsWith('auth/')) {
     //                     component.layout = withAuthLayout;
@@ -95,7 +97,7 @@ createInertiaApp({
     //                     component.layout = withAppLayout;
     //                 }
     //             }
-                
+
     //             return page;
     //         });
     // },
@@ -112,7 +114,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#de91efff',
     },
 });
 

@@ -272,53 +272,57 @@ export default function Dashboard() {
                 <div className="app-main-grid">
 
                     {/* API Keys panel */}
-                    <div className="app-panel">
-                        <div className="app-panel-head">
-                            <div>
-                                <h2>API Keys</h2>
-                                <p>Your most recent keys</p>
-                            </div>
-                            <Link href="/api-keys" className="app-panel-link">
-                                Manage all <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
-                            </Link>
-                        </div>
-
-                        {apiKeys.length === 0 ? (
-                            <div className="app-empty-state">
-                                <div className="app-empty-state-title">No API keys yet</div>
-                                <p className="app-empty-state-desc">
-                                    Generate your first key to start sending memory to TraceMem.
-                                </p>
-                                <Link href="/api-keys" className="app-btn app-btn-primary" style={{ marginTop: '16px', display: 'inline-flex' }}>
-                                    Generate a key
+                    <div className="app-panel-dependent">
+                        <div className="app-panel">
+                            <div className="app-panel-head" style={{ flexShrink: 0, marginBottom: '16px' }}>
+                                <div>
+                                    <h2>API Keys</h2>
+                                    <p>Your most recent keys</p>
+                                </div>
+                                <Link href="/api-keys" className="app-panel-link">
+                                    Manage all <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
                                 </Link>
                             </div>
-                        ) : (
-                            <div className="db-key-list">
-                                {apiKeys.slice(0, 5).map((key) => (
-                                    <div className="db-key-row" key={key.id}>
-                                        <div className="db-key-dot" data-env={key.environment} aria-hidden="true" />
-                                        <div className="db-key-info">
-                                            <span className="db-key-name">{key.name}</span>
-                                            <span className="db-key-meta">
-                                                {key.key_prefix}••••{key.key_last4 ?? '----'}
-                                                &nbsp;&nbsp;{fmtNum(key.usage_count)} uses
-                                            </span>
-                                        </div>
-                                        <div className="db-key-right">
-                                            <span className={`app-badge app-badge-${key.environment}`}>
-                                                {key.environment}
-                                            </span>
-                                            {key.revoked_at ? (
-                                                <span className="app-badge app-badge-revoked">Revoked</span>
-                                            ) : (
-                                                <span className="app-badge app-badge-active">Active</span>
-                                            )}
-                                        </div>
+
+                            {apiKeys.length === 0 ? (
+                                <div className="app-empty-state">
+                                    <div className="app-empty-state-title">No API keys yet</div>
+                                    <p className="app-empty-state-desc">
+                                        Generate your first key to start sending memory to TraceMem.
+                                    </p>
+                                    <Link href="/api-keys" className="app-btn app-btn-primary" style={{ marginTop: '16px', display: 'inline-flex' }}>
+                                        Generate a key
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="app-panel-scroll-area">
+                                    <div className="db-key-list">
+                                        {apiKeys.slice(0, 5).map((key) => (
+                                            <div className="db-key-row" key={key.id}>
+                                                <div className="db-key-dot" data-env={key.environment} aria-hidden="true" />
+                                                <div className="db-key-info">
+                                                    <span className="db-key-name">{key.name}</span>
+                                                    <span className="db-key-meta">
+                                                        {key.key_prefix}••••{key.key_last4 ?? '----'}
+                                                        &nbsp;&nbsp;{fmtNum(key.usage_count)} uses
+                                                    </span>
+                                                </div>
+                                                <div className="db-key-right">
+                                                    <span className={`app-badge app-badge-${key.environment}`}>
+                                                        {key.environment}
+                                                    </span>
+                                                    {key.revoked_at ? (
+                                                        <span className="app-badge app-badge-revoked">Revoked</span>
+                                                    ) : (
+                                                        <span className="app-badge app-badge-active">Active</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Usage overview panel */}
@@ -462,8 +466,8 @@ export default function Dashboard() {
                 )}
 
                 {/* ── Recent API activity ── */}
-                <div className="app-panel">
-                    <div className="app-panel-head">
+                <div className="app-panel app-panel-flex" style={{ height: '400px' }}>
+                    <div className="app-panel-head" style={{ flexShrink: 0, marginBottom: '16px' }}>
                         <div>
                             <h2>Recent API Activity</h2>
                             <p>Last 24-hour requests across all keys</p>
@@ -481,55 +485,57 @@ export default function Dashboard() {
                             </p>
                         </div>
                     ) : (
-                        <div className="db-activity-list">
-                            {recentUsage.slice(0, 10).map((row) => (
-                                <div key={row.id} className="db-activity-row">
-                                    <div
-                                        className="db-activity-dot"
-                                        style={{
-                                            background: row.status_code >= 500
-                                                ? 'var(--app-error)'
-                                                : row.status_code >= 400
-                                                ? 'var(--app-warning)'
-                                                : 'var(--app-success)',
-                                        }}
-                                    />
-                                    <div className="db-activity-body">
-                                        <div className="db-activity-top">
-                                            <span className="db-activity-method" style={{ color: methodColor(row.method) }}>
-                                                {row.method}
-                                            </span>
-                                            <span className="db-activity-endpoint">{row.endpoint}</span>
-                                            <span className={`db-activity-status ${statusClass(row.status_code)}`}>
-                                                {row.status_code}
-                                            </span>
-                                            <span className="db-activity-latency">
-                                                {fmtLatency(row.latency_ms)}
-                                            </span>
-                                        </div>
-                                        <div className="db-activity-meta">
-                                            <span>{new Date(row.requested_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
-                                            {row.apiKey && (
-                                                <span className={`app-badge app-badge-${row.apiKey.environment}`} style={{ fontSize: '9px', padding: '1px 5px' }}>
-                                                    {row.is_sandbox ? 'sandbox' : row.apiKey.environment}
+                        <div className="app-panel-scroll-area">
+                            <div className="db-activity-list">
+                                {recentUsage.slice(0, 8).map((row) => (
+                                    <div key={row.id} className="db-activity-row">
+                                        <div
+                                            className="db-activity-dot"
+                                            style={{
+                                                background: row.status_code >= 500
+                                                    ? 'var(--app-error)'
+                                                    : row.status_code >= 400
+                                                    ? 'var(--app-warning)'
+                                                    : 'var(--app-success)',
+                                            }}
+                                        />
+                                        <div className="db-activity-body">
+                                            <div className="db-activity-top">
+                                                <span className="db-activity-method" style={{ color: methodColor(row.method) }}>
+                                                    {row.method}
                                                 </span>
-                                            )}
-                                            {row.request_host && (
-                                                <span className="db-activity-chip">
-                                                    <Globe size={9} />
-                                                    {row.request_host}
+                                                <span className="db-activity-endpoint">{row.endpoint}</span>
+                                                <span className={`db-activity-status ${statusClass(row.status_code)}`}>
+                                                    {row.status_code}
                                                 </span>
-                                            )}
-                                            {row.ip_address && (
-                                                <span className="db-activity-chip">
-                                                    <Wifi size={9} />
-                                                    {row.ip_address}
+                                                <span className="db-activity-latency">
+                                                    {fmtLatency(row.latency_ms)}
                                                 </span>
-                                            )}
+                                            </div>
+                                            <div className="db-activity-meta">
+                                                <span>{new Date(row.requested_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
+                                                {row.apiKey && (
+                                                    <span className={`app-badge app-badge-${row.apiKey.environment}`} style={{ fontSize: '9px', padding: '1px 5px' }}>
+                                                        {row.is_sandbox ? 'sandbox' : row.apiKey.environment}
+                                                    </span>
+                                                )}
+                                                {row.request_host && (
+                                                    <span className="db-activity-chip">
+                                                        <Globe size={9} />
+                                                        {row.request_host}
+                                                    </span>
+                                                )}
+                                                {row.ip_address && (
+                                                    <span className="db-activity-chip">
+                                                        <Wifi size={9} />
+                                                        {row.ip_address}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

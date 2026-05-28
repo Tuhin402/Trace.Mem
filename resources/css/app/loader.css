@@ -1,0 +1,203 @@
+/* ============================================================
+   Global Loader System
+   ============================================================ */
+
+.global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #0e0e0f; /* var(--tm-bg) fallback */
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
+    overflow: hidden;
+}
+
+.global-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.global-loader.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+/* Background Video */
+.loader-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* Dark Overlay to make the light video dark */
+.loader-dark-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(14, 14, 15, 0.65); 
+    z-index: 2;
+}
+
+/* Interactive Mesh Gradient */
+.loader-mesh {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    /* Create multiple radial gradients that move with cursor var(--mx), var(--my) */
+    background: 
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(251, 171, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at calc(100% - var(--mx, 50%)) calc(100% - var(--my, 50%)), rgba(225, 78, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(162, 0, 186, 0.05) 0%, transparent 60%);
+    animation: mesh-breathe 8s ease-in-out infinite alternate, mesh-rotate 20s linear infinite;
+    mix-blend-mode: screen;
+}
+
+@keyframes mesh-breathe {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes mesh-rotate {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(15deg); }
+}
+
+/* Loader Content Container */
+.loader-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem;
+}
+
+.loader-logo-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    animation: fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.loader-logo-area svg {
+    width: auto;
+    height: 48px;
+    filter: drop-shadow(0 4px 12px rgba(251, 171, 255, 0.2));
+}
+
+.loader-bottom {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.loader-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-family: 'Mona Sans', sans-serif;
+    font-size: 0.875rem;
+    color: #e5e2e3; /* var(--tm-text) */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.loader-text {
+    opacity: 0.7;
+}
+
+.pulse-text {
+    animation: text-pulse 2s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.loader-percentage {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: #fbabff; /* var(--tm-primary) */
+}
+
+.loader-bar-container {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.08); /* var(--tm-border) */
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loader-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fbabff, #e14ef6);
+    box-shadow: 0 0 10px rgba(225, 78, 246, 0.5);
+    border-radius: 2px;
+    transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Minimal Mode for secondary transitions */
+.global-loader.mode-minimal .loader-video,
+.global-loader.mode-minimal .loader-dark-overlay,
+.global-loader.mode-minimal .loader-mesh {
+    display: none;
+}
+
+.global-loader.mode-minimal .loader-logo-area {
+    display: none;
+}
+
+.global-loader.mode-minimal .loader-content {
+    justify-content: flex-end;
+    padding: 0;
+}
+
+.global-loader.mode-minimal .loader-bottom {
+    max-width: 100%;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    gap: 0;
+}
+
+.global-loader.mode-minimal .loader-status {
+    display: none; /* Hide text on minimal transition loader, just show a bar at the very top */
+}
+
+.global-loader.mode-minimal .loader-bar-container {
+    border-radius: 0;
+    background-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .loader-content {
+        padding: 2rem;
+    }
+}

@@ -4,12 +4,34 @@ import type { AuthLayoutProps } from '@/types';
 import AppLogo from '@/components/app-logo';
 import AuthPromoPanel from '@/components/public/auth-promo-panel';
 import '../../../css/pages/auth.css';
+import { useEffect, useState } from 'react';
+import { router } from '@inertiajs/react';
+import { AuthSkeleton } from '@/components/skeletons/PublicSkeletons';
 
 export default function AuthSimpleLayout({
     children,
     title,
     description,
 }: AuthLayoutProps) {
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (e) => {
+            if (e.detail.visit.url.pathname.startsWith('/auth')) {
+                setIsLoading(true);
+            }
+        });
+
+        const removeFinish = router.on('finish', () => {
+            setIsLoading(false);
+        });
+
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
+
     return (
         <div className="auth-shell">
             {/* ── Left: Form Panel ── */}
@@ -28,7 +50,10 @@ export default function AuthSimpleLayout({
                         <p className="auth-page-desc">{description}</p>
                     )}
 
-                    {children}
+                    <div style={{ display: isLoading ? 'none' : 'block' }}>
+                        {children}
+                    </div>
+                    {isLoading && <AuthSkeleton />}
                 </div>
             </div>
 

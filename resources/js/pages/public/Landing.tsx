@@ -274,6 +274,8 @@ function UspIcon({ name }: { name: UspCardData['iconName'] }) {
 }
 
 /* ══════════════════════════════════════════════════════════ */
+import GlobalLoader from '@/components/loaders/GlobalLoader';
+
 export default function Landing() {
     const { props } = usePage<{ auth?: { user?: unknown } }>();
     const isLoggedIn = !!props.auth?.user;
@@ -297,6 +299,7 @@ export default function Landing() {
 
     return (
         <>
+            <GlobalLoader />
             <Helmet>
                 <meta
                     name="description"

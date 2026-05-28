@@ -102,10 +102,10 @@ function formatMode(mode: string) {
 
 function methodColor(method: string): string {
     switch (method.toUpperCase()) {
-        case 'GET':    return 'var(--app-info)';
-        case 'POST':   return 'var(--app-success)';
+        case 'GET': return 'var(--app-info)';
+        case 'POST': return 'var(--app-success)';
         case 'DELETE': return 'var(--app-error)';
-        default:       return 'var(--app-text-dim)';
+        default: return 'var(--app-text-dim)';
     }
 }
 
@@ -123,12 +123,12 @@ export default function ApiKeys() {
     const { props } = usePage<PageProps>();
     const { toast, Toasts } = useToast();
 
-    const plan       = props.plan ?? null;
+    const plan = props.plan ?? null;
     const usageStats = props.usageStats;
     const recentUsage = props.usageLogs ?? [];
-    const latestKey  = props.flash?.plain_key ?? null;
-    const flashMsg   = props.flash?.message ?? null;
-    const flashErr   = props.flash?.error ?? null;
+    const latestKey = props.flash?.plain_key ?? null;
+    const flashMsg = props.flash?.message ?? null;
+    const flashErr = props.flash?.error ?? null;
 
     const [localKeys, setLocalKeys] = useState<ApiKeyItem[]>(props.apiKeys ?? []);
     const [name, setName] = useState('');
@@ -146,7 +146,7 @@ export default function ApiKeys() {
 
     const canCreateTest = plan?.allow_test_keys ?? true;
     const canCreateLive = plan?.allow_live_keys ?? false;
-    const activeKeys  = localKeys.filter((k) => !k.revoked_at);
+    const activeKeys = localKeys.filter((k) => !k.revoked_at);
     const revokedKeys = localKeys.filter((k) => k.revoked_at);
 
     const generateKey = (environment: 'test' | 'live') => {
@@ -173,7 +173,7 @@ export default function ApiKeys() {
             {
                 preserveScroll: true,
                 onSuccess: () => setName(''),
-                onFinish:  () => setLoading(false),
+                onFinish: () => setLoading(false),
             },
         );
     };
@@ -289,7 +289,7 @@ export default function ApiKeys() {
                         </div>
                         <code className="app-key-reveal-code">{latestKey}</code>
                         <div className="app-key-reveal-warning">
-                            This secret key is shown <strong>only once</strong>. Copy it now and store it safely — it cannot be retrieved again.
+                            This secret key is shown <strong>only once</strong>. Copy it now and store it safely, it cannot be retrieved again.
                         </div>
                         {/* Expiry notice */}
                         <div className="ak-expiry-notice">
@@ -376,138 +376,142 @@ export default function ApiKeys() {
                     </div>
 
                     {/* Keys list card */}
-                    <div className="app-panel">
-                        <div className="app-panel-head">
-                            <div>
-                                <h2>Your API Keys</h2>
-                                <p>
-                                    {localKeys.length === 0
-                                        ? 'No keys yet. Generate one to get started.'
-                                        : `${activeKeys.length} active · ${revokedKeys.length} revoked`}
-                                </p>
+                    <div className="app-panel-dependent">
+                        <div className="app-panel">
+                            <div className="app-panel-head" style={{ flexShrink: 0, marginBottom: '16px' }}>
+                                <div>
+                                    <h2>Your API Keys</h2>
+                                    <p>
+                                        {localKeys.length === 0
+                                            ? 'No keys yet. Generate one to get started.'
+                                            : `${activeKeys.length} active · ${revokedKeys.length} revoked`}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        {localKeys.length === 0 ? (
-                            <div className="app-empty-state">
-                                <KeyRound size={28} style={{ color: 'var(--app-text-subtle)', margin: '0 auto 12px' }} />
-                                <div className="app-empty-state-title">No API keys yet</div>
-                                <p className="app-empty-state-desc">
-                                    Generate a test key from the form to start integrating TraceMem.
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="ak-key-list">
-                                {localKeys.map((key) => {
-                                    const isRevoked  = Boolean(key.revoked_at);
-                                    const confirming = revokeConfirmId === key.id;
-                                    const expiryDays = daysUntilExpiry(key.expires_at);
-                                    const expiringSoon = expiryDays !== null && expiryDays <= 7;
+                            {localKeys.length === 0 ? (
+                                <div className="app-empty-state">
+                                    <KeyRound size={28} style={{ color: 'var(--app-text-subtle)', margin: '0 auto 12px' }} />
+                                    <div className="app-empty-state-title">No API keys yet</div>
+                                    <p className="app-empty-state-desc">
+                                        Generate a test key from the form to start integrating TraceMem.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="app-panel-scroll-area">
+                                    <div className="ak-key-list">
+                                        {localKeys.map((key) => {
+                                            const isRevoked  = Boolean(key.revoked_at);
+                                            const confirming = revokeConfirmId === key.id;
+                                            const expiryDays = daysUntilExpiry(key.expires_at);
+                                            const expiringSoon = expiryDays !== null && expiryDays <= 7;
 
-                                    return (
-                                        <div
-                                            key={key.id}
-                                            className={`ak-key-item${isRevoked ? ' ak-key-item--revoked' : ''}`}
-                                        >
-                                            {/* Top row */}
-                                            <div className="ak-key-top">
-                                                <div className="ak-key-title-row">
-                                                    <span className="ak-key-name">{key.name}</span>
-                                                    <div className="ak-key-badges">
-                                                        <span className={`app-badge app-badge-${key.environment}`}>
-                                                            {key.environment}
-                                                        </span>
-                                                        <span className="app-badge app-badge-neutral">
-                                                            {formatMode(key.mode)}
-                                                        </span>
-                                                        {isRevoked ? (
-                                                            <span className="app-badge app-badge-revoked">Revoked</span>
-                                                        ) : (
-                                                            <span className="app-badge app-badge-active">Active</span>
+                                            return (
+                                                <div
+                                                    key={key.id}
+                                                    className={`ak-key-item${isRevoked ? ' ak-key-item--revoked' : ''}`}
+                                                >
+                                                    {/* Top row */}
+                                                    <div className="ak-key-top">
+                                                        <div className="ak-key-title-row">
+                                                            <span className="ak-key-name">{key.name}</span>
+                                                            <div className="ak-key-badges">
+                                                                <span className={`app-badge app-badge-${key.environment}`}>
+                                                                    {key.environment}
+                                                                </span>
+                                                                <span className="app-badge app-badge-neutral">
+                                                                    {formatMode(key.mode)}
+                                                                </span>
+                                                                {isRevoked ? (
+                                                                    <span className="app-badge app-badge-revoked">Revoked</span>
+                                                                ) : (
+                                                                    <span className="app-badge app-badge-active">Active</span>
+                                                                )}
+                                                                {expiringSoon && !isRevoked && (
+                                                                    <span className="app-badge ak-badge-expiring">
+                                                                        <AlertTriangle size={9} />
+                                                                        Expires in {expiryDays}d
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Actions */}
+                                                        {!isRevoked && (
+                                                            <div className="ak-key-actions">
+                                                                {confirming ? (
+                                                                    <>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="app-btn app-btn-sm app-btn-danger"
+                                                                            onClick={() => revokeKey(key.id)}
+                                                                        >
+                                                                            Confirm revoke
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="app-btn app-btn-sm app-btn-ghost"
+                                                                            onClick={() => setRevokeConfirmId(null)}
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="app-btn app-btn-sm app-btn-danger"
+                                                                        onClick={() => setRevokeConfirmId(key.id)}
+                                                                        aria-label={`Revoke ${key.name}`}
+                                                                    >
+                                                                        <Trash2 size={12} />
+                                                                        Revoke
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         )}
-                                                        {expiringSoon && !isRevoked && (
-                                                            <span className="app-badge ak-badge-expiring">
-                                                                <AlertTriangle size={9} />
-                                                                Expires in {expiryDays}d
-                                                            </span>
+                                                    </div>
+
+                                                    {/* Meta row */}
+                                                    <div className="ak-key-meta">
+                                                        <span className="ak-key-prefix">
+                                                            {key.key_prefix}••••{key.key_last4 ?? '----'}
+                                                        </span>
+                                                        <span className="ak-key-sep">|</span>
+                                                        <span>{fmtNum(key.usage_count)} uses</span>
+                                                        {key.last_used_at && (
+                                                            <>
+                                                                <span className="ak-key-sep">|</span>
+                                                                <span>Last used {key.last_used_at}</span>
+                                                            </>
+                                                        )}
+                                                        {key.expires_at && !isRevoked && expiryDays !== null && (
+                                                            <>
+                                                                <span className="ak-key-sep">|</span>
+                                                                <span style={{ color: expiringSoon ? 'var(--app-warning)' : 'var(--app-text-subtle)' }}>
+                                                                    Expires in {expiryDays}d
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                        {key.created_at && (
+                                                            <>
+                                                                <span className="ak-key-sep">|</span>
+                                                                <span>Created {key.created_at}</span>
+                                                            </>
                                                         )}
                                                     </div>
                                                 </div>
-
-                                                {/* Actions */}
-                                                {!isRevoked && (
-                                                    <div className="ak-key-actions">
-                                                        {confirming ? (
-                                                            <>
-                                                                <button
-                                                                    type="button"
-                                                                    className="app-btn app-btn-sm app-btn-danger"
-                                                                    onClick={() => revokeKey(key.id)}
-                                                                >
-                                                                    Confirm revoke
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    className="app-btn app-btn-sm app-btn-ghost"
-                                                                    onClick={() => setRevokeConfirmId(null)}
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </>
-                                                        ) : (
-                                                            <button
-                                                                type="button"
-                                                                className="app-btn app-btn-sm app-btn-danger"
-                                                                onClick={() => setRevokeConfirmId(key.id)}
-                                                                aria-label={`Revoke ${key.name}`}
-                                                            >
-                                                                <Trash2 size={12} />
-                                                                Revoke
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Meta row */}
-                                            <div className="ak-key-meta">
-                                                <span className="ak-key-prefix">
-                                                    {key.key_prefix}••••{key.key_last4 ?? '----'}
-                                                </span>
-                                                <span className="ak-key-sep">|</span>
-                                                <span>{fmtNum(key.usage_count)} uses</span>
-                                                {key.last_used_at && (
-                                                    <>
-                                                        <span className="ak-key-sep">|</span>
-                                                        <span>Last used {key.last_used_at}</span>
-                                                    </>
-                                                )}
-                                                {key.expires_at && !isRevoked && expiryDays !== null && (
-                                                    <>
-                                                        <span className="ak-key-sep">|</span>
-                                                        <span style={{ color: expiringSoon ? 'var(--app-warning)' : 'var(--app-text-subtle)' }}>
-                                                            Expires in {expiryDays}d
-                                                        </span>
-                                                    </>
-                                                )}
-                                                {key.created_at && (
-                                                    <>
-                                                        <span className="ak-key-sep">|</span>
-                                                        <span>Created {key.created_at}</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* ── Recent activity (NO pricing section here) ── */}
-                <div className="app-panel">
-                    <div className="app-panel-head">
+                <div className="app-panel app-panel-flex" style={{ height: '400px' }}>
+                    <div className="app-panel-head" style={{ flexShrink: 0, marginBottom: '16px' }}>
                         <div>
                             <h2>Recent API Activity</h2>
                             <p>Last 24-hour requests made with your keys</p>
@@ -526,55 +530,57 @@ export default function ApiKeys() {
                             </p>
                         </div>
                     ) : (
-                        <div className="db-activity-list">
-                            {recentUsage.slice(0, 10).map((row) => (
-                                <div key={row.id} className="db-activity-row">
-                                    <div
-                                        className="db-activity-dot"
-                                        style={{
-                                            background: row.status_code >= 500
-                                                ? 'var(--app-error)'
-                                                : row.status_code >= 400
-                                                ? 'var(--app-warning)'
-                                                : 'var(--app-success)',
-                                        }}
-                                    />
-                                    <div className="db-activity-body">
-                                        <div className="db-activity-top">
-                                            <span className="db-activity-method" style={{ color: methodColor(row.method) }}>
-                                                {row.method}
-                                            </span>
-                                            <span className="db-activity-endpoint">{row.endpoint}</span>
-                                            <span className={`db-activity-status ${statusClass(row.status_code)}`}>
-                                                {row.status_code}
-                                            </span>
-                                            <span className="db-activity-latency">
-                                                {fmtLatency(row.latency_ms)}
-                                            </span>
-                                        </div>
-                                        <div className="db-activity-meta">
-                                            <span>{new Date(row.requested_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
-                                            {row.apiKey && (
-                                                <span className={`app-badge app-badge-${row.apiKey.environment}`} style={{ fontSize: '9px', padding: '1px 5px' }}>
-                                                    {row.is_sandbox ? 'sandbox' : row.apiKey.environment}
+                        <div className="app-panel-scroll-area">
+                            <div className="db-activity-list">
+                                {recentUsage.slice(0, 10).map((row) => (
+                                    <div key={row.id} className="db-activity-row">
+                                        <div
+                                            className="db-activity-dot"
+                                            style={{
+                                                background: row.status_code >= 500
+                                                    ? 'var(--app-error)'
+                                                    : row.status_code >= 400
+                                                        ? 'var(--app-warning)'
+                                                        : 'var(--app-success)',
+                                            }}
+                                        />
+                                        <div className="db-activity-body">
+                                            <div className="db-activity-top">
+                                                <span className="db-activity-method" style={{ color: methodColor(row.method) }}>
+                                                    {row.method}
                                                 </span>
-                                            )}
-                                            {row.request_host && (
-                                                <span className="db-activity-chip">
-                                                    <Globe size={9} />
-                                                    {row.request_host}
+                                                <span className="db-activity-endpoint">{row.endpoint}</span>
+                                                <span className={`db-activity-status ${statusClass(row.status_code)}`}>
+                                                    {row.status_code}
                                                 </span>
-                                            )}
-                                            {row.ip_address && (
-                                                <span className="db-activity-chip">
-                                                    <Wifi size={9} />
-                                                    {row.ip_address}
+                                                <span className="db-activity-latency">
+                                                    {fmtLatency(row.latency_ms)}
                                                 </span>
-                                            )}
+                                            </div>
+                                            <div className="db-activity-meta">
+                                                <span>{new Date(row.requested_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
+                                                {row.apiKey && (
+                                                    <span className={`app-badge app-badge-${row.apiKey.environment}`} style={{ fontSize: '9px', padding: '1px 5px' }}>
+                                                        {row.is_sandbox ? 'sandbox' : row.apiKey.environment}
+                                                    </span>
+                                                )}
+                                                {row.request_host && (
+                                                    <span className="db-activity-chip">
+                                                        <Globe size={9} />
+                                                        {row.request_host}
+                                                    </span>
+                                                )}
+                                                {row.ip_address && (
+                                                    <span className="db-activity-chip">
+                                                        <Wifi size={9} />
+                                                        {row.ip_address}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

@@ -7,9 +7,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     return (
         <div className="public-shell">
             <PublicNavbar />
-            <main className="public-main">{children}</main>
+            <main className="public-main">
+                {children}
+            </main>
             <PublicFooter />
             <WhatsAppFloatButton />
         </div>
     );
-}
+}

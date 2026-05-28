@@ -139,5 +139,23 @@
 
     body {
         @apply bg-background text-foreground;
+        background-color: var(--tm-bg, #0e0e0f);
+        color: var(--tm-text, #e5e2e3);
     }
+}
+
+/* Base TraceMem Tokens to prevent FOUC */
+:root {
+    --tm-bg: #0e0e0f;
+    --tm-surface: #131314;
+    --tm-surface-2: #1c1b1c;
+    --tm-surface-3: #201f20;
+    --tm-surface-high: #353436;
+    
+    --tm-primary: #fbabff;
+    --tm-primary-deep: #a200ba;
+    
+    --tm-text: #e5e2e3;
+    --tm-text-muted: #d6c0d3;
+    --tm-text-dim: #9f8b9d;
 }

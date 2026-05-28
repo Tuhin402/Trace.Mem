@@ -21,11 +21,13 @@
 
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: #ffffff;
+                color: #0e0e0f;
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: #0e0e0f;
+                color: #e5e2e3;
             }
         </style>
 

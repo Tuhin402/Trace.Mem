@@ -15,7 +15,7 @@ const snippets = {
 
 # Initialise the TraceMem client
 TM_KEY = "cmlive_your_key_here"
-BASE   = "https://tracemem.io/api/v1"
+BASE   = "https://tracemem.one/api/v1"
 
 # ── Store a memory ──────────────────────────────────
 response = requests.post(
@@ -41,7 +41,7 @@ print(context.json())   # → [{"content": "User prefers concise ..."}]`,
 
 // Initialise the TraceMem client
 const TM_KEY = "cmlive_your_key_here";
-const BASE   = "https://tracemem.io/api/v1";
+const BASE   = "https://tracemem.one/api/v1";
 const auth   = { headers: { Authorization: \`Bearer \${TM_KEY}\` } };
 
 // ── Store a memory ──────────────────────────────────
@@ -63,7 +63,7 @@ console.log(data); // → [{ content: "User prefers concise ..." }]`,
 
 // Initialise the TraceMem client
 $key  = 'cmlive_your_key_here';
-$base = 'https://tracemem.io/api/v1';
+$base = 'https://tracemem.one/api/v1';
 
 // ── Store a memory ──────────────────────────────────
 Http::withToken($key)->post("{$base}/remember", [
@@ -94,21 +94,21 @@ const howSteps = [
     {
         phase: 'Phase 02',
         title: 'Recall',
-        desc: 'On every new request, TraceMem retrieves the most semantically relevant memories — ranked by recency, salience, and context match.',
+        desc: 'On every new request, TraceMem retrieves the most semantically relevant memories, ranked by recency, salience, and context match.',
         icon: <Zap size={40} strokeWidth={1.5} />,
-        viDesc: 'The right memories surface instantly — ranked by relevance, not just recency.',
+        viDesc: 'The right memories surface instantly, ranked by relevance, not just recency.',
     },
     {
         phase: 'Phase 03',
         title: 'Context Assembly',
-        desc: 'Retrieved memories are assembled into a compact, prompt-ready context block — injected seamlessly before your LLM call.',
+        desc: 'Retrieved memories are assembled into a compact, prompt-ready context block, injected seamlessly before your LLM call.',
         icon: <PackageCheck size={40} strokeWidth={1.5} />,
         viDesc: 'Memories are assembled into a lean context block. Zero token waste. Instant injection.',
     },
     {
         phase: 'Phase 04',
         title: 'Conflict Resolution',
-        desc: 'When contradicting memories exist, TraceMem resolves conflicts automatically — keeping context accurate and coherent over time.',
+        desc: 'When contradicting memories exist, TraceMem resolves conflicts automatically, keeping context accurate and coherent over time.',
         icon: <GitMerge size={40} strokeWidth={1.5} />,
         viDesc: 'Contradictions detected and resolved automatically. Memory stays accurate forever.',
     },
@@ -124,7 +124,7 @@ type UseCase = {
 const useCases: UseCase[] = [
     {
         tab: 'SaaS Copilots',
-        desc: 'Give your product AI a persistent identity. Remember user preferences, workflow habits, and goals across every session — no repeated onboarding.',
+        desc: 'Give your product AI a persistent identity. Remember user preferences, workflow habits, and goals across every session, no repeated onboarding.',
         cards: [
             {
                 icon: <Brain size={22} />,
@@ -147,7 +147,7 @@ const useCases: UseCase[] = [
             {
                 icon: <MessageSquare size={22} />,
                 title: 'Zero context re-entry',
-                desc: 'The support agent knows the full history — ticket types, resolutions, and user sentiment — from day one.',
+                desc: 'The support agent knows the full history, ticket types, resolutions, and user sentiment, from day one.',
                 tag: 'Support · Efficiency',
             },
             {
@@ -160,7 +160,7 @@ const useCases: UseCase[] = [
     },
     {
         tab: 'Internal Tools',
-        desc: 'Build internal AI assistants that know your team\'s processes, preferences, and history — without storing sensitive data in raw prompts.',
+        desc: 'Build internal AI assistants that know your team\'s processes, preferences, and history, without storing sensitive data in raw prompts.',
         cards: [
             {
                 icon: <Shield size={22} />,
@@ -171,14 +171,14 @@ const useCases: UseCase[] = [
             {
                 icon: <LayoutGrid size={22} />,
                 title: 'Process & workflow recall',
-                desc: 'The AI remembers your SOPs, team norms, and recurring decisions — reducing onboarding time.',
+                desc: 'The AI remembers your SOPs, team norms, and recurring decisions, reducing onboarding time.',
                 tag: 'Internal · Ops',
             },
         ],
     },
     {
         tab: 'Developer Platforms',
-        desc: 'Embed persistent AI memory directly into your developer platform — giving each user\'s agent a unique, persistent memory layer.',
+        desc: 'Embed persistent AI memory directly into your developer platform, giving each user\'s agent a unique, persistent memory layer.',
         cards: [
             {
                 icon: <Code2 size={22} />,
@@ -189,7 +189,7 @@ const useCases: UseCase[] = [
             {
                 icon: <Layers size={22} />,
                 title: 'Usage-based, predictable pricing',
-                desc: 'Pay per active session — not per token. Your costs scale linearly with real usage.',
+                desc: 'Pay per active session, not per token. Your costs scale linearly with real usage.',
                 tag: 'Dev · Pricing',
             },
         ],
@@ -202,17 +202,17 @@ const uspCards: UspCardData[] = [
     {
         iconName: 'brain',
         title: 'Semantic Extraction',
-        desc: 'Raw interactions are parsed with AI to extract structured facts, preferences, and intent — not just raw text.',
+        desc: 'Raw interactions are parsed with AI to extract structured facts, preferences, and intent, not just raw text.',
     },
     {
         iconName: 'zap',
         title: 'AI-First Memory Intelligence',
-        desc: 'Memory is stored, ranked, and retrieved using embeddings — no hand-crafted schemas or keyword matching.',
+        desc: 'Memory is stored, ranked, and retrieved using embeddings, no hand-crafted schemas or keyword matching.',
     },
     {
         iconName: 'layers',
         title: 'Context Assembly',
-        desc: 'Relevant memories are assembled into compact, prompt-ready blocks — injected just-in-time before your LLM call.',
+        desc: 'Relevant memories are assembled into compact, prompt-ready blocks, injected just-in-time before your LLM call.',
     },
     {
         iconName: 'shield',
@@ -227,7 +227,7 @@ const uspCards: UspCardData[] = [
     {
         iconName: 'users',
         title: 'Conflict Resolution',
-        desc: 'Contradicting memories are detected and resolved automatically — keeping long-term context coherent and accurate.',
+        desc: 'Contradicting memories are detected and resolved automatically, keeping long-term context coherent and accurate.',
     },
 ];
 
@@ -235,11 +235,11 @@ const uspCards: UspCardData[] = [
 const faqItems = [
     {
         q: 'What does TraceMem store?',
-        a: 'TraceMem stores structured semantic memories — extracted facts, preferences, skills, and user intent — not raw chat logs. Only meaningful, structured information is persisted, keeping storage lean and retrieval fast.',
+        a: 'TraceMem stores structured semantic memories, extracted facts, preferences, skills, and user intent, not raw chat logs. Only meaningful, structured information is persisted, keeping storage lean and retrieval fast.',
     },
     {
         q: 'How does TraceMem differ from standard RAG?',
-        a: 'Standard RAG is optimised for document retrieval from static sources. TraceMem is built for episodic and semantic user memory — extracting implicit preferences, user behaviour patterns, and stateful context over time, rather than just searching PDFs.',
+        a: 'Standard RAG is optimised for document retrieval from static sources. TraceMem is built for episodic and semantic user memory, extracting implicit preferences, user behaviour patterns, and stateful context over time, rather than just searching PDFs.',
     },
     {
         q: 'Is it model-agnostic? Can I use my own LLM?',
@@ -251,16 +251,16 @@ const faqItems = [
     },
     {
         q: 'Do you offer test keys to try it out?',
-        a: 'Yes. Test keys are semantic-only and rate-limited — perfect for prototyping and integration testing before going live. No credit card required.',
+        a: 'Yes. Test keys are semantic-only and rate-limited, perfect for prototyping and integration testing before going live. No credit card required.',
     },
 ];
 
 /* ── Devs tabs ────────────────────────────────────────────── */
 type DevsTab = 'efficiency' | 'visibility' | 'control';
 const devsTabs: { key: DevsTab; label: string; stat: string; statLabel: string; desc: string }[] = [
-    { key: 'efficiency',  label: 'Efficiency',  stat: '85%',  statLabel: 'Reduction in Token Usage',   desc: 'TraceMem eliminates redundant context — your LLM only sees what matters.' },
+    { key: 'efficiency',  label: 'Efficiency',  stat: '85%',  statLabel: 'Reduction in Token Usage',   desc: 'TraceMem eliminates redundant context, your LLM only sees what matters.' },
     { key: 'visibility',  label: 'Visibility',  stat: '<50ms', statLabel: 'Memory Retrieval Latency', desc: 'Sub-50ms vector search under the hood. Zero perceptible latency in production.' },
-    { key: 'control',     label: 'Control',     stat: '100%', statLabel: 'Tenant Isolated',            desc: 'Every memory is scoped cryptographically. No cross-tenant leakage — ever.' },
+    { key: 'control',     label: 'Control',     stat: '100%', statLabel: 'Tenant Isolated',            desc: 'Every memory is scoped cryptographically. No cross-tenant leakage, ever.' },
 ];
 
 function UspIcon({ name }: { name: UspCardData['iconName'] }) {
@@ -312,12 +312,12 @@ export default function Landing() {
                 <meta property="og:title"       content="TraceMem" />
                 <meta property="og:description" content="Long-term memory infrastructure for AI applications." />
                 <meta property="og:type"        content="website" />
-                <meta property="og:url"         content="https://tracemem.io" />
-                <meta property="og:image"       content="https://tracemem.io/og-image.png" />
+                <meta property="og:url"         content="https://tracemem.one" />
+                <meta property="og:image"       content="https://tracemem.one/og-image.png" />
                 <meta name="twitter:card"        content="summary_large_image" />
                 <meta name="twitter:title"       content="TraceMem" />
                 <meta name="twitter:description" content="Long-term memory infrastructure for AI applications." />
-                <link rel="canonical"            href="https://tracemem.io" />
+                <link rel="canonical"            href="https://tracemem.one" />
             </Helmet>
 
             <Head title="TraceMem | Long-Term Contextual Memory Infrastructure" />
@@ -339,7 +339,7 @@ export default function Landing() {
                     <p className="hero-subtext">
                         The drop-in semantic layer for LLMs. Store structured memories,
                         recall relevant context instantly, and assemble prompt-ready
-                        knowledge — built for production scale.
+                        knowledge, built for production scale.
                     </p>
 
                     <div className="hero-typewriter" aria-live="polite">
@@ -404,7 +404,7 @@ export default function Landing() {
                                 { icon: <Zap size={16} />,    title: 'Sub-50ms Latency',      desc: 'Optimised vector search under the hood.' },
                                 { icon: <Shield size={16} />, title: 'Tenant Isolation',      desc: 'Strict cryptographic boundaries per user.' },
                                 { icon: <Brain size={16} />,  title: 'Semantic Extraction',   desc: 'Structured facts, not raw chat transcripts.' },
-                                { icon: <Code2 size={16} />,  title: 'Model Agnostic',        desc: 'Works with any LLM — OpenAI, Anthropic, or your own.' },
+                                { icon: <Code2 size={16} />,  title: 'Model Agnostic',        desc: 'Works with any LLM, OpenAI, Anthropic, or your own.' },
                             ].map((f) => (
                                 <div className="devs-feature-item" key={f.title}>
                                     <div className="devs-feature-icon">{f.icon}</div>

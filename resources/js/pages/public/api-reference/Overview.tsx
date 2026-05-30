@@ -13,14 +13,14 @@ export default function Overview() {
                 <meta property="og:title" content="TraceMem API Reference" />
                 <meta property="og:description" content="Full documentation for the TraceMem REST API. Learn how to store, recall, and contextually assemble memory for modern AI and LLM apps." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.io/api-reference" />
+                <meta property="og:url" content="https://tracemem.one/api-reference" />
             </Helmet>
 
             <Head title="API Reference Overview" />
 
             <ApiReferencePage
                 title="TraceMem REST API"
-                description="A developer-first memory layer for AI applications. Store structured meaning, recall semantically relevant memories, and assemble prompt-ready context — all over a clean, authenticated REST interface."
+                description="A developer-first memory layer for AI applications. Store structured meaning, recall semantically relevant memories, and assemble prompt-ready context, all over a clean, authenticated REST interface."
                 endpoint="/api/v1"
                 method="OVERVIEW"
                 auth="Bearer API tokens are required for all protected endpoints. Test keys (cmtest_) use semantic-only mode with rate limits. Live keys (cmlive_) unlock AI-first mode and higher throughput."

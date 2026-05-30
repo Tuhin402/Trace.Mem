@@ -28,7 +28,7 @@ export default function Recall() {
                     python: `import requests
 
 response = requests.post(
-    "https://tracemem.io/api/v1/recall",
+    "https://tracemem.one/api/v1/recall",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={"limit": 5}
 )
@@ -39,14 +39,14 @@ for memory in memories:
                     javascript: `import axios from "axios";
 
 const { data } = await axios.post(
-  "https://tracemem.io/api/v1/recall",
+  "https://tracemem.one/api/v1/recall",
   { limit: 5 },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );
 
 data.memories.forEach((m) => console.log(m.content, m.score));`,
                     php: `$response = Http::withToken('cmlive_xxx')
-    ->post('https://tracemem.io/api/v1/recall', [
+    ->post('https://tracemem.one/api/v1/recall', [
         'limit' => 5,
     ]);
 
@@ -54,14 +54,14 @@ $memories = $response->json('memories');
 foreach ($memories as $memory) {
     echo $memory['content'] . PHP_EOL;
 }`,
-                    curl: `curl -X POST "https://tracemem.io/api/v1/recall" \\
+                    curl: `curl -X POST "https://tracemem.one/api/v1/recall" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{ "limit": 5 }'`,
                     java: `String body = "{\"limit\":5}";
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://tracemem.io/api/v1/recall"))
+    .uri(URI.create("https://tracemem.one/api/v1/recall"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -71,7 +71,7 @@ HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
                     go: `reqBody := strings.NewReader(\`{"limit":5}\`)
 
-req, _ := http.NewRequest("POST", "https://tracemem.io/api/v1/recall", reqBody)
+req, _ := http.NewRequest("POST", "https://tracemem.one/api/v1/recall", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
 req.Header.Set("Content-Type", "application/json")
 

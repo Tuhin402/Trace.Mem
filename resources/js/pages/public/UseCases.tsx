@@ -47,12 +47,12 @@ const useCases: UseCase[] = [
         tab: 'SaaS Copilots',
         eyebrow: 'SaaS · Copilot Products',
         headline: 'Give your copilot a persistent identity across every session.',
-        lead: 'TraceMem stores structured user preferences, goals, and workflow habits. Each session picks up exactly where the last one left off — without re-prompting the user.',
+        lead: 'TraceMem stores structured user preferences, goals, and workflow habits. Each session picks up exactly where the last one left off, without re-prompting the user.',
         cards: [
             {
                 icon: <Brain size={22} />,
                 title: 'Persistent user preferences',
-                body: 'Store user tone preferences, response format choices, and stated goals as structured memory. The copilot recalls them on every subsequent request — no repeat questions.',
+                body: 'Store user tone preferences, response format choices, and stated goals as structured memory. The copilot recalls them on every subsequent request, no repeat questions.',
                 tag: 'SaaS · Onboarding',
             },
             {
@@ -67,12 +67,12 @@ const useCases: UseCase[] = [
         tab: 'Support Assistants',
         eyebrow: 'Support · Automation',
         headline: 'Stop making users repeat themselves. Give your support bot real memory.',
-        lead: 'TraceMem recalls past tickets, resolutions, and user-stated issues — so your support assistant can respond with full context from the first message.',
+        lead: 'TraceMem recalls past tickets, resolutions, and user-stated issues, so your support assistant can respond with full context from the first message.',
         cards: [
             {
                 icon: <MessageSquare size={22} />,
                 title: 'Zero context re-entry',
-                body: 'The support agent knows the full resolution history for each user. It recalls past ticket types, stated problems, and agent handoffs — from the first message of a new thread.',
+                body: 'The support agent knows the full resolution history for each user. It recalls past ticket types, stated problems, and agent handoffs, from the first message of a new thread.',
                 tag: 'Support · Efficiency',
             },
             {
@@ -86,13 +86,13 @@ const useCases: UseCase[] = [
     {
         tab: 'Internal AI Tools',
         eyebrow: 'Internal · Teams',
-        headline: 'Build internal assistants that know your team\'s processes — without raw prompt exposure.',
-        lead: 'TraceMem gives internal AI tools structured, tenant-isolated memory per team. SOPs, norms, and recurring decisions are recalled on demand — not pasted into every prompt.',
+        headline: 'Build internal assistants that know your team\'s processes, without raw prompt exposure.',
+        lead: 'TraceMem gives internal AI tools structured, tenant-isolated memory per team. SOPs, norms, and recurring decisions are recalled on demand, not pasted into every prompt.',
         cards: [
             {
                 icon: <Lock size={22} />,
                 title: 'Tenant-isolated team memory',
-                body: 'Each team\'s memory is stored under a strict tenant boundary. HR, Finance, and Engineering memory never intersects — isolated at the data layer, not just at the application layer.',
+                body: 'Each team\'s memory is stored under a strict tenant boundary. HR, Finance, and Engineering memory never intersects, isolated at the data layer, not just at the application layer.',
                 tag: 'Internal · Security',
             },
             {
@@ -107,7 +107,7 @@ const useCases: UseCase[] = [
         tab: 'Developer Platforms',
         eyebrow: 'Developer · API Platforms',
         headline: 'Embed persistent memory into every user\'s AI agent via a clean REST API.',
-        lead: 'TraceMem is API-first. Add structured memory to your platform in a single integration — then each user gets their own scoped memory layer that grows with their usage.',
+        lead: 'TraceMem is API-first. Add structured memory to your platform in a single integration, then each user gets their own scoped memory layer that grows with their usage.',
         cards: [
             {
                 icon: <Code2 size={22} />,
@@ -118,7 +118,7 @@ const useCases: UseCase[] = [
             {
                 icon: <Users size={22} />,
                 title: 'Per-user memory scoping',
-                body: 'Each API call is scoped to a user_id. Memory is isolated per user automatically — so a single integration supports thousands of distinct memory contexts without extra configuration.',
+                body: 'Each API call is scoped to a user_id. Memory is isolated per user automatically, so a single integration supports thousands of distinct memory contexts without extra configuration.',
                 tag: 'Dev · Multitenancy',
             },
         ],
@@ -132,13 +132,13 @@ const useCases: UseCase[] = [
             {
                 icon: <Cpu size={22} />,
                 title: 'Cross-run memory persistence',
-                body: 'Each agent task run can write and read structured memory. Decisions made in run 1 are available in run 10 — scoped to the user or task context and recalled semantically.',
+                body: 'Each agent task run can write and read structured memory. Decisions made in run 1 are available in run 10, scoped to the user or task context and recalled semantically.',
                 tag: 'Agents · State',
             },
             {
                 icon: <GitMerge size={22} />,
                 title: 'Conflict-aware memory updates',
-                body: 'When an agent writes memory that contradicts prior state, TraceMem detects and resolves the conflict — keeping long-term context accurate without requiring agent-side logic.',
+                body: 'When an agent writes memory that contradicts prior state, TraceMem detects and resolves the conflict, keeping long-term context accurate without requiring agent-side logic.',
                 tag: 'Agents · Consistency',
             },
         ],
@@ -147,12 +147,12 @@ const useCases: UseCase[] = [
         tab: 'Personalized Experiences',
         eyebrow: 'Personalization · AI Products',
         headline: 'Build AI products that genuinely adapt to each individual user over time.',
-        lead: 'TraceMem stores behavioral patterns, stated preferences, and interaction history as structured memory — enabling real personalization without hard-coded user profiles.',
+        lead: 'TraceMem stores behavioral patterns, stated preferences, and interaction history as structured memory, enabling real personalization without hard-coded user profiles.',
         cards: [
             {
                 icon: <SlidersHorizontal size={22} />,
                 title: 'Behavioral memory extraction',
-                body: 'Raw user interactions are parsed and structured. Facts, preferences, and intent signals are extracted and stored — not raw transcripts. Only meaningful memory is kept.',
+                body: 'Raw user interactions are parsed and structured. Facts, preferences, and intent signals are extracted and stored, not raw transcripts. Only meaningful memory is kept.',
                 tag: 'Personalization · Behavior',
             },
             {
@@ -173,12 +173,12 @@ const workflowSteps = [
         phase: '01',
         title: 'Input Arrives',
         desc: 'A user message or agent output is received. TraceMem receives the raw content via the /remember endpoint.',
-        visual: 'The raw input is passed to the memory engine — unstructured text, chat turns, or agent output.',
+        visual: 'The raw input is passed to the memory engine, unstructured text, chat turns, or agent output.',
     },
     {
         phase: '02',
         title: 'Memory Segmentation',
-        desc: 'The input is parsed and segmented into discrete memory units — facts, preferences, intent, and behavioral signals.',
+        desc: 'The input is parsed and segmented into discrete memory units, facts, preferences, intent, and behavioral signals.',
         visual: 'AI extraction identifies what matters: structured facts are isolated, noise is discarded.',
     },
     {
@@ -190,14 +190,14 @@ const workflowSteps = [
     {
         phase: '04',
         title: 'Semantic Recall',
-        desc: 'On the next request, /recall retrieves the most relevant memories — ranked by semantic similarity, recency, and salience.',
-        visual: 'Vector search surfaces the entries most relevant to the current query — not just the most recent.',
+        desc: 'On the next request, /recall retrieves the most relevant memories, ranked by semantic similarity, recency, and salience.',
+        visual: 'Vector search surfaces the entries most relevant to the current query, not just the most recent.',
     },
     {
         phase: '05',
         title: 'Context Assembly',
-        desc: 'Retrieved memories are assembled into a compact, prompt-ready context block — injected just before your LLM call.',
-        visual: 'A structured, minimal context string is returned — ready to prepend to any prompt without token waste.',
+        desc: 'Retrieved memories are assembled into a compact, prompt-ready context block, injected just before your LLM call.',
+        visual: 'A structured, minimal context string is returned, ready to prepend to any prompt without token waste.',
     },
 ];
 
@@ -208,7 +208,7 @@ const productFitItems = [
     {
         icon: <MessageSquare size={20} />,
         title: 'User Assistants',
-        desc: 'Products where users interact repeatedly over time benefit from memory that persists across sessions — eliminating redundant context and making responses feel consistent.',
+        desc: 'Products where users interact repeatedly over time benefit from memory that persists across sessions, eliminating redundant context and making responses feel consistent.',
     },
     {
         icon: <Shield size={20} />,
@@ -223,7 +223,7 @@ const productFitItems = [
     {
         icon: <Database size={20} />,
         title: 'Internal AI Tools',
-        desc: 'Internal tools powered by AI need process memory — SOPs, team norms, and decision history — recalled on demand without exposing sensitive data in raw prompts.',
+        desc: 'Internal tools powered by AI need process memory, SOPs, team norms, and decision history, recalled on demand without exposing sensitive data in raw prompts.',
     },
     {
         icon: <Cpu size={20} />,
@@ -233,7 +233,7 @@ const productFitItems = [
     {
         icon: <Network size={20} />,
         title: 'AI Products with Repeated Context',
-        desc: 'Any AI product where users repeatedly provide the same background benefits from structured memory — reducing input overhead and improving response quality.',
+        desc: 'Any AI product where users repeatedly provide the same background benefits from structured memory, reducing input overhead and improving response quality.',
     },
 ];
 
@@ -245,19 +245,19 @@ const archPillars = [
         num: '01',
         icon: <Lock size={18} />,
         title: 'Scoped Memory',
-        desc: 'Every memory entry is bound to a user_id and tenant. Reads and writes are strictly isolated — no cross-user leakage at the data layer.',
+        desc: 'Every memory entry is bound to a user_id and tenant. Reads and writes are strictly isolated, no cross-user leakage at the data layer.',
     },
     {
         num: '02',
         icon: <Brain size={18} />,
         title: 'Structured Extraction',
-        desc: 'Raw content is parsed by an AI extraction layer that identifies facts, preferences, and intent — discarding noise and storing only structured memory units.',
+        desc: 'Raw content is parsed by an AI extraction layer that identifies facts, preferences, and intent, discarding noise and storing only structured memory units.',
     },
     {
         num: '03',
         icon: <Filter size={18} />,
         title: 'Deduplication',
-        desc: 'New entries are compared against existing memory before storage. Equivalent memories are merged rather than duplicated — keeping storage lean and retrieval precise.',
+        desc: 'New entries are compared against existing memory before storage. Equivalent memories are merged rather than duplicated, keeping storage lean and retrieval precise.',
     },
     {
         num: '04',
@@ -269,13 +269,13 @@ const archPillars = [
         num: '05',
         icon: <Zap size={18} />,
         title: 'Recall Ranking',
-        desc: 'Retrieved memories are scored by semantic similarity to the query, recency weighting, and salience — returning the most relevant context, not just the most recent.',
+        desc: 'Retrieved memories are scored by semantic similarity to the query, recency weighting, and salience, returning the most relevant context, not just the most recent.',
     },
     {
         num: '06',
         icon: <PackageCheck size={18} />,
         title: 'Context Assembly',
-        desc: 'Ranked memories are assembled into a compact, structured context string — returned prompt-ready so it can be injected before any LLM call with no extra formatting.',
+        desc: 'Ranked memories are assembled into a compact, structured context string, returned prompt-ready so it can be injected before any LLM call with no extra formatting.',
     },
 ];
 
@@ -299,7 +299,7 @@ export default function UseCases() {
                 <title>Use Cases | TraceMem</title>
                 <meta
                     name="description"
-                    content="Explore how TraceMem powers real AI use cases — SaaS copilots, support assistants, internal tools, agent workflows, and personalized AI experiences. Persistent, structured, tenant-isolated memory for LLM applications."
+                    content="Explore how TraceMem powers real AI use cases, SaaS copilots, support assistants, internal tools, agent workflows, and personalized AI experiences. Persistent, structured, tenant-isolated memory for LLM applications."
                 />
                 <meta
                     name="keywords"
@@ -308,15 +308,15 @@ export default function UseCases() {
                 <meta property="og:title" content="TraceMem Use Cases" />
                 <meta property="og:description" content="See how TraceMem enables persistent, structured AI memory across SaaS copilots, support bots, internal tools, and autonomous agents." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.io/usecases" />
-                <link rel="canonical" href="https://tracemem.io/usecases" />
+                <meta property="og:url" content="https://tracemem.one/usecases" />
+                <link rel="canonical" href="https://tracemem.one/usecases" />
             </Helmet>
 
             <Head title="Use Cases" />
 
             <div className="uc-shell">
 
-                {/* ══ 1. PAGE HEADER — slim, focused, distinct from Landing hero ══ */}
+                {/* ══ 1. PAGE HEADER, slim, focused, distinct from Landing hero ══ */}
                 <section className="uc-page-header" aria-label="Use Cases page header">
                     <div className="uc-inner uc-page-header-inner">
                         <div className="uc-page-header-badges" aria-hidden="true">
@@ -398,7 +398,7 @@ export default function UseCases() {
                             <div className="uc-panel-intro">
                                 <p className="uc-panel-intro-text">
                                     The two key capabilities below show exactly how TraceMem
-                                    makes this possible — structured, scoped, and ready to
+                                    makes this possible, structured, scoped, and ready to
                                     drop into your existing stack with no infrastructure changes.
                                 </p>
                             </div>
@@ -431,7 +431,7 @@ export default function UseCases() {
                             </h2>
                             <p className="uc-section-lead">
                                 Every message that passes through TraceMem follows the same
-                                deterministic pipeline — extract, deduplicate, rank, assemble.
+                                deterministic pipeline, extract, deduplicate, rank, assemble.
                             </p>
                         </div>
 
@@ -517,8 +517,8 @@ export default function UseCases() {
                                 Where TraceMem fits best.
                             </h2>
                             <p className="uc-section-lead uc-section-lead--center">
-                                Any AI product where users interact repeatedly — and where
-                                repetitive context is a friction point — is a strong fit for
+                                Any AI product where users interact repeatedly, and where
+                                repetitive context is a friction point, is a strong fit for
                                 structured persistent memory.
                             </p>
                         </div>
@@ -557,7 +557,7 @@ export default function UseCases() {
                                 <p className="uc-arch-lead">
                                     TraceMem is not a vector database wrapper. It is a purpose-built
                                     memory engine with structured extraction, deduplication, conflict
-                                    resolution, and ranked recall — operating as a managed API layer
+                                    resolution, and ranked recall, operating as a managed API layer
                                     between your application and your LLM.
                                 </p>
                                 <div className="uc-arch-cta">
@@ -584,7 +584,7 @@ export default function UseCases() {
                     </div>
                 </section>
 
-                {/* ══ 8. CTA — minimal gradient strip ════════════════════ */}
+                {/* ══ 8. CTA, minimal gradient strip ════════════════════ */}
                 <section className="uc-cta-strip" aria-label="Call to action">
                     <div className="uc-cta-strip-glow" aria-hidden="true" />
                     <div className="uc-inner uc-cta-strip-inner">
@@ -595,7 +595,7 @@ export default function UseCases() {
                                 <span className="uc-cta-strip-accent"> For every user.</span>
                             </h2>
                             <p className="uc-cta-strip-desc">
-                                Integrate via REST in minutes — test key included, no credit card, no infra changes.
+                                Integrate via REST in minutes, test key included, no credit card, no infra changes.
                             </p>
                         </div>
                         <div className="uc-cta-strip-actions">

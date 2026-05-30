@@ -79,7 +79,7 @@ const CANCEL_REASONS = [
     'Missing features I need for my workflow',
     'Switching to a different memory / context solution',
     'Technical issues or reliability concerns',
-    'Just taking a break — I plan to return later',
+    'Just taking a break, I plan to return later',
 ];
 
 /* ── Helpers ─────────────────────────────────────────────── */
@@ -247,7 +247,7 @@ function CancelModal({
                 {/* Reason selection */}
                 <div className="bl-modal-body">
                     <p className="bl-modal-reason-heading">
-                        Before you go — please tell us why you're cancelling:
+                        Before you go, please tell us why you're cancelling:
                     </p>
                     <div className="bl-reason-list">
                         {CANCEL_REASONS.map((r) => (
@@ -486,7 +486,7 @@ export default function Billing() {
                             {cancelOpen && (
                                 <div className="bl-cancel-body">
                                     <p className="bl-cancel-desc">
-                                        Cancelling will <strong>immediately revoke</strong> all paid features —
+                                        Cancelling will <strong>immediately revoke</strong> all paid features -
                                         live keys, memory write quota, and higher rate limits.
                                         You will drop to the free tier right away.
                                     </p>

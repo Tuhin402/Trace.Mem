@@ -21,26 +21,26 @@ export default function Health() {
                 snippets={{
                     python: `import requests
 
-response = requests.get("https://tracemem.io/api/v1/health")
+response = requests.get("https://tracemem.one/api/v1/health")
 print(response.json())
 # {"ok": true, "service": "memory-layer", "version": "1.0.0"}`,
-                    javascript: `const res  = await fetch("https://tracemem.io/api/v1/health");
+                    javascript: `const res  = await fetch("https://tracemem.one/api/v1/health");
 const data = await res.json();
 console.log(data);
 // { ok: true, service: "memory-layer", version: "1.0.0" }`,
-                    php: `$response = Http::get('https://tracemem.io/api/v1/health')->json();
+                    php: `$response = Http::get('https://tracemem.one/api/v1/health')->json();
 // ["ok" => true, "service" => "memory-layer", "version" => "1.0.0"]`,
-                    curl: `curl "https://tracemem.io/api/v1/health"
+                    curl: `curl "https://tracemem.one/api/v1/health"
 # {"ok":true,"service":"memory-layer","version":"1.0.0"}`,
                     java: `HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://tracemem.io/api/v1/health"))
+    .uri(URI.create("https://tracemem.one/api/v1/health"))
     .GET()
     .build();
 
 HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());
 System.out.println(response.body());`,
-                    go: `resp, _ := http.Get("https://tracemem.io/api/v1/health")
+                    go: `resp, _ := http.Get("https://tracemem.one/api/v1/health")
 defer resp.Body.Close()
 
 body, _ := io.ReadAll(resp.Body)

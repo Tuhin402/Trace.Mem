@@ -220,7 +220,7 @@ export default function Pricing() {
                 <title>Pricing | TraceMem</title>
                 <meta
                     name="description"
-                    content="Transparent pricing for TraceMem AI memory infrastructure. Compare Semantic Starter and AI First Pro — semantic search, AI extraction, context assembly, and developer-friendly APIs."
+                    content="Transparent pricing for TraceMem AI memory infrastructure. Compare Semantic Starter and AI First Pro, semantic search, AI extraction, context assembly, and developer-friendly APIs."
                 />
                 <meta
                     name="keywords"
@@ -229,8 +229,8 @@ export default function Pricing() {
                 <meta property="og:title" content="TraceMem Pricing" />
                 <meta property="og:description" content="Simple, transparent pricing for persistent AI memory infrastructure." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.io/pricing" />
-                <link rel="canonical" href="https://tracemem.io/pricing" />
+                <meta property="og:url" content="https://tracemem.one/pricing" />
+                <link rel="canonical" href="https://tracemem.one/pricing" />
             </Helmet>
 
             <Head title="Pricing" />

@@ -18,7 +18,7 @@ const memoryTypes = [
         key: 'fact',
         icon: <Pin size={22} />,
         title: 'Fact',
-        desc: 'Stable, objective information about the user or their world — names, roles, projects, affiliations, and declared knowledge. Facts form the stable foundation of the memory graph.',
+        desc: 'Stable, objective information about the user or their world, names, roles, projects, affiliations, and declared knowledge. Facts form the stable foundation of the memory graph.',
         examples: ['"Name: Sarah"', '"Role: ML Engineer"', '"Uses Python"'],
         badge: 'fact',
     },
@@ -26,7 +26,7 @@ const memoryTypes = [
         key: 'rule',
         icon: <Scale size={22} />,
         title: 'Rule',
-        desc: 'Constraints, invariants, and non-negotiables. Rules govern how the AI should or must behave in specific situations — they override general defaults and are strictly respected.',
+        desc: 'Constraints, invariants, and non-negotiables. Rules govern how the AI should or must behave in specific situations, they override general defaults and are strictly respected.',
         examples: ['"Never use jargon"', '"Always cite sources"', '"Respond in English"'],
         badge: 'rule',
     },
@@ -34,7 +34,7 @@ const memoryTypes = [
         key: 'skill',
         icon: <Wrench size={22} />,
         title: 'Skill',
-        desc: 'Capabilities, competencies, and areas of expertise. Skills describe what the user can do, knows how to do, or wants to learn — helping the AI calibrate explanations and suggestions appropriately.',
+        desc: 'Capabilities, competencies, and areas of expertise. Skills describe what the user can do, knows how to do, or wants to learn, helping the AI calibrate explanations and suggestions appropriately.',
         examples: ['"Knows React"', '"Beginner at ML"', '"Proficient in SQL"'],
         badge: 'skill',
     },
@@ -82,7 +82,7 @@ const flowSteps = [
         icon: <PackageCheck size={22} />,
         label: 'Assemble',
         title: 'Assemble',
-        desc: 'Retrieved memories are assembled into a compact, prompt-ready context block. Inject it before your LLM call — zero extra work.',
+        desc: 'Retrieved memories are assembled into a compact, prompt-ready context block. Inject it before your LLM call, zero extra work.',
     },
 ];
 
@@ -145,7 +145,7 @@ export default function Docs() {
                 <title>Documentation | TraceMem</title>
                 <meta
                     name="description"
-                    content="Official documentation for TraceMem — the context memory layer for AI applications. Learn how to store, recall, and assemble structured memory for LLMs."
+                    content="Official documentation for TraceMem, the context memory layer for AI applications. Learn how to store, recall, and assemble structured memory for LLMs."
                 />
                 <meta
                     name="keywords"
@@ -154,8 +154,8 @@ export default function Docs() {
                 <meta property="og:title" content="TraceMem Documentation" />
                 <meta property="og:description" content="Persistent memory infrastructure for AI and LLM applications." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.io/docs" />
-                <link rel="canonical" href="https://tracemem.io/docs" />
+                <meta property="og:url" content="https://tracemem.one/docs" />
+                <link rel="canonical" href="https://tracemem.one/docs" />
             </Helmet>
 
             <Head title="Documentation" />
@@ -179,7 +179,7 @@ export default function Docs() {
                             <p className="docs-hero-lead">
                                 TraceMem is the context memory layer for AI and LLM applications.
                                 Store structured memories, recall relevant context, and assemble
-                                prompt-ready knowledge — all through a simple REST API.
+                                prompt-ready knowledge, all through a simple REST API.
                             </p>
 
                             <div className="docs-hero-actions">
@@ -268,7 +268,7 @@ export default function Docs() {
                             </h2>
                             <p className="docs-section-lead">
                                 Most AI applications treat each conversation as stateless. TraceMem
-                                gives your AI a persistent, structured memory — so it learns and
+                                gives your AI a persistent, structured memory, so it learns and
                                 improves across every interaction.
                             </p>
                         </div>
@@ -281,8 +281,8 @@ export default function Docs() {
                                 </div>
                                 <h3 className="docs-gs-card-title">Persistent AI Memory</h3>
                                 <p className="docs-gs-card-desc">
-                                    TraceMem extracts structured memories — facts, preferences, rules,
-                                    and skills — from raw conversations and stores them persistently.
+                                    TraceMem extracts structured memories, facts, preferences, rules,
+                                    and skills, from raw conversations and stores them persistently.
                                     Your AI retains what matters, across sessions, users, and contexts.
                                 </p>
                             </div>
@@ -296,7 +296,7 @@ export default function Docs() {
                                 <p className="docs-gs-card-desc">
                                     Without structured memory, users repeat themselves. Responses
                                     become generic. TraceMem solves this by maintaining a rich,
-                                    user-specific context graph — recalling only what's relevant,
+                                    user-specific context graph, recalling only what's relevant,
                                     never flooding your prompt window.
                                 </p>
                             </div>
@@ -331,7 +331,7 @@ export default function Docs() {
                             </h2>
                             <p className="docs-section-lead center">
                                 TraceMem classifies every extracted memory into one of four semantic
-                                types. Each type is stored, retrieved, and assembled independently —
+                                types. Each type is stored, retrieved, and assembled independently,
                                 giving your AI precise, contextually correct recall.
                             </p>
                         </div>
@@ -380,7 +380,7 @@ export default function Docs() {
                             <p className="docs-section-lead center">
                                 A transparent, six-stage pipeline between your users and your LLM.
                                 Every memory passes through capture, normalization, extraction,
-                                deduplication, recall, and assembly — automatically.
+                                deduplication, recall, and assembly, automatically.
                             </p>
                         </div>
 
@@ -467,7 +467,7 @@ export default function Docs() {
                                     The official TraceMem Postman workspace contains every API
                                     endpoint, pre-filled with example request bodies, headers, and
                                     authentication templates. Fork it to your own workspace and
-                                    start testing immediately — no configuration required.
+                                    start testing immediately, no configuration required.
                                 </p>
 
                                 <div className="docs-postman-feature-list">
@@ -475,7 +475,7 @@ export default function Docs() {
                                         'All endpoints pre-configured with example payloads',
                                         'Environment variables for live and test API keys',
                                         'Ready-to-run /remember, /recall, and /assemble calls',
-                                        'Fork once — use forever in your own Postman account',
+                                        'Fork once, use forever in your own Postman account',
                                     ].map((feat) => (
                                         <div className="docs-postman-feature" key={feat}>
                                             <div
@@ -520,7 +520,7 @@ export default function Docs() {
                                 <div className="docs-postman-info-card">
                                     <div className="docs-postman-info-label">Base URL</div>
                                     <div className="docs-postman-info-value">
-                                        tracemem.io/api/v1
+                                        tracemem.one/api/v1
                                     </div>
                                     <div className="docs-postman-info-sub">
                                         All endpoints are versioned under /api/v1. The workspace

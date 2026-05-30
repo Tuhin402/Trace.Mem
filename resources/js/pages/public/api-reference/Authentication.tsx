@@ -30,45 +30,45 @@ export default function Authentication() {
 
 # Test key — semantic-only mode
 requests.get(
-    "https://tracemem.io/api/v1/health",
+    "https://tracemem.one/api/v1/health",
     headers={"Authorization": "Bearer cmtest_xxx"}
 )
 
 # Live key — AI-first mode
 requests.get(
-    "https://tracemem.io/api/v1/health",
+    "https://tracemem.one/api/v1/health",
     headers={"Authorization": "Bearer cmlive_xxx"}
 )`,
                     javascript: `// Test key — semantic-only mode
-fetch("https://tracemem.io/api/v1/health", {
+fetch("https://tracemem.one/api/v1/health", {
   headers: { Authorization: "Bearer cmtest_xxx" }
 });
 
 // Live key — AI-first mode
-fetch("https://tracemem.io/api/v1/health", {
+fetch("https://tracemem.one/api/v1/health", {
   headers: { Authorization: "Bearer cmlive_xxx" }
 });`,
                     php: `// Test key
-Http::withToken('cmtest_xxx')->get('https://tracemem.io/api/v1/health');
+Http::withToken('cmtest_xxx')->get('https://tracemem.one/api/v1/health');
 
 // Live key
-Http::withToken('cmlive_xxx')->get('https://tracemem.io/api/v1/health');`,
+Http::withToken('cmlive_xxx')->get('https://tracemem.one/api/v1/health');`,
                     curl: `# Test key — semantic-only mode
 curl -H "Authorization: Bearer cmtest_xxx" \\
-  https://tracemem.io/api/v1/health
+  https://tracemem.one/api/v1/health
 
 # Live key — AI-first mode
 curl -H "Authorization: Bearer cmlive_xxx" \\
-  https://tracemem.io/api/v1/health`,
+  https://tracemem.one/api/v1/health`,
                     java: `HttpRequest req = HttpRequest.newBuilder()
-    .uri(URI.create("https://tracemem.io/api/v1/health"))
+    .uri(URI.create("https://tracemem.one/api/v1/health"))
     .header("Authorization", "Bearer cmtest_xxx")
     .GET()
     .build();
 
 HttpResponse<String> res = HttpClient.newHttpClient()
     .send(req, HttpResponse.BodyHandlers.ofString());`,
-                    go: `req, _ := http.NewRequest("GET", "https://tracemem.io/api/v1/health", nil)
+                    go: `req, _ := http.NewRequest("GET", "https://tracemem.one/api/v1/health", nil)
 req.Header.Set("Authorization", "Bearer cmtest_xxx")
 
 client := &http.Client{}

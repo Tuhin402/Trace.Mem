@@ -165,10 +165,26 @@ class MemoryExtractionService extends BaseService
                 $type = $this->semanticSegmenter->detectSemanticType($content);
             }
 
+            // Build consistent metadata shape for AI-extracted items
+            $isCodeHeavy = $this->isCodeHeavyContent($content);
+
+            $metadata = [
+                'source_kind'   => $isCodeHeavy ? 'code_snippet' : 'plain',
+                'contains_code' => $isCodeHeavy,
+                'subject'       => 'general',
+                'source'        => 'ai_extraction',
+            ];
+
+            // Code-heavy AI output is gated the same way as pipeline code
+            if ($isCodeHeavy) {
+                $metadata['skip_storage'] = true;
+            }
+
             $result[] = [
-                'type' => $type,
-                'content' => $content,
+                'type'       => $type,
+                'content'    => $content,
                 'confidence' => 0.7,
+                'metadata'   => $metadata,
             ];
         }
 
@@ -178,5 +194,35 @@ class MemoryExtractionService extends BaseService
     private function fallbackExtract(string $input): array
     {
         return $this->semanticSegmenter->split($input);
+    }
+
+    /**
+     * Detect whether content is primarily code (fenced blocks, dense backticks,
+     * or high ratio of syntax-heavy characters).
+     */
+    private function isCodeHeavyContent(string $content): bool
+    {
+        // Fenced code blocks
+        if (preg_match('/```[\s\S]*?```/u', $content)) {
+            return true;
+        }
+
+        // Dense inline backtick usage (4+ backtick characters)
+        if (substr_count($content, '`') >= 4) {
+            return true;
+        }
+
+        // High ratio of syntax-heavy characters typical of code
+        $totalChars = mb_strlen($content, 'UTF-8');
+
+        if ($totalChars > 20) {
+            $specialChars = preg_match_all('/[{}()\[\];=><!@#$%^&*~]/u', $content);
+
+            if ($specialChars !== false && ($specialChars / $totalChars) > 0.15) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

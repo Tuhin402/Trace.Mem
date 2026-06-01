@@ -75,12 +75,39 @@ class MemoryScoringService
 
     public function recallScore(Memory $memory): float
     {
-        return round(
+        $score = (
             ((float) $memory->importance * 0.5) +
             ((float) $memory->confidence * 0.3) +
-            ((float) $memory->decay_score * 0.2),
-            4
+            ((float) $memory->decay_score * 0.2)
         );
+
+        $meta = is_array($memory->metadata) ? $memory->metadata : [];
+        $subject = $meta['subject'] ?? 'self';
+
+        // ── Subject-based adjustments ────────────────────────────
+        if ($subject === 'other') {
+            $score -= 0.12;
+        } elseif ($subject === 'general') {
+            $score -= 0.04;
+        }
+
+        // ── Code snippet scoring (explicit_remember promotes, otherwise demotes) ──
+        if (($meta['source_kind'] ?? null) === 'code_snippet') {
+            $score += ($meta['explicit_remember'] ?? false) ? 0.05 : -0.04;
+        }
+
+        // ── Transient instruction penalty ────────────────────────
+        if ($meta['transient'] ?? false) {
+            $score -= 0.08;
+        }
+
+        // ── Explicit remember boost ─────────────────────────────
+        if (($meta['explicit_remember'] ?? false)
+            && ($meta['source_kind'] ?? null) !== 'code_snippet') {
+            $score += 0.05;
+        }
+
+        return round(max(0.0, min($score, 1.0)), 4);
     }
 
     public function decayScore(Memory $memory): float

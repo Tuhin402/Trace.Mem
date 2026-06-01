@@ -24,13 +24,31 @@ class MemoryService
         string $userId,
         string $type,
         string $content,
-        float $confidence = 0.5
+        float $confidence = 0.5,
+        array $metadata = []
     ): Memory {
         $type = $this->sanitizeType($type);
 
-        return DB::transaction(function () use ($tenantId, $userId, $type, $content, $confidence) {
-            $normalizedContent = $this->normalizer->normalize($content);
+        return DB::transaction(function () use ($tenantId, $userId, $type, $content, $confidence, $metadata) {
+            // ── Transient confidence cap ─────────────────────────────
+            if ($metadata['transient'] ?? false) {
+                $confidence = min($confidence, 0.35);
+            }
+
+            // ── code-safe normalization branch ──────────────────────
+            $isCodeSnippet = (($metadata['source_kind'] ?? 'plain') === 'code_snippet');
+
+            $normalizedContent = $isCodeSnippet
+                ? $this->normalizer->normalizeCode($content)
+                : $this->normalizer->normalize($content);
+
             $contentHash = $this->normalizer->hash($tenantId, $userId, $type, $normalizedContent);
+
+            // ── merge pipeline metadata (preserve existing source tag) ─
+            $mergedMetadata = array_merge(
+                ['source' => 'semantic_segmenter'],
+                is_array($metadata) ? $metadata : []
+            );
 
             $existing = $this->deduper->findDuplicate($tenantId, $userId, $type, $contentHash);
 
@@ -38,6 +56,7 @@ class MemoryService
                 $existing->content = $content;
                 $existing->normalized_content = $normalizedContent;
                 $existing->content_hash = $contentHash;
+                $existing->metadata = $mergedMetadata;
                 $existing->importance = number_format(max(
                         (float) $existing->importance,
                         $this->scoring->baseImportance($type, $content)
@@ -64,6 +83,7 @@ class MemoryService
                 'decay_score' => 1.0,
                 'last_accessed_at' => null,
                 'access_count' => 0,
+                'metadata' => $mergedMetadata,
             ]);
 
             $this->conflicts->resolve($memory);
@@ -101,12 +121,23 @@ class MemoryService
                     continue;
                 }
 
+                // Forward segment metadata (if present) to store()
+                $segmentMetadata = is_array($item['metadata'] ?? null)
+                    ? $item['metadata']
+                    : [];
+
+                // Skip storage for gated items (e.g., raw code without explicit remember)
+                if ($segmentMetadata['skip_storage'] ?? false) {
+                    continue;
+                }
+
                 $saved[] = $this->store(
                     $tenantId,
                     $userId,
                     $type,
                     $content,
-                    (float) ($item['confidence'] ?? 0.5)
+                    (float) ($item['confidence'] ?? 0.5),
+                    $segmentMetadata
                 );
             }
 

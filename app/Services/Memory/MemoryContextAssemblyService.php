@@ -164,6 +164,29 @@ class MemoryContextAssemblyService
 
         $confidencePenalty = ((float) $memory->confidence < 0.4) ? 0.1 : 0.0;
 
+        // ── Metadata-aware adjustments ───────────────────────────
+        $meta = is_array($memory->metadata) ? $memory->metadata : [];
+        $metadataPenalty = 0.0;
+
+        // Code snippets without explicit_remember are deprioritized
+        if (($meta['source_kind'] ?? null) === 'code_snippet'
+            && ! ($meta['explicit_remember'] ?? false)) {
+            $metadataPenalty += 0.10;
+        }
+
+        // Third-party statements deprioritized unless query mentions the entity
+        if (($meta['subject'] ?? 'self') === 'other') {
+            $queryOverlapsMemory = count(array_intersect($queryTokens, $memoryTokens)) >= 2;
+            if (! $queryOverlapsMemory) {
+                $metadataPenalty += 0.08;
+            }
+        }
+
+        // Transient memories deprioritized in context assembly
+        if ($meta['transient'] ?? false) {
+            $metadataPenalty += 0.06;
+        }
+
         $final = $baseScore
             + $tokenOverlapBonus
             + $segmentBonus
@@ -171,21 +194,23 @@ class MemoryContextAssemblyService
             + $recencyBonus
             + $importanceBonus
             - $conflictPenalty
-            - $confidencePenalty;
+            - $confidencePenalty
+            - $metadataPenalty;
 
         return [
             'score' => max(0.0, $final),
             'breakdown' => [
-                'base_score' => round($baseScore, 4),
+                'base_score'          => round($baseScore, 4),
                 'token_overlap_bonus' => round($tokenOverlapBonus, 4),
-                'segment_bonus' => round($segmentBonus, 4),
-                'matched_segments' => array_values(array_unique($matchedSegments)),
-                'phrase_bonus' => round($phraseBonus, 4),
-                'recency_bonus' => round($recencyBonus, 4),
-                'importance_bonus' => round($importanceBonus, 4),
-                'conflict_penalty' => round($conflictPenalty, 4),
-                'confidence_penalty' => round($confidencePenalty, 4),
-                'final_score' => round(max(0.0, $final), 4),
+                'segment_bonus'       => round($segmentBonus, 4),
+                'matched_segments'    => array_values(array_unique($matchedSegments)),
+                'phrase_bonus'        => round($phraseBonus, 4),
+                'recency_bonus'       => round($recencyBonus, 4),
+                'importance_bonus'    => round($importanceBonus, 4),
+                'conflict_penalty'    => round($conflictPenalty, 4),
+                'confidence_penalty'  => round($confidencePenalty, 4),
+                'metadata_penalty'    => round($metadataPenalty, 4),
+                'final_score'         => round(max(0.0, $final), 4),
             ],
         ];
     }

@@ -8,6 +8,13 @@ class MemoryConflictService
 {
     private const CONFLICT_THRESHOLD = 0.65;
 
+    private const CONFLICTABLE_TYPES = [
+        'preference' => ['preference', 'rule'],
+        'rule'       => ['rule', 'preference', 'fact'],
+        'fact'       => ['fact', 'rule'],
+        'skill'      => ['skill'],
+    ];
+
     public function __construct(
         private readonly MemorySemanticSegmentationService $semanticSegmenter,
     ) {}
@@ -17,10 +24,19 @@ class MemoryConflictService
      */
     public function resolve(Memory $memory): void
     {
+        // ── Skip conflict checking for code snippets ─────────────
+        $incomingMeta = is_array($memory->metadata) ? $memory->metadata : [];
+        if (($incomingMeta['source_kind'] ?? null) === 'code_snippet') {
+            return;
+        }
+
+        // ── Cross-type conflict query ────────────────────────
+        $conflictTypes = self::CONFLICTABLE_TYPES[$memory->type] ?? [$memory->type];
+
         $others = Memory::query()
             ->where('tenant_id', $memory->tenant_id)
             ->where('user_id', $memory->user_id)
-            ->where('type', $memory->type)
+            ->whereIn('type', $conflictTypes)
             ->where('id', '!=', $memory->id)
             ->latest()
             ->limit(10)
@@ -28,10 +44,26 @@ class MemoryConflictService
 
         foreach ($others as $other) {
             /** @var Memory $other */
+
+            // Skip code snippet stored memories
+            $otherMeta = is_array($other->metadata) ? $other->metadata : [];
+            if (($otherMeta['source_kind'] ?? null) === 'code_snippet') {
+                continue;
+            }
+
+            // Skip cross-subject conflicts (other vs self don't conflict)
+            $incomingSubject = $incomingMeta['subject'] ?? 'self';
+            $otherSubject = $otherMeta['subject'] ?? 'self';
+            if ($incomingSubject !== $otherSubject
+                && ($incomingSubject === 'other' || $otherSubject === 'other')) {
+                continue;
+            }
+
             $analysis = $this->analyzeConflict(
                 $memory->normalized_content,
                 $other->normalized_content,
-                $memory->type
+                $memory->type,
+                $other->type
             );
 
             if (! $analysis['conflicts']) {
@@ -107,10 +139,17 @@ class MemoryConflictService
     
             foreach ($storedMemories as $memory) {
                 /** @var Memory $memory */
+
+                // Skip code snippet memories in conflict preview
+                $memMeta = is_array($memory->metadata) ? $memory->metadata : [];
+                if (($memMeta['source_kind'] ?? null) === 'code_snippet') {
+                    continue;
+                }
     
                 $analysis = $this->analyzeConflict(
                     $normalizedIncoming,
                     (string) $memory->normalized_content,
+                    (string) ($segment['type'] ?? 'fact'),
                     (string) $memory->type
                 );
     
@@ -176,13 +215,20 @@ class MemoryConflictService
     /**
      * Return a conflict decision plus score and reasons.
      */
-    private function analyzeConflict(string $a, string $b, string $type): array
+    private function analyzeConflict(string $a, string $b, string $incomingType, string $storedType = ''): array
     {
-        if (! in_array($type, ['preference', 'rule', 'fact',], true)) {
+        $allowedTypes = ['preference', 'rule', 'fact', 'skill'];
+
+        if ($storedType === '') {
+            $storedType = $incomingType;
+        }
+
+        if (! in_array($incomingType, $allowedTypes, true)
+            || ! in_array($storedType, $allowedTypes, true)) {
             return [
                 'conflicts' => false,
-                'score' => 0.0,
-                'reasons' => [],
+                'score'     => 0.0,
+                'reasons'   => [],
             ];
         }
 
@@ -257,12 +303,18 @@ class MemoryConflictService
             $reasons[] = 'opposing_intent';
         }
 
+        // Cross-type conflict boost for semantically meaningful pairs
+        if ($this->isCrossTypeConflictMeaningful($incomingType, $storedType)) {
+            $score += 0.10;
+            $reasons[] = 'cross_type:' . $incomingType . '_vs_' . $storedType;
+        }
+
         $score = round(min(1.0, $score), 4);
 
         return [
             'conflicts' => $score >= self::CONFLICT_THRESHOLD,
-            'score' => $score,
-            'reasons' => array_values(array_unique($reasons)),
+            'score'     => $score,
+            'reasons'   => array_values(array_unique($reasons)),
         ];
     }
 
@@ -581,5 +633,28 @@ class MemoryConflictService
     private function sharesKeywords(array $aTokens, array $bTokens): bool
     {
         return $this->sharedKeywordsCount($aTokens, $bTokens) >= 2;
+    }
+
+    /**
+     * Check whether a cross-type pair is semantically meaningful for conflicts.
+     */
+    private function isCrossTypeConflictMeaningful(string $typeA, string $typeB): bool
+    {
+        if ($typeA === $typeB) {
+            return false;
+        }
+
+        $meaningfulPairs = [
+            ['preference', 'rule'],
+            ['rule', 'fact'],
+        ];
+
+        foreach ($meaningfulPairs as [$a, $b]) {
+            if (($typeA === $a && $typeB === $b) || ($typeA === $b && $typeB === $a)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

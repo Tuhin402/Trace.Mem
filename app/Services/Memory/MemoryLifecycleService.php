@@ -44,6 +44,7 @@ class MemoryLifecycleService
         $archived = 0;
         $now = now();
 
+        // ── Pass 1: Archive stale memories (original logic) ─────
         Memory::query()
             ->where(function ($query) {
                 $query->whereNull('status')
@@ -55,6 +56,30 @@ class MemoryLifecycleService
             })
             ->where('access_count', '<=', $maxAccessCount)
             ->where('confidence', '<=', $maxConfidence)
+            ->orderBy('id')
+            ->chunkById(100, function ($memories) use (&$archived, $now) {
+                foreach ($memories as $memory) {
+                    $memory->forceFill([
+                        'status' => 'archived',
+                        'archived_at' => $now,
+                        'decay_score' => '0.1000',
+                    ])->save();
+
+                    $archived++;
+                }
+            });
+
+        // ── Pass 2: Archive transient memories after 7 days ─────
+        $transientCutoff = now()->subDays(7);
+
+        Memory::query()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhereIn('status', ['active', 'stale']);
+            })
+            ->whereNotNull('metadata')
+            ->where('metadata->transient', true)
+            ->where('created_at', '<', $transientCutoff)
             ->orderBy('id')
             ->chunkById(100, function ($memories) use (&$archived, $now) {
                 foreach ($memories as $memory) {

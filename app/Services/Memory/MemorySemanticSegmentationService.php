@@ -128,27 +128,75 @@ class MemorySemanticSegmentationService
 
     public function split(string $input): array
     {
-        $input = $this->normalizeText($input);
+        $pipeline = new MemorySemanticSegmentationPipeline();
 
-        $parts = preg_split(
-            '/(?<=[.!?])\s+|\s*(?:,| and | but | while | although )\s*/iu',
-            $input
-        ) ?: [];
+        $segments = $pipeline->split($input);
+
+        // ── Detect global intent markers from the raw input ──────────
+        $inputLower = mb_strtolower($input, 'UTF-8');
+        $isTransient              = $this->detectTransient($inputLower);
+        $hasExplicitRemember      = $this->detectExplicitRemember($inputLower);
+        $hasExplicitRememberCode  = $this->detectExplicitRememberCode($inputLower);
 
         $memories = [];
 
-        foreach ($parts as $part) {
-            $part = trim($part);
+        foreach ($segments as $segment) {
+            $text = trim((string) ($segment['text'] ?? ''));
 
-            if ($part === '') {
+            if ($text === '') {
                 continue;
             }
 
-            $memory = $this->normalizeAtomicMemory($part);
+            $metadata = is_array($segment['metadata'] ?? null)
+                ? $segment['metadata']
+                : [];
 
-            if ($memory !== null) {
-                $memories[] = $memory;
+            $sourceKind = $metadata['source_kind'] ?? 'plain';
+
+            $type = $sourceKind === 'code_snippet'
+                ? 'skill'
+                : $this->detectType($text);
+
+            $content = $sourceKind === 'code_snippet'
+                ? ($metadata['raw_excerpt'] ?? $text)
+                : $this->normalizeContent($text);
+
+            $confidence = $this->confidenceScore($text, $type);
+
+            // ── Subject-based confidence adjustments ─────────────────
+            if (($metadata['subject'] ?? 'self') === 'other') {
+                $confidence = max(0.1, round($confidence - 0.12, 4));
+            } elseif (($metadata['subject'] ?? 'self') === 'general') {
+                $confidence = max(0.1, round($confidence - 0.05, 4));
             }
+
+            // ── Transient instruction handling ───────────────────────
+            if ($isTransient) {
+                $metadata['transient'] = true;
+                $confidence = min($confidence, 0.35);
+            }
+
+            // ── Explicit remember handling ───────────────────────────
+            if ($hasExplicitRemember) {
+                $metadata['explicit_remember'] = true;
+            }
+
+            // ── Code-gating: skip raw code unless explicitly asked ───
+            if ($sourceKind === 'code_snippet') {
+                if ($hasExplicitRememberCode) {
+                    $metadata['explicit_remember'] = true;
+                    $metadata['skip_storage'] = false;
+                } else {
+                    $metadata['skip_storage'] = true;
+                }
+            }
+
+            $memories[] = [
+                'type'       => $type,
+                'content'    => $content,
+                'confidence' => $confidence,
+                'metadata'   => $metadata,
+            ];
         }
 
         return array_values($memories);
@@ -216,6 +264,11 @@ class MemorySemanticSegmentationService
             '/^i hate /iu' => 'User hates ',
             '/^i really hate /iu' => 'User really hates ',
             '/^i enjoy /iu' => 'User enjoys ',
+            '/^i really /iu' => 'User really ',
+            '/^i usually /iu' => 'User usually ',
+            '/^i use /iu' => 'User use ',
+            '/^i uses /iu' => 'User uses ',
+            '/^i used /iu' => 'User used ',
             '/^i prefer /iu' => 'User prefers ',
             '/^i would rather /iu' => 'User would rather ',
             '/^i\'d rather /iu' => 'User would rather ',
@@ -344,5 +397,315 @@ class MemorySemanticSegmentationService
         }
 
         return round($score, 4);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  Global intent detection — Transient markers
+    // ─────────────────────────────────────────────────────────────
+
+    private function detectTransient(string $lowerInput): bool
+    {
+        $phrases = [
+            // ── Explicit task / session / conversation scope ─────────
+            'for this task only',
+            'for this task',
+            'this task only',
+            'for this session only',
+            'for this session',
+            'for this conversation only',
+            'for this conversation',
+            'for this chat only',
+            'for this chat',
+            'for this request only',
+            'for this request',
+            'for this query only',
+            'for this prompt only',
+            'for this project only',
+            'for this thread only',
+            'for this thread',
+
+            // ── "Just / only" + temporal qualifier ──────────────────
+            'just for now',
+            'just for today',
+            'just for tonight',
+            'just for this',
+            'just this once',
+            'just this time',
+            'just this one time',
+            'just temporarily',
+            'only for now',
+            'only for today',
+            'only for tonight',
+            'only this time',
+            'only this once',
+            'only right now',
+            'only today',
+            'only tonight',
+
+            // ── Direct temporal markers ─────────────────────────────
+            'right now only',
+            'for now',
+            'for the moment',
+            'for the time being',
+            'at the moment only',
+            'at this point only',
+            'in this case only',
+            'in this instance',
+            'this time only',
+            'today only',
+            'tonight only',
+            'one-time only',
+            'one time only',
+            'one-off',
+
+            // ── Explicit non-permanence ─────────────────────────────
+            'temporarily',
+            'temporary',
+            'temp only',
+            'not permanent',
+            'not permanently',
+            'not forever',
+            'short-term',
+            'short term only',
+            'provisional',
+            'provisionally',
+            'interim',
+            'ephemeral',
+
+            // ── "Don't save / remember" directives ──────────────────
+            "don't remember this",
+            'do not remember this',
+            "don't save this",
+            'do not save this',
+            "don't store this",
+            'do not store this',
+            "don't keep this",
+            'do not keep this',
+            'forget this after',
+            'forget after this',
+            'discard after',
+            'discard this after',
+            "don't memorize",
+            'do not memorize',
+            'no need to remember',
+            'no need to save',
+            'not worth remembering',
+            'not worth saving',
+
+            // ── Implied short-lived intent ──────────────────────────
+            'for a bit',
+            'for a moment',
+            'for a second',
+            'for a minute',
+            'for the next few minutes',
+            'for the next hour',
+            'for the next few hours',
+            'for the current task',
+            'during this task',
+            'during this session',
+            'while working on this',
+            'while i work on this',
+            'until i finish this',
+            'until this is done',
+            "until i'm done",
+        ];
+
+        foreach ($phrases as $phrase) {
+            if (str_contains($lowerInput, $phrase)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  Global intent detection — Explicit remember markers
+    // ─────────────────────────────────────────────────────────────
+
+    private function detectExplicitRemember(string $lowerInput): bool
+    {
+        $phrases = [
+            // ── Direct remember / save / keep ────────────────────────
+            'remember this',
+            'remember that',
+            'remember the following',
+            'remember what i',
+            'save this',
+            'save that',
+            'save the following',
+            'keep this',
+            'keep that',
+            'keep the following',
+            'store this',
+            'store that',
+            'store the following',
+
+            // ── Negation of forgetting ──────────────────────────────
+            "don't forget",
+            'do not forget',
+            'never forget',
+            "don't lose this",
+            'do not lose this',
+
+            // ── Imperative memory phrases ────────────────────────────
+            'memorize this',
+            'memorize that',
+            'note this',
+            'note that',
+            'take note',
+            'make a note',
+            'make note of',
+            'jot this down',
+            'write this down',
+            'log this',
+            'record this',
+
+            // ── Cognitive / mental directives ────────────────────────
+            'keep in mind',
+            'bear in mind',
+            'keep this in mind',
+            'bear this in mind',
+            'commit to memory',
+            'commit this to memory',
+
+            // ── Polite / request forms ──────────────────────────────
+            'please remember',
+            'please save',
+            'please store',
+            'please keep',
+            'please note',
+            'i want you to remember',
+            'i need you to remember',
+            'i want you to save',
+            'i need you to save',
+            'can you remember',
+            'could you remember',
+            'can you save',
+            'could you save',
+
+            // ── Later / future retrieval ────────────────────────────
+            'save for later',
+            'keep for later',
+            'store for later',
+            'save for future',
+            'keep for future',
+            'remember for later',
+            'remember for next time',
+            'save for next time',
+
+            // ── Misc memory-related ─────────────────────────────────
+            'pin this',
+            'bookmark this',
+            'hold onto this',
+            'preserve this',
+            'retain this',
+            'hold this',
+            'file this',
+            'stash this',
+        ];
+
+        foreach ($phrases as $phrase) {
+            if (str_contains($lowerInput, $phrase)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  Global intent detection — Explicit remember-code markers
+    // ─────────────────────────────────────────────────────────────
+
+    private function detectExplicitRememberCode(string $lowerInput): bool
+    {
+        $phrases = [
+            // ── "remember / save / store / keep" + code entity ───────
+            'remember this code',
+            'remember the code',
+            'remember this snippet',
+            'remember the snippet',
+            'remember this script',
+            'remember this function',
+            'remember this class',
+            'remember this method',
+            'remember this block',
+            'remember this implementation',
+            'remember this solution',
+            'remember this fix',
+            'remember this bugfix',
+            'remember this bug fix',
+            'remember this pattern',
+            'remember this example',
+            'remember this syntax',
+            'remember this template',
+            'remember this config',
+            'remember this configuration',
+            'remember this query',
+            'remember this command',
+            'remember this regex',
+            'remember this algorithm',
+            'remember this logic',
+            'remember this approach',
+            'remember this workaround',
+            'remember this hack',
+            'remember this trick',
+
+            'save this code',
+            'save the code',
+            'save this snippet',
+            'save the snippet',
+            'save this script',
+            'save this function',
+            'save this implementation',
+            'save this solution',
+            'save this fix',
+            'save this bugfix',
+            'save this bug fix',
+            'save this pattern',
+            'save this example',
+            'save this syntax',
+            'save this template',
+            'save this config',
+            'save this command',
+            'save this query',
+            'save this regex',
+
+            'store this code',
+            'store the code',
+            'store this snippet',
+            'store the snippet',
+            'store this script',
+            'store this function',
+            'store this implementation',
+
+            'keep this code',
+            'keep the code',
+            'keep this snippet',
+            'keep the snippet',
+            'keep this script',
+            'keep this function',
+            'keep this implementation',
+
+            'memorize this code',
+            'memorize this snippet',
+
+            // ── "note / pin / bookmark" + code ──────────────────────
+            'note this code',
+            'note this snippet',
+            'pin this code',
+            'pin this snippet',
+            'bookmark this code',
+            'bookmark this snippet',
+        ];
+
+        foreach ($phrases as $phrase) {
+            if (str_contains($lowerInput, $phrase)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

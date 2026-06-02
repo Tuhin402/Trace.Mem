@@ -249,9 +249,9 @@
     line-height: 1;
 }
 
-.pricing-plan-col.highlight .pricing-plan-name {
+/* .pricing-plan-col.highlight .pricing-plan-name {
     margin-top: 16px;
-}
+} */
 
 .pricing-plan-mode {
     font-family: var(--font-mono);

@@ -7,6 +7,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import PublicLayout from '@/layouts/public-layout';
 import ApiReferenceLayout from '@/layouts/api-reference-layout';
 import ErrorBoundary from '@/components/error-boundary';
+import { useEffect, type ReactNode } from 'react';
 
 import '../css/public/api-reference.css';
 import '../css/public/public.css';
@@ -36,78 +37,72 @@ import { HelmetProvider } from 'react-helmet-async';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 
 const appName = import.meta.env.VITE_APP_NAME || 'TraceMem';
-const appSlug = import.meta.env.VITE_APP_SLUG || 'tracemem';
-// const appDomain = import.meta.env.VITE_APP_DOMAIN || 'tracemem.io';
+// ── Persistent layout wrappers ─────────────────────────────
+const withPublicLayout = (page: ReactNode) => <PublicLayout>{page}</PublicLayout>;
+const withApiRefLayout = (page: ReactNode) => <ApiReferenceLayout>{page}</ApiReferenceLayout>;
+const withAuthLayout   = (page: ReactNode) => <AuthLayout>{page}</AuthLayout>;
+const withAppLayout    = (page: ReactNode) => <AppLayout>{page}</AppLayout>;
+const withSettingsLayout = (page: ReactNode) => (
+    <AppLayout><SettingsLayout>{page}</SettingsLayout></AppLayout>
+);
 
-// const withAuthLayout = (page: React.ReactNode) => <AuthLayout>{page}</AuthLayout>;
-// const withApiReferenceLayout = (page: React.ReactNode) => <ApiReferenceLayout>{page}</ApiReferenceLayout>;
-// const withPublicLayout = (page: React.ReactNode) => <PublicLayout>{page}</PublicLayout>;
-// const withSettingsLayout = (page: React.ReactNode) => (
-//     <AppLayout>
-//         <SettingsLayout>{page}</SettingsLayout>
-//     </AppLayout>
-// );
-// const withAppLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>;
+// ── FOUC prevention: marks #app as hydrated once React mounts ──
+function HydrationGate({ children }: { children: ReactNode }) {
+    useEffect(() => {
+        const el = document.getElementById('app');
+        if (el) el.classList.add('hydrated');
+    }, []);
+    return <>{children}</>;
+}
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    layout: (name) => {
-        switch (true) {
-            case name === 'welcome':
-                return null;
+    resolve: (name) => {
+        return resolvePageComponent(
+            `./pages/${name}.tsx`,
+            import.meta.glob('./pages/**/*.tsx'),
+        ).then((page: any) => {
+            const component = page.default || page;
 
-            case name.startsWith('auth/'):
-                return AuthLayout;
+            if (component.layout === undefined) {
+                switch (true) {
+                    case name === 'welcome':
+                        break; // Landing page manages its own chrome
 
-            case name.startsWith('public/api-reference'):
-                return ApiReferenceLayout;
+                    case name.startsWith('auth/'):
+                        component.layout = withAuthLayout;
+                        break;
 
-            case name === 'public/Docs':
-                return ApiReferenceLayout;
+                    case name.startsWith('public/api-reference'):
+                    case name === 'public/Docs':
+                    case name === 'public/Pricing':
+                        component.layout = withApiRefLayout;
+                        break;
 
-            case name === 'public/Pricing':
-                return ApiReferenceLayout;
+                    case name.startsWith('public/'):
+                        component.layout = withPublicLayout;
+                        break;
 
-            case name.startsWith('public/'):
-                return PublicLayout;
+                    case name.startsWith('settings/'):
+                    case name.startsWith('teams/'):
+                        component.layout = withSettingsLayout;
+                        break;
 
-            case name.startsWith('settings/'):
-            case name.startsWith('teams/'):
-                return [AppLayout, SettingsLayout];
+                    default:
+                        component.layout = withAppLayout;
+                        break;
+                }
+            }
 
-            default:
-                return AppLayout;
-        }
+            return page;
+        });
     },
-    // resolve: (name) => {
-    //     return resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx'))
-    //         .then((page: any) => {
-    //             const component = page.default || page;
-
-    //             if (component.layout === undefined) {
-    //                 if (name.startsWith('auth/')) {
-    //                     component.layout = withAuthLayout;
-    //                 } else if (name.startsWith('public/api-reference') || name === 'public/Docs' || name === 'public/Pricing') {
-    //                     component.layout = withApiReferenceLayout;
-    //                 } else if (name.startsWith('public/')) {
-    //                     component.layout = withPublicLayout;
-    //                 } else if (name === 'app/Settings' || name.startsWith('settings/')) {
-    //                     component.layout = withSettingsLayout;
-    //                 } else {
-    //                     component.layout = withAppLayout;
-    //                 }
-    //             }
-
-    //             return page;
-    //         });
-    // },
-    // strictMode: true,
     withApp(app) {
         return (
             <HelmetProvider>
                 <ErrorBoundary>
                     <TooltipProvider delayDuration={0}>
-                        {app}
+                        <HydrationGate>{app}</HydrationGate>
                     </TooltipProvider>
                 </ErrorBoundary>
             </HelmetProvider>

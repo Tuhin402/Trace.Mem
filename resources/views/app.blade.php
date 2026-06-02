@@ -29,7 +29,12 @@
                 background-color: #0e0e0f;
                 color: #e5e2e3;
             }
+
+            /* FOUC prevention: invisible until React mounts and CSS paints */
+            #app:not(.hydrated) { opacity: 0; }
+            #app.hydrated { opacity: 1; transition: opacity 0.08s ease-out; }
         </style>
+        <noscript><style>#app:not(.hydrated) { opacity: 1 !important; }</style></noscript>
 
         <link rel="icon" type="favicon.ico" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -47,5 +52,12 @@
     </head>
     <body class="font-sans antialiased">
         <x-inertia::app />
+        <script>
+            // Safety: reveal app after 4s even if JS hydration stalls
+            setTimeout(function() {
+                var el = document.getElementById('app');
+                if (el && !el.classList.contains('hydrated')) el.classList.add('hydrated');
+            }, 4000);
+        </script>
     </body>
 </html>

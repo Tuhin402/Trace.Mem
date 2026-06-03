@@ -61,7 +61,9 @@ export default function AppSidebarLayout({
         });
 
         const removeFinish = router.on('finish', () => {
-            setLoadingUrl(null);
+            // Defer to next frame so the skeleton teardown doesn't collide
+            // with Inertia's page-component swap in the same React commit.
+            requestAnimationFrame(() => setLoadingUrl(null));
         });
 
         return () => {
@@ -82,11 +84,11 @@ export default function AppSidebarLayout({
                 </div>
 
                 {loadingUrl && (
-                    <>
+                    <div>
                         {loadingUrl.startsWith('/dashboard') && <DashboardSkeleton />}
                         {loadingUrl.startsWith('/api-keys') && <ApiKeysSkeleton />}
                         {loadingUrl.startsWith('/settings') && <SettingsSkeleton />}
-                    </>
+                    </div>
                 )}
             </AppContent>
         </AppShell>

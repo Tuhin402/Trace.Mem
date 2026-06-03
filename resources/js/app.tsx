@@ -1,4 +1,11 @@
+import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
+
+declare global {
+    interface Window {
+        __REACT_ROOT__?: any;
+    }
+}
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
@@ -97,16 +104,23 @@ createInertiaApp({
             return page;
         });
     },
-    withApp(app) {
-        return (
+    setup({ el, App, props }) {
+        const appElement = (
             <HelmetProvider>
                 <ErrorBoundary>
                     <TooltipProvider delayDuration={0}>
-                        <HydrationGate>{app}</HydrationGate>
+                        <HydrationGate>
+                            <App {...props} />
+                        </HydrationGate>
                     </TooltipProvider>
                 </ErrorBoundary>
             </HelmetProvider>
         );
+
+        if (!window.__REACT_ROOT__) {
+            window.__REACT_ROOT__ = createRoot(el);
+        }
+        window.__REACT_ROOT__.render(appElement);
     },
     progress: {
         color: '#de91efff',

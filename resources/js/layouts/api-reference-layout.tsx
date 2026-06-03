@@ -16,7 +16,9 @@ export default function ApiReferenceLayout({ children }: { children: ReactNode }
         });
 
         const removeFinish = router.on('finish', () => {
-            setIsLoading(false);
+            // Defer to next frame so the skeleton teardown doesn't collide
+            // with Inertia's page-component swap in the same React commit.
+            requestAnimationFrame(() => setIsLoading(false));
         });
 
         return () => {
@@ -32,7 +34,11 @@ export default function ApiReferenceLayout({ children }: { children: ReactNode }
                 <div style={{ display: isLoading ? 'none' : 'block' }}>
                     {children}
                 </div>
-                {isLoading && <ContentSectionSkeleton />}
+                {isLoading && (
+                    <div>
+                        <ContentSectionSkeleton />
+                    </div>
+                )}
             </main>
             <PublicFooter />
         </div>

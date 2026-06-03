@@ -19,6 +19,8 @@ import { useEffect, type ReactNode } from 'react';
 import '../css/public/api-reference.css';
 import '../css/public/public.css';
 import '../css/pages/landing.css';
+import '../css/pages/playground.css';
+import '../css/pages/status.css';
 import '../css/pages/docs.css';
 import '../css/pages/pricing.css';
 import '../css/pages/usecases.css';
@@ -117,10 +119,10 @@ createInertiaApp({
             </HelmetProvider>
         );
 
-        if (!window.__REACT_ROOT__) {
+        if (!window.__REACT_ROOT__ && el) {
             window.__REACT_ROOT__ = createRoot(el);
         }
-        window.__REACT_ROOT__.render(appElement);
+        window.__REACT_ROOT__!.render(appElement);
     },
     progress: {
         color: '#de91efff',

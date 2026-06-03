@@ -232,6 +232,7 @@ export default function PublicFooter() {
                                 <Link href="/docs"          className="footer-link">Docs</Link>
                                 <Link href="/api-reference" className="footer-link">API Reference</Link>
                                 <Link href="/pricing"       className="footer-link">Pricing</Link>
+                                <Link href="/status"        className="footer-link">Status</Link>
                             </div>
                         </div>
 

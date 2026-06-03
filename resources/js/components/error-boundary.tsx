@@ -9,6 +9,8 @@ type State = {
 };
 
 export default class ErrorBoundary extends React.Component<Props, State> {
+    private recoveryTimer: ReturnType<typeof setTimeout> | null = null;
+
     constructor(props: Props) {
         super(props);
 
@@ -24,7 +26,28 @@ export default class ErrorBoundary extends React.Component<Props, State> {
     }
 
     componentDidCatch(error: Error, info: React.ErrorInfo) {
+        // Auto-recover from transient Inertia page-swap reconciliation errors.
+        // These happen when React's commit phase collides with a skeleton
+        // teardown — the DOM is left in a valid state and a re-render fixes it.
+        const isTransient =
+            error.name === 'NotFoundError' ||
+            error.message?.includes('removeChild') ||
+            error.message?.includes('insertBefore') ||
+            error.message?.includes('appendChild');
+
+        if (isTransient) {
+            console.warn('[ErrorBoundary] Recovered from transient navigation error:', error.message);
+            this.recoveryTimer = setTimeout(() => this.setState({ hasError: false }), 0);
+            return;
+        }
+
         console.error('React Error Boundary:', error, info);
+    }
+
+    componentWillUnmount() {
+        if (this.recoveryTimer) {
+            clearTimeout(this.recoveryTimer);
+        }
     }
 
     render() {
@@ -46,4 +69,4 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
         return this.props.children;
     }
-}
+}

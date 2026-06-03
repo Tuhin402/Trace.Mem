@@ -8,6 +8,7 @@ import CodeWindow from '@/components/public/code-window';
 import CtaButton from '@/components/public/cta-button';
 import FaqAccordion from '@/components/public/faq-accordion';
 import AppLogo from '@/components/app-logo';
+import PlaygroundSection from '@/components/public/playground-section';
 
 /* ── Code snippets ────────────────────────────────────────── */
 const snippets = {
@@ -380,6 +381,9 @@ export default function Landing() {
                     />
                 </div>
             </section>
+
+            {/* ══ 2b. PLAYGROUND ═════════════════════════════════════ */}
+            <PlaygroundSection />
 
             {/* ══ 3. BUILT FOR DEVS ════════════════════════════════ */}
             <section className="lp-section devs-section" aria-label="Built for Developers">

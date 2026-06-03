@@ -13,6 +13,7 @@ Route::inertia('/', 'public/Landing')->name('home');
 Route::inertia('/docs', 'public/Docs')->name('docs');
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 Route::inertia('/usecases', 'public/UseCases')->name('usecases');
+Route::inertia('/status', 'public/Status')->name('status');
 
 Route::inertia('/api-reference', 'public/api-reference/Overview')->name('api.reference.overview');
 Route::inertia('/api-reference/quick-start', 'public/api-reference/QuickStart')->name('api.reference.quick-start');

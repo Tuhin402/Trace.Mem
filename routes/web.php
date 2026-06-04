@@ -5,6 +5,7 @@ use App\Http\Controllers\ApiKeyController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\MemoryInspectorController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/api-keys', [ApiKeyController::class, 'index'])->name('api.keys');
     Route::get('/logs', [LogsController::class, 'index'])->name('logs');
+    Route::get('/memory-inspector', [MemoryInspectorController::class, 'index'])->name('memory.inspector');
     Route::post('/api-keys', [ApiKeyController::class, 'store'])->name('api.keys.store');
     Route::delete('/api-keys/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api.keys.destroy');
     Route::post('/api-keys/{apiKey}/rotate', [ApiKeyController::class, 'rotate'])->name('api.keys.rotate');

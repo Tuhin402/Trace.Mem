@@ -16,6 +16,7 @@ function AppTopBar({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItem[] }) {
         if (url.startsWith('/api-keys')) return 'API Keys';
         if (url.startsWith('/billing')) return 'Billing';
         if (url.startsWith('/settings')) return 'Settings';
+        if (url.startsWith('/memory-inspector')) return 'Memory Inspector';
         if (url.startsWith('/teams')) return 'Teams';
         return breadcrumbs?.[breadcrumbs.length - 1]?.title ?? '';
     })();
@@ -55,7 +56,7 @@ export default function AppSidebarLayout({
     useEffect(() => {
         const removeStart = router.on('start', (e) => {
             const path = e.detail.visit.url.pathname;
-            if (path.startsWith('/dashboard') || path.startsWith('/api-keys') || path.startsWith('/settings')) {
+            if (path.startsWith('/dashboard') || path.startsWith('/api-keys') || path.startsWith('/settings') || path.startsWith('/memory-inspector')) {
                 setLoadingUrl(path);
             }
         });

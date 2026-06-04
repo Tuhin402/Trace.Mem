@@ -560,8 +560,15 @@ export default function Dashboard() {
 
                             {/* Memory Inspector */}
                             <div>
-                                <div className="obs-title">Memory Inspector</div>
-                                <div className="obs-subtitle">Recent atomic memories created across your environments.</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                                    <div>
+                                        <div className="obs-title">Memory Inspector</div>
+                                        <div className="obs-subtitle">Recent atomic memories created across your environments.</div>
+                                    </div>
+                                    <Link href="/memory-inspector" className="app-panel-link" style={{ marginTop: '2px' }}>
+                                        View all <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
+                                    </Link>
+                                </div>
                                 
                                 {memories.length === 0 ? (
                                     <div className="app-empty-state" style={{ marginTop: '16px' }}>

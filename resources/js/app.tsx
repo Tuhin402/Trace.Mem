@@ -39,6 +39,7 @@ import '../css/pages/settings.css';
 import '../css/pages/billing.css';
 import '../css/pages/logs.css';
 import '../css/pages/observability.css';
+import '../css/pages/memory-inspector.css';
 
 
 

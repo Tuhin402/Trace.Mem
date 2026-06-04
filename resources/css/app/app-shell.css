@@ -441,6 +441,8 @@
 }
 
 .app-field input {
+    width: 100%;
+    box-sizing: border-box;
     height: 42px;
     background: var(--app-surface-2);
     border: 1px solid var(--app-border-strong);

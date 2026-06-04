@@ -1,0 +1,214 @@
+/* ============================================================
+   TraceMem — Observability Modules (Inspector & Insights)
+   ============================================================ */
+
+/* ── Common Panel Extensions ────────────────────────────────── */
+.obs-panel {
+    background: var(--tm-surface);
+    border: 1px solid var(--tm-border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-radius: 4px;
+}
+
+.obs-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.obs-title {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--app-text);
+}
+
+.obs-subtitle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--app-text-dim);
+    margin-top: 4px;
+}
+
+/* ── Empty State ────────────────────────────────────────────── */
+.obs-empty-banner {
+    background: linear-gradient(135deg, rgba(225, 78, 246, 0.05), transparent);
+    border: 1px dashed var(--tm-border-strong);
+    padding: 32px 24px;
+    text-align: center;
+    border-radius: 4px;
+    margin-top: 24px;
+}
+
+.obs-empty-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(225, 78, 246, 0.1);
+    color: var(--tm-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.obs-empty-title {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--app-text);
+}
+
+.obs-empty-desc {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--app-text-dim);
+    margin-top: 8px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ── Memory Cards ───────────────────────────────────────────── */
+.obs-memory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.obs-memory-card {
+    background: var(--tm-surface-2);
+    border: 1px solid var(--tm-border);
+    padding: 16px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.obs-memory-card:hover {
+    border-color: rgba(225, 78, 246, 0.3);
+}
+
+.obs-memory-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.obs-memory-type {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--tm-primary);
+    background: rgba(225, 78, 246, 0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.obs-memory-date {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-dim);
+}
+
+.obs-memory-content {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--app-text);
+    line-height: 1.5;
+}
+
+.obs-memory-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--tm-border);
+}
+
+.obs-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-dim);
+}
+
+/* ── Insights Grid ──────────────────────────────────────────── */
+.obs-insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.obs-insight-card {
+    background: var(--tm-surface-2);
+    border: 1px solid var(--tm-border);
+    padding: 16px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.obs-insight-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-text-dim);
+}
+
+.obs-insight-value {
+    font-family: var(--font-headline);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--app-text);
+    margin-top: 8px;
+}
+
+.obs-insight-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-text-subtle);
+    margin-top: 4px;
+}
+
+.obs-endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.obs-endpoint-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--tm-border-strong);
+}
+
+.obs-endpoint-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.obs-endpoint-name {
+    color: var(--app-text);
+}
+
+.obs-endpoint-count {
+    color: var(--tm-primary);
+}

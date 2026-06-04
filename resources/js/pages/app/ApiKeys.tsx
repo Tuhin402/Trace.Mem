@@ -516,7 +516,7 @@ export default function ApiKeys() {
                             <h2>Recent API Activity</h2>
                             <p>Last 24-hour requests made with your keys</p>
                         </div>
-                        <Link href="/logs" className="app-panel-link">
+                        <Link href="/logs?tab=usage" className="app-panel-link">
                             View all <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
                         </Link>
                     </div>

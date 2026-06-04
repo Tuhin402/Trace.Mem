@@ -453,6 +453,51 @@
     background: var(--tm-primary);
 }
 
+/* ── How it works ───────────────────────────────────────────── */
+.pg-how-works {
+    margin-top: 64px;
+    padding-top: 48px;
+    border-top: 1px solid var(--tm-border);
+}
+
+.pg-how-title {
+    font-family: var(--font-headline);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tm-text);
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.pg-how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+}
+
+.pg-how-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    background: var(--tm-surface-2);
+    border: 1px solid var(--tm-border);
+}
+
+.pg-how-card-title {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tm-text);
+}
+
+.pg-how-card-desc {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tm-text-muted);
+    line-height: 1.6;
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .pg-panels {

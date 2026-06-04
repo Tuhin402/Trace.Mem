@@ -37,6 +37,10 @@ const examples: Record<string, { label: string; text: string }> = {
         label: 'Conflicting statements',
         text: `User: I'm using MySQL for my database.\nAssistant: Noted, MySQL it is.\nUser: Actually wait, we switched to PostgreSQL last month.\nAssistant: Updated — PostgreSQL now.\nUser: And my timezone is EST.\nUser: Sorry, I moved recently. My timezone is now PST.`,
     },
+    relations: {
+        label: 'Relationships & Others',
+        text: `User: My mother loves to sing in the morning.\nAssistant: That's lovely. Does she have a favorite genre?\nUser: Yes, mostly classical. Oh, and my girlfriend loves me and we are planning to move to NY next year.`,
+    },
 };
 
 /* ── Mock processing logic ─────────────────────────────────── */
@@ -51,7 +55,7 @@ function generateMockResults(input: string, mode: Mode): PlaygroundResult {
             type: 'preference',
             content: isAiFirst
                 ? 'User has strong tool/format preferences — should be respected in all future responses'
-                : 'Keyword match: preference-related language detected',
+                : 'NLP entity extraction: preference-related semantic intent detected',
             confidence: isAiFirst ? 0.94 : 0.78,
             source: 'preference-extractor',
         });
@@ -63,7 +67,7 @@ function generateMockResults(input: string, mode: Mode): PlaygroundResult {
             type: 'fact',
             content: isAiFirst
                 ? 'User is a backend developer, works with specific tech stack — contextual identity established'
-                : 'Factual entities detected: role, technologies, team structure',
+                : 'NLP entity extraction: factual identities detected (role, technologies, team structure)',
             confidence: isAiFirst ? 0.91 : 0.72,
             source: 'fact-extractor',
         });
@@ -75,7 +79,7 @@ function generateMockResults(input: string, mode: Mode): PlaygroundResult {
             type: 'skill',
             content: isAiFirst
                 ? 'User demonstrates backend architecture expertise — adjust technical depth accordingly'
-                : 'Technical terms detected: middleware, architecture patterns',
+                : 'NLP entity extraction: technical terms detected (middleware, architecture patterns)',
             confidence: isAiFirst ? 0.88 : 0.65,
             source: 'skill-detector',
         });
@@ -87,7 +91,7 @@ function generateMockResults(input: string, mode: Mode): PlaygroundResult {
             type: 'intent',
             content: isAiFirst
                 ? 'User has an active implementation goal — provide actionable, specific guidance'
-                : 'Action-oriented language detected: potential request intent',
+                : 'NLP entity extraction: action-oriented language detected (potential request intent)',
             confidence: isAiFirst ? 0.87 : 0.61,
             source: 'intent-classifier',
         });
@@ -111,10 +115,41 @@ function generateMockResults(input: string, mode: Mode): PlaygroundResult {
             type: 'fact',
             content: isAiFirst
                 ? 'Contradiction detected and auto-resolved — newer statement supersedes older'
-                : 'Potential conflict flagged — manual resolution may be needed',
+                : 'NLP entity extraction: potential temporal conflict flagged',
             confidence: isAiFirst ? 0.96 : 0.7,
             source: 'conflict-resolver',
         });
+    }
+
+    /* Detect relations & atomic splitting */
+    if (/mother|gf|girlfriend|wife|brother|sister|loves|planning/i.test(input)) {
+        if (isAiFirst) {
+            memories.push({
+                type: 'fact',
+                content: 'User\'s mother loves to sing (mostly classical) — relational preference captured',
+                confidence: 0.92,
+                source: 'relation-extractor',
+            });
+            memories.push({
+                type: 'fact',
+                content: 'User\'s girlfriend loves the user — relational state captured',
+                confidence: 0.95,
+                source: 'relation-extractor',
+            });
+            memories.push({
+                type: 'intent',
+                content: 'User is planning to move to NY next year with girlfriend — future life event captured',
+                confidence: 0.89,
+                source: 'life-event-extractor',
+            });
+        } else {
+            memories.push({
+                type: 'fact',
+                content: 'NLP entity extraction: Multiple relational entities and locations detected in single compound statement',
+                confidence: 0.76,
+                source: 'entity-extractor',
+            });
+        }
     }
 
     const contextAssembly = memories
@@ -123,7 +158,7 @@ function generateMockResults(input: string, mode: Mode): PlaygroundResult {
 
     const modeDiff = isAiFirst
         ? 'AI-First mode uses deep semantic understanding to extract implicit meaning, resolve conflicts automatically, and produce higher-confidence memory units with actionable context.'
-        : 'Semantic-Only mode relies on keyword matching and surface-level NLP. It detects entities and patterns but may miss implicit preferences, nuanced intent, or contradictions.';
+        : 'Semantic-Only mode relies on custom NLP. It detects entities and patterns but may miss implicit preferences, nuanced intent, or contradictions.';
 
     return { memories, contextAssembly, modeDiff };
 }
@@ -358,6 +393,37 @@ export default function PlaygroundSection() {
                             <div className={`pg-preview-seg ${results && results.memories.length > 1 ? 'active' : ''}`} />
                             <div className={`pg-preview-seg ${results && results.memories.length > 2 ? 'active' : ''}`} />
                             <div className={`pg-preview-seg ${results && results.memories.length > 3 ? 'active' : ''}`} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* How it works */}
+                <div className="pg-how-works">
+                    <h3 className="pg-how-title">How Playground Evaluation Works</h3>
+                    <div className="pg-how-grid">
+                        <div className="pg-how-card">
+                            <h4 className="pg-how-card-title">1. Stateless Processing</h4>
+                            <p className="pg-how-card-desc">
+                                When you run the playground, we simulate a POST request to our extraction endpoints.
+                                However, in this demo environment, no data is saved to the database. It operates entirely
+                                in-memory (similar to a stateless Postman test), processing the text and returning the structured JSON instantly.
+                            </p>
+                        </div>
+                        <div className="pg-how-card">
+                            <h4 className="pg-how-card-title">2. Atomic Memory Separation</h4>
+                            <p className="pg-how-card-desc">
+                                Large, compound sentences are broken down into granular, atomic memory units.
+                                Our AI models identify discrete facts, preferences, and intents within a single input paragraph,
+                                decoupling them so they can be retrieved independently.
+                            </p>
+                        </div>
+                        <div className="pg-how-card">
+                            <h4 className="pg-how-card-title">3. Context to JSON</h4>
+                            <p className="pg-how-card-desc">
+                                The unstructured user input is parsed, categorized, and scored for confidence.
+                                The resulting atomic memories are then packaged into a structured JSON payload,
+                                ready to be seamlessly injected into your application's LLM context window.
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -1,11 +1,13 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
     User,
     Lock,
     AlertTriangle,
     CheckCircle2,
     Save,
+    Eye,
+    EyeOff,
 } from 'lucide-react';
 import { useToast } from '@/components/app/toast';
 
@@ -23,6 +25,73 @@ type PageProps = {
 };
 
 type Tab = 'profile' | 'password';
+
+/* ── Reusable password input with visibility toggle ── */
+function PasswordField({
+    id,
+    value,
+    onChange,
+    placeholder,
+    autoComplete,
+    error,
+}: {
+    id: string;
+    value: string;
+    onChange: (v: string) => void;
+    placeholder: string;
+    autoComplete: string;
+    error?: string;
+}) {
+    const [visible, setVisible] = useState(false);
+
+    return (
+        <div className="app-field">
+            <div style={{ position: 'relative' }}>
+                <input
+                    id={id}
+                    type={visible ? 'text' : 'password'}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    autoComplete={autoComplete}
+                    placeholder={placeholder}
+                    style={{ paddingRight: '44px' }}
+                />
+                <button
+                    type="button"
+                    onClick={() => setVisible(!visible)}
+                    aria-label={visible ? 'Hide password' : 'Show password'}
+                    style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        padding: '4px',
+                        cursor: 'pointer',
+                        color: 'var(--app-text-dim)',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                >
+                    {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+            </div>
+            {error && <span className="app-field-error">{error}</span>}
+        </div>
+    );
+}
+
+/* ── Password validation rules (same as registration) ── */
+function validatePassword(pw: string): string | null {
+    if (pw.length < 8)              return 'Password must be at least 8 characters.';
+    if (!/[A-Z]/.test(pw))          return 'Password must contain at least one uppercase letter (A–Z).';
+    if (!/[a-z]/.test(pw))          return 'Password must contain at least one lowercase letter (a–z).';
+    if (!/[0-9]/.test(pw))          return 'Password must contain at least one number (0–9).';
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pw))
+        return 'Password must contain at least one special character (!@#$…).';
+    return null;
+}
 
 export default function Settings() {
     const { props } = usePage<PageProps>();
@@ -71,10 +140,13 @@ export default function Settings() {
             setPwErrors({ current_password: 'Current password is required.' });
             return;
         }
-        if (newPassword.length < 8) {
-            setPwErrors({ password: 'New password must be at least 8 characters.' });
+
+        const pwError = validatePassword(newPassword);
+        if (pwError) {
+            setPwErrors({ password: pwError });
             return;
         }
+
         if (newPassword !== confirmPassword) {
             setPwErrors({ password_confirmation: 'Passwords do not match.' });
             return;
@@ -201,50 +273,44 @@ export default function Settings() {
                         </div>
 
                         <div className="st-form">
-                            <div className="app-field">
-                                <label htmlFor="st-current-pw">Current password</label>
-                                <input
-                                    id="st-current-pw"
-                                    type="password"
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                    autoComplete="current-password"
-                                    placeholder="Your current password"
-                                />
-                                {pwErrors.current_password && (
-                                    <span className="app-field-error">{pwErrors.current_password}</span>
-                                )}
+                            <label htmlFor="st-current-pw">Current password</label>
+                            <PasswordField
+                                id="st-current-pw"
+                                value={currentPassword}
+                                onChange={setCurrentPassword}
+                                autoComplete="current-password"
+                                placeholder="Your current password"
+                                error={pwErrors.current_password}
+                            />
+
+                            <label htmlFor="st-new-pw">New password</label>
+                            <PasswordField
+                                id="st-new-pw"
+                                value={newPassword}
+                                onChange={setNewPassword}
+                                autoComplete="new-password"
+                                placeholder="At least 8 characters"
+                                error={pwErrors.password}
+                            />
+
+                            {/* Password requirement rules */}
+                            <div className="auth-pw-rules" aria-label="Password requirements" style={{ marginTop: '-4px', marginBottom: '8px' }}>
+                                <span className="auth-pw-rule" style={{ color: newPassword.length >= 8 ? 'var(--app-success)' : undefined }}>Minimum 8 characters</span>
+                                <span className="auth-pw-rule" style={{ color: /[A-Z]/.test(newPassword) ? 'var(--app-success)' : undefined }}>At least one uppercase letter (A–Z)</span>
+                                <span className="auth-pw-rule" style={{ color: /[a-z]/.test(newPassword) ? 'var(--app-success)' : undefined }}>At least one lowercase letter (a–z)</span>
+                                <span className="auth-pw-rule" style={{ color: /[0-9]/.test(newPassword) ? 'var(--app-success)' : undefined }}>At least one number (0–9)</span>
+                                <span className="auth-pw-rule" style={{ color: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(newPassword) ? 'var(--app-success)' : undefined }}>At least one special character (!@#$…)</span>
                             </div>
 
-                            <div className="app-field">
-                                <label htmlFor="st-new-pw">New password</label>
-                                <input
-                                    id="st-new-pw"
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    autoComplete="new-password"
-                                    placeholder="At least 8 characters"
-                                />
-                                {pwErrors.password && (
-                                    <span className="app-field-error">{pwErrors.password}</span>
-                                )}
-                            </div>
-
-                            <div className="app-field">
-                                <label htmlFor="st-confirm-pw">Confirm new password</label>
-                                <input
-                                    id="st-confirm-pw"
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    autoComplete="new-password"
-                                    placeholder="Repeat your new password"
-                                />
-                                {pwErrors.password_confirmation && (
-                                    <span className="app-field-error">{pwErrors.password_confirmation}</span>
-                                )}
-                            </div>
+                            <label htmlFor="st-confirm-pw">Confirm new password</label>
+                            <PasswordField
+                                id="st-confirm-pw"
+                                value={confirmPassword}
+                                onChange={setConfirmPassword}
+                                autoComplete="new-password"
+                                placeholder="Repeat your new password"
+                                error={pwErrors.password_confirmation}
+                            />
 
                             <button
                                 type="button"

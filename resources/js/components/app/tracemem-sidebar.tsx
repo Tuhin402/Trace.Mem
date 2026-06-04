@@ -120,7 +120,7 @@ function SidebarUser() {
             {open && (
                 <div className="tracemem-user-dropdown">
                     <Link
-                        href="/settings/profile"
+                        href="/settings"
                         className="tracemem-user-dd-item"
                         onClick={() => setOpen(false)}
                     >

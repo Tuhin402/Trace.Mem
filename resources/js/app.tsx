@@ -38,6 +38,7 @@ import '../css/pages/apikeys.css';
 import '../css/pages/settings.css';
 import '../css/pages/billing.css';
 import '../css/pages/logs.css';
+import '../css/pages/observability.css';
 
 
 

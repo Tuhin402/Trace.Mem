@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AuthPromoPanel from '@/components/public/auth-promo-panel';
 import '../../../css/pages/auth.css';
@@ -13,6 +14,8 @@ export default function Register() {
         account_type: 'individual',
         company_name: '',
     });
+    const [showPw, setShowPw] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -125,26 +128,37 @@ export default function Register() {
                             <label className="auth-label" htmlFor="reg-password">
                                 Password
                             </label>
-                            <input
-                                id="reg-password"
-                                type="password"
-                                className="auth-input"
-                                placeholder="••••••••"
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                autoComplete="new-password"
-                                required
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    id="reg-password"
+                                    type={showPw ? 'text' : 'password'}
+                                    className="auth-input"
+                                    placeholder="••••••••"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    autoComplete="new-password"
+                                    required
+                                    style={{ paddingRight: '44px' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPw(!showPw)}
+                                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: 'var(--app-text-dim)', display: 'flex', alignItems: 'center' }}
+                                >
+                                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                             {errors.password && (
                                 <div className="auth-error">{errors.password}</div>
                             )}
-                            {/* Password rules */}
+                            {/* Password rules — live highlighting */}
                             <div className="auth-pw-rules" aria-label="Password requirements">
-                                <span className="auth-pw-rule">Minimum 8 characters</span>
-                                <span className="auth-pw-rule">At least one uppercase letter (A–Z)</span>
-                                <span className="auth-pw-rule">At least one lowercase letter (a–z)</span>
-                                <span className="auth-pw-rule">At least one number (0–9)</span>
-                                <span className="auth-pw-rule">At least one special character (!@#$…)</span>
+                                <span className="auth-pw-rule" style={{ color: data.password.length >= 8 ? 'var(--app-success, #22c55e)' : undefined }}>Minimum 8 characters</span>
+                                <span className="auth-pw-rule" style={{ color: /[A-Z]/.test(data.password) ? 'var(--app-success, #22c55e)' : undefined }}>At least one uppercase letter (A–Z)</span>
+                                <span className="auth-pw-rule" style={{ color: /[a-z]/.test(data.password) ? 'var(--app-success, #22c55e)' : undefined }}>At least one lowercase letter (a–z)</span>
+                                <span className="auth-pw-rule" style={{ color: /[0-9]/.test(data.password) ? 'var(--app-success, #22c55e)' : undefined }}>At least one number (0–9)</span>
+                                <span className="auth-pw-rule" style={{ color: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(data.password) ? 'var(--app-success, #22c55e)' : undefined }}>At least one special character (!@#$…)</span>
                             </div>
                         </div>
 
@@ -153,16 +167,27 @@ export default function Register() {
                             <label className="auth-label" htmlFor="reg-password-confirm">
                                 Confirm password
                             </label>
-                            <input
-                                id="reg-password-confirm"
-                                type="password"
-                                className="auth-input"
-                                placeholder="••••••••"
-                                value={data.password_confirmation}
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
-                                autoComplete="new-password"
-                                required
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    id="reg-password-confirm"
+                                    type={showConfirm ? 'text' : 'password'}
+                                    className="auth-input"
+                                    placeholder="••••••••"
+                                    value={data.password_confirmation}
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    autoComplete="new-password"
+                                    required
+                                    style={{ paddingRight: '44px' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirm(!showConfirm)}
+                                    aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: 'var(--app-text-dim)', display: 'flex', alignItems: 'center' }}
+                                >
+                                    {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                             {errors.password_confirmation && (
                                 <div className="auth-error">{errors.password_confirmation}</div>
                             )}

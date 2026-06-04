@@ -32,6 +32,26 @@ type ApiKeyItem = {
     created_at: string;
 };
 
+type MemoryItem = {
+    id: number;
+    type: string;
+    content: string;
+    confidence: string;
+    decay_score: string;
+    status: string;
+    created_at: string;
+};
+
+type InsightsData = {
+    memory_writes: number;
+    recall_hit_rate: number;
+    total_tokens: number;
+    top_endpoints: { endpoint: string; total: number }[];
+    split: { test: number; live: number };
+    latency_trend: { date: string; avg_latency: number }[];
+    error_trend: { date: string; error_count: number }[];
+};
+
 type SubscriptionFeature = {
     id: number;
     feature_scope: 'global' | 'model';
@@ -98,6 +118,8 @@ type PageProps = {
     plans?: SubscriptionPlan[];
     usageStats?: UsageStats;
     usageLogs?: UsageRecentItem[];
+    todayInsights?: InsightsData;
+    memories?: MemoryItem[];
     subscription?: {
         starts_at?: string | null;
         renews_at?: string | null;
@@ -145,6 +167,8 @@ export default function Dashboard() {
     const plans        = props.plans ?? [];
     const usageStats   = props.usageStats;
     const recentUsage  = props.usageLogs ?? [];
+    const todayInsights = props.todayInsights;
+    const memories     = props.memories ?? [];
     const subscription = props.subscription ?? null;
     const filters      = props.selectedFilters ?? {};
     const flashKey     = props.flash?.plain_key ?? null;
@@ -465,6 +489,118 @@ export default function Dashboard() {
                     </div>
                 )}
 
+                {/* ── Observability Modules ── */}
+                <div className="app-panel">
+                    <div className="app-panel-head">
+                        <div>
+                            <h2>Observability & Insights</h2>
+                            <p>Real-time analytics and memory inspection.</p>
+                        </div>
+                    </div>
+
+                    {(recentUsage.length === 0 && memories.length === 0) ? (
+                        <div className="obs-empty-banner">
+                            <div className="obs-empty-icon">
+                                <ShieldCheck size={20} />
+                            </div>
+                            <div className="obs-empty-title">Start sending data to unlock insights</div>
+                            <div className="obs-empty-desc">
+                                Once your API keys are active, this section will populate with a premium Memory Inspector 
+                                and detailed usage analytics for the current day.
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '16px' }}>
+                            
+                            {/* Today's Insights */}
+                            {todayInsights && (
+                                <div style={{ paddingBottom: '24px', borderBottom: '1px solid var(--tm-border)' }}>
+                                    <div className="obs-title">Today's Activity</div>
+                                    <div className="obs-insights-grid">
+                                        <div className="obs-insight-card">
+                                            <span className="obs-insight-label">Memory Writes</span>
+                                            <span className="obs-insight-value">{fmtNum(todayInsights.memory_writes)}</span>
+                                        </div>
+                                        <div className="obs-insight-card">
+                                            <span className="obs-insight-label">Recall Hit Rate</span>
+                                            <span className="obs-insight-value">{todayInsights.recall_hit_rate}%</span>
+                                        </div>
+                                        <div className="obs-insight-card">
+                                            <span className="obs-insight-label">Total Tokens</span>
+                                            <span className="obs-insight-value">{fmtNum(todayInsights.total_tokens)}</span>
+                                        </div>
+                                        <div className="obs-insight-card">
+                                            <span className="obs-insight-label">Env Split</span>
+                                            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                                <span className="app-badge app-badge-test">{fmtNum(todayInsights.split.test)} test</span>
+                                                <span className="app-badge app-badge-live">{fmtNum(todayInsights.split.live)} live</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
+                                        <span className="obs-subtitle">Top Endpoints (Today)</span>
+                                        <Link href="/logs?tab=insights" className="app-panel-link">
+                                            View all-time insights <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
+                                        </Link>
+                                    </div>
+                                    <div className="obs-endpoints-list">
+                                        {todayInsights.top_endpoints.length === 0 && (
+                                            <span className="app-mono-label" style={{ color: 'var(--app-text-subtle)' }}>No requests today</span>
+                                        )}
+                                        {todayInsights.top_endpoints.map(ep => (
+                                            <div className="obs-endpoint-row" key={ep.endpoint}>
+                                                <span className="obs-endpoint-name">{ep.endpoint}</span>
+                                                <span className="obs-endpoint-count">{fmtNum(ep.total)} calls</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Memory Inspector */}
+                            <div>
+                                <div className="obs-title">Memory Inspector</div>
+                                <div className="obs-subtitle">Recent atomic memories created across your environments.</div>
+                                
+                                {memories.length === 0 ? (
+                                    <div className="app-empty-state" style={{ marginTop: '16px' }}>
+                                        <div className="app-empty-state-title">No memories stored yet</div>
+                                        <p className="app-empty-state-desc">Use the /remember endpoint to store your first memory.</p>
+                                    </div>
+                                ) : (
+                                    <div className="obs-memory-grid">
+                                        {memories.map(mem => (
+                                            <div className="obs-memory-card" key={mem.id}>
+                                                <div className="obs-memory-head">
+                                                    <span className="obs-memory-type">{mem.type}</span>
+                                                    <span className="obs-memory-date">
+                                                        {new Date(mem.created_at).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                                <div className="obs-memory-content">
+                                                    {mem.content}
+                                                </div>
+                                                <div className="obs-memory-meta">
+                                                    <div className="obs-meta-item">
+                                                        <Activity size={10} /> Conf: {Number(mem.confidence).toFixed(2)}
+                                                    </div>
+                                                    <div className="obs-meta-item">
+                                                        <Clock3 size={10} /> Decay: {Number(mem.decay_score).toFixed(2)}
+                                                    </div>
+                                                    <div className="obs-meta-item">
+                                                        Status: <span style={{ color: 'var(--tm-primary)' }}>{mem.status}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* ── Recent API activity ── */}
                 <div className="app-panel app-panel-flex" style={{ height: '400px' }}>
                     <div className="app-panel-head" style={{ flexShrink: 0, marginBottom: '16px' }}>
@@ -472,7 +608,7 @@ export default function Dashboard() {
                             <h2>Recent API Activity</h2>
                             <p>Last 24-hour requests across all keys</p>
                         </div>
-                        <Link href="/logs" className="app-panel-link">
+                        <Link href="/logs?tab=usage" className="app-panel-link">
                             View all logs <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
                         </Link>
                     </div>

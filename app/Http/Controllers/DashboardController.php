@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Memory;
 use App\Services\Billing\ApiUsageAnalyticsService;
 use App\Services\Billing\BillingCatalogService;
 use Illuminate\Http\Request;
@@ -19,6 +20,9 @@ class DashboardController extends Controller
         $user    = $request->user();
         $filters = $request->only(['period', 'month']);
         $usage   = $this->analytics->forUser($user, $filters);
+        
+        $todayInsights = $this->analytics->insightsForUser($user, ['period' => 'today']);
+        $memories = Memory::where('user_id', $user->id)->latest('created_at')->take(6)->get();
 
         // Active subscription (null if cancelled / none)
         $subscription = $user?->currentSubscription;
@@ -32,6 +36,8 @@ class DashboardController extends Controller
             'usageStats'      => $usage['summary'],
             'usageLogs'       => $usage['recent'],
             'availableMonths' => $usage['months'],
+            'todayInsights'   => $todayInsights,
+            'memories'        => $memories,
             'selectedFilters' => $filters,
             'subscription'    => $subscription
                 ? [

@@ -44,6 +44,108 @@ class ApiUsageAnalyticsService
     }
 
     /**
+     * Returns insights for the new Usage Analytics & Insights module.
+     */
+    public function insightsForUser(User $user, array $filters = []): array
+    {
+        $keyIds = $user->apiKeys()->pluck('id');
+
+        if ($keyIds->isEmpty()) {
+            return $this->emptyInsights();
+        }
+
+        $base     = ApiUsageLog::query()->whereIn('api_key_id', $keyIds);
+        $filtered = $this->applyFilters(clone $base, $filters);
+
+        $totalRecalls = (clone $filtered)->where('endpoint', 'like', '%recall%')->count();
+        $successfulRecalls = (clone $filtered)->where('endpoint', 'like', '%recall%')->whereBetween('status_code', [200, 299])->count();
+        $recallHitRate = $totalRecalls > 0 ? round(($successfulRecalls / $totalRecalls) * 100) : 0;
+
+        $memoryWrites = (clone $filtered)->where('endpoint', 'like', '%remember%')->whereBetween('status_code', [200, 299])->count();
+        $totalTokens = (clone $filtered)->sum('tokens_used');
+
+        $topEndpoints = (clone $filtered)
+            ->select('endpoint', DB::raw('count(*) as total'))
+            ->groupBy('endpoint')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $testUsage = (clone $filtered)->where('is_sandbox', true)->count();
+        $liveUsage = (clone $filtered)->where('is_sandbox', false)->count();
+
+        // Calculate mode distribution by joining api_keys if needed, or just relying on logs if we logged it.
+        // Wait, mode is NOT on ApiUsageLog, it's on ApiKey. We must join.
+        $modeDistribution = (clone $filtered)
+            ->join('api_keys', 'api_usage_logs.api_key_id', '=', 'api_keys.id')
+            ->select('api_keys.mode', DB::raw('count(api_usage_logs.id) as total'))
+            ->groupBy('api_keys.mode')
+            ->get();
+
+        $keyUsage = (clone $filtered)
+            ->join('api_keys', 'api_usage_logs.api_key_id', '=', 'api_keys.id')
+            ->select(
+                'api_keys.name',
+                'api_keys.environment',
+                DB::raw('count(api_usage_logs.id) as total_requests'),
+                DB::raw('round(avg(api_usage_logs.latency_ms)) as avg_latency')
+            )
+            ->groupBy('api_keys.id', 'api_keys.name', 'api_keys.environment')
+            ->orderByDesc('total_requests')
+            ->limit(5)
+            ->get();
+
+        $driver = DB::getDriverName();
+        $dateExp = match ($driver) {
+            'mysql', 'mariadb' => "DATE(api_usage_logs.requested_at) as date",
+            'pgsql'            => "DATE(api_usage_logs.requested_at) as date",
+            default            => "date(api_usage_logs.requested_at) as date",
+        };
+
+        $latencyTrend = (clone $filtered)
+            ->selectRaw("$dateExp, round(avg(latency_ms)) as avg_latency")
+            ->whereNotNull('latency_ms')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->limit(30)
+            ->get();
+
+        $errorTrend = (clone $filtered)
+            ->selectRaw("$dateExp, count(*) as error_count")
+            ->where('status_code', '>=', 400)
+            ->groupBy('date')
+            ->orderBy('date')
+            ->limit(30)
+            ->get();
+
+        $requestTrend = (clone $filtered)
+            ->selectRaw("$dateExp, count(*) as total")
+            ->groupBy('date')
+            ->orderBy('date')
+            ->limit(30)
+            ->get();
+
+        $totalRequests = (clone $filtered)->count();
+        $errorCount = (clone $filtered)->where('status_code', '>=', 400)->count();
+        $errorRate = $totalRequests > 0 ? round(($errorCount / $totalRequests) * 100, 2) : 0;
+
+        return [
+            'memory_writes'     => $memoryWrites,
+            'recall_hit_rate'   => $recallHitRate,
+            'total_tokens'      => (int) $totalTokens,
+            'top_endpoints'     => $topEndpoints,
+            'split'             => ['test' => $testUsage, 'live' => $liveUsage],
+            'latency_trend'     => $latencyTrend,
+            'error_trend'       => $errorTrend,
+            'request_trend'     => $requestTrend,
+            'mode_distribution' => $modeDistribution,
+            'key_usage'         => $keyUsage,
+            'error_rate'        => $errorRate,
+            'total_requests'    => $totalRequests,
+        ];
+    }
+
+    /**
      * Returns logs for the dedicated Logs page with pagination.
      * Supports period / month / search filters.
      */
@@ -100,21 +202,51 @@ class ApiUsageAnalyticsService
     {
         $period = $filters['period'] ?? 'all_time';
         $month  = $filters['month'] ?? null;
+        $env    = $filters['environment'] ?? 'all';
+        $status = $filters['status'] ?? 'all';
+        $mode   = $filters['mode'] ?? 'all';
+
+        if ($env !== 'all') {
+            $isSandbox = $env === 'test';
+            $query->where('api_usage_logs.is_sandbox', $isSandbox);
+        }
+
+        if ($status !== 'all') {
+            if ($status === 'success') {
+                $query->whereBetween('api_usage_logs.status_code', [200, 299]);
+            } elseif ($status === 'client_error') {
+                $query->whereBetween('api_usage_logs.status_code', [400, 499]);
+            } elseif ($status === 'server_error') {
+                $query->where('api_usage_logs.status_code', '>=', 500);
+            }
+        }
+
+        if ($mode !== 'all') {
+            $query->whereHas('apiKey', function ($q) use ($mode) {
+                $q->where('mode', $mode);
+            });
+        }
 
         if ($month) {
             [$start, $end] = $this->monthRange($month);
-            return $query->whereBetween('requested_at', [$start, $end]);
+            $query->whereBetween('api_usage_logs.requested_at', [$start, $end]);
+        } else {
+            match ($period) {
+                'today'        => $query->where('api_usage_logs.requested_at', '>=', now()->startOfDay()),
+                '7_days'       => $query->where('api_usage_logs.requested_at', '>=', now()->subDays(7)),
+                '30_days'      => $query->where('api_usage_logs.requested_at', '>=', now()->subDays(30)),
+                '90_days'      => $query->where('api_usage_logs.requested_at', '>=', now()->subDays(90)),
+                'this_month'   => $query->whereBetween('api_usage_logs.requested_at', [now()->startOfMonth(), now()->endOfMonth()]),
+                'last_month'   => $query->whereBetween('api_usage_logs.requested_at', [
+                    now()->subMonthNoOverflow()->startOfMonth(),
+                    now()->subMonthNoOverflow()->endOfMonth(),
+                ]),
+                'year_to_date' => $query->whereBetween('api_usage_logs.requested_at', [now()->startOfYear(), now()]),
+                default        => null,
+            };
         }
 
-        return match ($period) {
-            'this_month'   => $query->whereBetween('requested_at', [now()->startOfMonth(), now()->endOfMonth()]),
-            'last_month'   => $query->whereBetween('requested_at', [
-                now()->subMonthNoOverflow()->startOfMonth(),
-                now()->subMonthNoOverflow()->endOfMonth(),
-            ]),
-            'year_to_date' => $query->whereBetween('requested_at', [now()->startOfYear(), now()]),
-            default        => $query,  // all_time — no filter
-        };
+        return $query;
     }
 
     private function monthRange(string $month): array
@@ -135,9 +267,9 @@ class ApiUsageAnalyticsService
         $driver = DB::getDriverName();
 
         $expression = match ($driver) {
-            'mysql', 'mariadb' => "DATE_FORMAT(requested_at, '%Y-%m') as month",
-            'pgsql'            => "TO_CHAR(requested_at, 'YYYY-MM') as month",
-            default            => "strftime('%Y-%m', requested_at) as month",  // SQLite
+            'mysql', 'mariadb' => "DATE_FORMAT(api_usage_logs.requested_at, '%Y-%m') as month",
+            'pgsql'            => "TO_CHAR(api_usage_logs.requested_at, 'YYYY-MM') as month",
+            default            => "strftime('%Y-%m', api_usage_logs.requested_at) as month",  // SQLite
         };
 
         return (clone $base)
@@ -161,6 +293,24 @@ class ApiUsageAnalyticsService
             ],
             'recent'  => collect(),
             'months'  => collect(),
+        ];
+    }
+
+    private function emptyInsights(): array
+    {
+        return [
+            'memory_writes'     => 0,
+            'recall_hit_rate'   => 0,
+            'total_tokens'      => 0,
+            'top_endpoints'     => [],
+            'split'             => ['test' => 0, 'live' => 0],
+            'latency_trend'     => [],
+            'error_trend'       => [],
+            'request_trend'     => [],
+            'mode_distribution' => [],
+            'key_usage'         => [],
+            'error_rate'        => 0,
+            'total_requests'    => 0,
         ];
     }
 }

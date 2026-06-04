@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AuthPromoPanel from '@/components/public/auth-promo-panel';
 import '../../../css/pages/auth.css';
@@ -10,6 +11,7 @@ export default function Login() {
         password: '',
         remember: false,
     });
+    const [showPw, setShowPw] = useState(false);
 
     function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -62,16 +64,27 @@ export default function Login() {
                                     Forgot password?
                                 </Link>
                             </div>
-                            <input
-                                id="password"
-                                type="password"
-                                className="auth-input"
-                                placeholder="••••••••"
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                autoComplete="current-password"
-                                required
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    id="password"
+                                    type={showPw ? 'text' : 'password'}
+                                    className="auth-input"
+                                    placeholder="••••••••"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    autoComplete="current-password"
+                                    required
+                                    style={{ paddingRight: '44px' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPw(!showPw)}
+                                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: 'var(--app-text-dim)', display: 'flex', alignItems: 'center' }}
+                                >
+                                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                             {errors.password && (
                                 <div className="auth-error">{errors.password}</div>
                             )}

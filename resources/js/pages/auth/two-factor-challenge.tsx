@@ -34,11 +34,6 @@ export default function TwoFactorChallenge() {
         };
     }, [showRecoveryInput]);
 
-    setLayoutProps({
-        title: authConfigContent.title,
-        description: authConfigContent.description,
-    });
-
     const toggleRecoveryMode = (clearErrors: () => void): void => {
         setShowRecoveryInput(!showRecoveryInput);
         clearErrors();
@@ -49,91 +44,98 @@ export default function TwoFactorChallenge() {
         <>
             <Head title="Two-factor authentication" />
 
-            <Form
-                {...store.form()}
-                className="auth-fields"
-                resetOnError
-                resetOnSuccess={!showRecoveryInput}
-            >
-                {({ errors, processing, clearErrors }) => (
-                    <>
-                        {showRecoveryInput ? (
-                            /* Recovery code input */
-                            <div className="auth-field">
-                                <label className="auth-label" htmlFor="recovery-code-input">
-                                    Recovery code
-                                </label>
-                                <input
-                                    id="recovery-code-input"
-                                    name="recovery_code"
-                                    type="text"
-                                    className="auth-recovery-input"
-                                    placeholder="xxxx-xxxx-xxxx-xxxx"
-                                    autoFocus={showRecoveryInput}
-                                    required
-                                    spellCheck={false}
-                                    autoComplete="one-time-code"
-                                />
-                                {errors.recovery_code && (
-                                    <div className="auth-error">{errors.recovery_code}</div>
-                                )}
-                            </div>
-                        ) : (
-                            /* OTP input */
-                            <div className="auth-field" style={{ alignItems: 'center' }}>
-                                <div className="auth-otp-wrap">
-                                    <InputOTP
-                                        name="code"
-                                        maxLength={OTP_MAX_LENGTH}
-                                        value={code}
-                                        onChange={(value) => setCode(value)}
-                                        disabled={processing}
-                                        pattern={REGEXP_ONLY_DIGITS}
-                                    >
-                                        <InputOTPGroup>
-                                            {Array.from(
-                                                { length: OTP_MAX_LENGTH },
-                                                (_, index) => (
-                                                    <InputOTPSlot
-                                                        key={index}
-                                                        index={index}
-                                                    />
-                                                ),
-                                            )}
-                                        </InputOTPGroup>
-                                    </InputOTP>
+            <div className="auth-card">
+                <h1 className="auth-page-title">{authConfigContent.title}</h1>
+                <p className="auth-page-desc">
+                    {authConfigContent.description}
+                </p>
+
+                <Form
+                    {...store.form()}
+                    className="auth-fields"
+                    resetOnError
+                    resetOnSuccess={!showRecoveryInput}
+                >
+                    {({ errors, processing, clearErrors }) => (
+                        <>
+                            {showRecoveryInput ? (
+                                /* Recovery code input */
+                                <div className="auth-field">
+                                    <label className="auth-label" htmlFor="recovery-code-input">
+                                        Recovery code
+                                    </label>
+                                    <input
+                                        id="recovery-code-input"
+                                        name="recovery_code"
+                                        type="text"
+                                        className="auth-recovery-input"
+                                        placeholder="xxxx-xxxx-xxxx-xxxx"
+                                        autoFocus={showRecoveryInput}
+                                        required
+                                        spellCheck={false}
+                                        autoComplete="one-time-code"
+                                    />
+                                    {errors.recovery_code && (
+                                        <div className="auth-error">{errors.recovery_code}</div>
+                                    )}
                                 </div>
-                                {errors.code && (
-                                    <div className="auth-error" style={{ marginTop: '8px' }}>
-                                        {errors.code}
+                            ) : (
+                                /* OTP input */
+                                <div className="auth-field" style={{ alignItems: 'center' }}>
+                                    <div className="auth-otp-wrap">
+                                        <InputOTP
+                                            name="code"
+                                            maxLength={OTP_MAX_LENGTH}
+                                            value={code}
+                                            onChange={(value) => setCode(value)}
+                                            disabled={processing}
+                                            pattern={REGEXP_ONLY_DIGITS}
+                                        >
+                                            <InputOTPGroup>
+                                                {Array.from(
+                                                    { length: OTP_MAX_LENGTH },
+                                                    (_, index) => (
+                                                        <InputOTPSlot
+                                                            key={index}
+                                                            index={index}
+                                                        />
+                                                    ),
+                                                )}
+                                            </InputOTPGroup>
+                                        </InputOTP>
                                     </div>
-                                )}
-                            </div>
-                        )}
+                                    {errors.code && (
+                                        <div className="auth-error" style={{ marginTop: '8px' }}>
+                                            {errors.code}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            className="auth-btn"
-                            disabled={processing}
-                            id="two-factor-submit-btn"
-                        >
-                            {processing && <span className="auth-spinner" aria-hidden="true" />}
-                            {processing ? 'Verifying…' : 'Verify & continue'}
-                        </button>
-
-                        {/* Toggle mode */}
-                        <div className="auth-mode-toggle">
+                            {/* Submit */}
                             <button
-                                type="button"
-                                onClick={() => toggleRecoveryMode(clearErrors)}
+                                type="submit"
+                                className="auth-btn"
+                                disabled={processing}
+                                id="two-factor-submit-btn"
                             >
-                                {authConfigContent.toggleText}
+                                {processing && <span className="auth-spinner" aria-hidden="true" />}
+                                {processing ? 'Verifying…' : 'Verify & continue'}
                             </button>
-                        </div>
-                    </>
-                )}
-            </Form>
+
+                            {/* Toggle mode */}
+                            <div className="auth-mode-toggle">
+                                <button
+                                    type="button"
+                                    onClick={() => toggleRecoveryMode(clearErrors)}
+                                >
+                                    {authConfigContent.toggleText}
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </Form>
+            </div>
         </>
     );
 }

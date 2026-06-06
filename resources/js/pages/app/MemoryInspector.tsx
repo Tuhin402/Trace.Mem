@@ -11,6 +11,7 @@ import {
     Crosshair,
 } from 'lucide-react';
 import { fmtNum } from '@/lib/fmt';
+import { MemoryImportExport } from '@/components/app/MemoryImportExport';
 
 /* ── Types ──────────────────────────────────────────────── */
 type MemoryMeta = Record<string, unknown>;
@@ -355,7 +356,7 @@ export default function MemoryInspector() {
             <div className="app-page">
 
                 {/* ── Header ── */}
-                <div className="app-page-header">
+                <div className="app-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                     <div>
                         <div style={{ marginBottom: '12px' }}>
                             <Link href="/dashboard" className="mi-back-link">
@@ -367,6 +368,9 @@ export default function MemoryInspector() {
                         <p className="app-page-subtitle">
                             Debug console - inspect stored memories, scoring, recall eligibility, and conflicts.
                         </p>
+                    </div>
+                    <div>
+                        <MemoryImportExport />
                     </div>
                 </div>
 

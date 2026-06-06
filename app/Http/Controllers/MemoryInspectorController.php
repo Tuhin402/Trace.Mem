@@ -219,4 +219,155 @@ class MemoryInspectorController extends Controller
             'details'         => $details,
         ];
     }
+
+    public function export(Request $request)
+    {
+        $user = $request->user();
+        $memories = Memory::where('user_id', $user->id)->get();
+
+        $data = [
+            'version' => '1.0',
+            'export_date' => now()->toIso8601String(),
+            'original_user_id' => $user->id,
+            'original_tenant_scope_id' => $user->tenant_scope_id,
+            'memories' => $memories->map(function ($memory) {
+                $attributes = $memory->getAttributes();
+                unset($attributes['id']);
+                unset($attributes['tenant_id']);
+                unset($attributes['user_id']);
+                return $attributes;
+            })->all(),
+        ];
+
+        return response()->streamDownload(function () use ($data) {
+            echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }, 'memories_export_' . now()->format('Y_m_d_H_i_s') . '.json', [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimetypes:application/json,text/plain', 'max:7168'], // 7MB max
+        ]);
+
+        $file = $request->file('file');
+        $content = file_get_contents($file->getRealPath());
+        $data = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !isset($data['memories']) || !is_array($data['memories'])) {
+            return back()->withErrors(['file' => 'Invalid JSON structure. Must contain a "memories" array.']);
+        }
+
+        $user = $request->user();
+        $tenantId = $user->tenant_scope_id;
+        $userId = $user->id;
+
+        $originalTenantId = $data['original_tenant_scope_id'] ?? null;
+        $originalUserId = $data['original_user_id'] ?? null;
+        $isCrossSystem = ($originalTenantId && $originalTenantId !== $tenantId) || ($originalUserId && $originalUserId !== $userId);
+
+        $importedCount = 0;
+        $conflicts = [];
+
+        foreach ($data['memories'] as $memoryData) {
+            if (empty($memoryData['content_hash']) || empty($memoryData['type'])) {
+                continue;
+            }
+
+            // check if memory exists
+            $existing = Memory::where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->where('type', $memoryData['type'])
+                ->where('content_hash', $memoryData['content_hash'])
+                ->first();
+
+            $meta = is_string($memoryData['metadata']) ? json_decode($memoryData['metadata'], true) : ($memoryData['metadata'] ?? []);
+            if (!is_array($meta)) $meta = [];
+
+            if ($isCrossSystem) {
+                $meta['migrated'] = true;
+                $meta['migrated_from_tenant'] = $originalTenantId;
+                $meta['migrated_from_user'] = $originalUserId;
+            }
+
+            $memoryData['metadata'] = $meta;
+
+            if ($existing) {
+                $conflicts[] = [
+                    'imported_memory' => $memoryData,
+                    'existing_memory' => $existing->toArray(),
+                ];
+            } else {
+                $memoryData['tenant_id'] = $tenantId;
+                $memoryData['user_id'] = $userId;
+                
+                // Remove timestamps if they are set so DB can handle or we respect them
+                // Eloquent handles created_at, updated_at
+                Memory::create($memoryData);
+                $importedCount++;
+            }
+        }
+
+        if (count($conflicts) > 0) {
+            return response()->json([
+                'status' => 'conflicts',
+                'imported_count' => $importedCount,
+                'conflicts' => $conflicts,
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Successfully imported {$importedCount} memories.");
+    }
+
+    public function resolveImport(Request $request)
+    {
+        $request->validate([
+            'resolutions' => ['required', 'array'],
+            'resolutions.*.action' => ['required', 'in:overwrite,skip'],
+            'resolutions.*.memory' => ['required', 'array'],
+        ]);
+
+        $user = $request->user();
+        $tenantId = $user->tenant_scope_id;
+        $userId = $user->id;
+
+        $resolvedCount = 0;
+
+        foreach ($request->input('resolutions') as $res) {
+            if ($res['action'] === 'skip') {
+                continue;
+            }
+
+            $mem = $res['memory'];
+            if (empty($mem['content_hash']) || empty($mem['type'])) continue;
+
+            $existing = Memory::where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->where('type', $mem['type'])
+                ->where('content_hash', $mem['content_hash'])
+                ->first();
+
+            if ($existing) {
+                $updateData = $mem;
+                unset($updateData['id']); // just in case
+                unset($updateData['tenant_id']);
+                unset($updateData['user_id']);
+                
+                $meta = is_string($updateData['metadata']) ? json_decode($updateData['metadata'], true) : ($updateData['metadata'] ?? []);
+                if (!is_array($meta)) $meta = [];
+                // Migration marks should already be on the payload from the frontend if needed
+                $updateData['metadata'] = $meta;
+
+                $existing->update($updateData);
+                $resolvedCount++;
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'resolved_count' => $resolvedCount,
+        ]);
+    }
 }

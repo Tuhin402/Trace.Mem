@@ -258,6 +258,16 @@
     }
     .db-activity-chip { display: none; }
     .db-activity-chip:first-of-type { display: inline-flex; }
+    
+    .db-promo-head {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 16px;
+    }
+    .db-promo-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 640px) {

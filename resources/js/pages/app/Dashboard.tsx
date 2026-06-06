@@ -427,6 +427,27 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {/* ── Data Portability Promo ── */}
+                <div className="app-panel" style={{ marginBottom: '24px', background: 'linear-gradient(145deg, var(--app-surface), var(--app-background))', border: '1px solid var(--app-border)', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', right: '-20px', top: '-20px', opacity: 0.05, pointerEvents: 'none' }}>
+                        <Activity size={180} />
+                    </div>
+                    <div className="app-panel-head db-promo-head" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <ShieldCheck size={18} style={{ color: 'var(--app-accent)' }} /> 
+                                Memory Portability & Migration
+                            </h2>
+                            <p style={{ maxWidth: '600px', marginTop: '4px' }}>
+                                Full control over your data. You can now easily export all your memories as JSON for backup, or securely import memories migrated from another system directly into your tenant.
+                            </p>
+                        </div>
+                        <Link href="/memory-inspector" className="app-btn app-btn-primary db-promo-btn">
+                            Go to Memory Inspector <ArrowRight size={14} />
+                        </Link>
+                    </div>
+                </div>
+
                 {/* ── Plans section — ONLY if no active plan ── */}
                 {!plan && plans.length > 0 && (
                     <div className="app-panel">

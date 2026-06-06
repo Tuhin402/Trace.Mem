@@ -47,6 +47,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api-keys', [ApiKeyController::class, 'index'])->name('api.keys');
     Route::get('/logs', [LogsController::class, 'index'])->name('logs');
     Route::get('/memory-inspector', [MemoryInspectorController::class, 'index'])->name('memory.inspector');
+    Route::get('/memory-inspector/export', [MemoryInspectorController::class, 'export'])->name('memory.inspector.export');
+    Route::post('/memory-inspector/import', [MemoryInspectorController::class, 'import'])->name('memory.inspector.import');
+    Route::post('/memory-inspector/import/resolve', [MemoryInspectorController::class, 'resolveImport'])->name('memory.inspector.import.resolve');
     Route::post('/api-keys', [ApiKeyController::class, 'store'])->name('api.keys.store');
     Route::delete('/api-keys/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api.keys.destroy');
     Route::post('/api-keys/{apiKey}/rotate', [ApiKeyController::class, 'rotate'])->name('api.keys.rotate');

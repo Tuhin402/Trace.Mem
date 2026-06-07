@@ -43,6 +43,13 @@ return [
         'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
     ],
 
+    // nvidia nim open ai Configuration
+    'nvidia_nim_openai' => [
+        'api_key' => env('NVIDIA_KEY'),
+        'base_url' => env('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1'),
+        'model' => env('OPENAI_MODEL', 'openai/gpt-oss-20b'),
+    ],
+
     // Stripe Configuration
     'stripe' => [
         'key' => env('STRIPE_KEY'),

@@ -18,11 +18,18 @@ class MemoryExtractionService extends BaseService
     public function extract(string $input): array
     {
         try {
+            // $response = Http::timeout(10)
+            //     ->retry(2, 300)
+            //     ->withToken(config('services.openai.api_key'))
+            //     ->post(config('services.openai.base_url') . '/chat/completions', [
+            //         'model' => 'gpt-4o-mini',
+
             $response = Http::timeout(10)
                 ->retry(2, 300)
-                ->withToken(config('services.openai.api_key'))
-                ->post(config('services.openai.base_url') . '/chat/completions', [
-                    'model' => 'gpt-4o-mini',
+                ->withToken(config('services.nvidia_nim_openai.api_key'))
+                ->acceptJson()
+                ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
+                    'model' => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
                     'messages' => [
                         [
                             'role' => 'system',
@@ -77,6 +84,12 @@ class MemoryExtractionService extends BaseService
                         ],
                     ],
                     'temperature' => 0.2,
+
+                    'top_p' => 1,
+                    'max_tokens' => 4096,
+                    'stream' => false,
+                    'reasoning_effort' => 'medium',
+                    
                     'response_format' => [
                         'type' => 'json_schema',
                         'json_schema' => [

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Services\Memory\MemorySemanticSegmentationService;
+use App\Services\Memory\CodeDetectionService;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,8 @@ use Iqbalatma\LaravelServiceRepo\BaseService;
 class MemoryExtractionService extends BaseService
 {
     public function __construct(
-        private readonly MemorySemanticSegmentationService $semanticSegmenter
+        private readonly MemorySemanticSegmentationService $semanticSegmenter,
+        private readonly CodeDetectionService $codeDetector
     ) {}
 
     public function extract(string $input): array
@@ -215,27 +217,6 @@ class MemoryExtractionService extends BaseService
      */
     private function isCodeHeavyContent(string $content): bool
     {
-        // Fenced code blocks
-        if (preg_match('/```[\s\S]*?```/u', $content)) {
-            return true;
-        }
-
-        // Dense inline backtick usage (4+ backtick characters)
-        if (substr_count($content, '`') >= 4) {
-            return true;
-        }
-
-        // High ratio of syntax-heavy characters typical of code
-        $totalChars = mb_strlen($content, 'UTF-8');
-
-        if ($totalChars > 20) {
-            $specialChars = preg_match_all('/[{}()\[\];=><!@#$%^&*~]/u', $content);
-
-            if ($specialChars !== false && ($specialChars / $totalChars) > 0.15) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->codeDetector->isCodeHeavy($content);
     }
 }

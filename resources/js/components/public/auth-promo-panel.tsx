@@ -15,12 +15,12 @@ export default function AuthPromoPanel() {
                 <p className="auth-promo-body">
                     TraceMem gives your AI agents persistent, structured, and
                     tenant-scoped memory. Store what matters, recall it instantly,
-                    and assemble prompt-ready context — without bloating your prompts.
+                    and assemble prompt-ready context - without bloating your prompts.
                 </p>
 
                 <div className="auth-promo-badge" aria-hidden="true">
                     <span className="auth-promo-badge-dot" />
-                    <span>tracemem.io/api/v1 — REST · Secure · Production-Ready</span>
+                    <span>tracemem.one/api/v1 - REST · Secure · Production-Ready</span>
                 </div>
             </div>
         </div>

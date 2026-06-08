@@ -6,6 +6,13 @@ class MemorySemanticSegmentationPipeline
 {
     private const DEFAULT_MAX_SEGMENTS = 40;
 
+    private CodeDetectionService $codeDetector;
+
+    public function __construct(?CodeDetectionService $codeDetector = null)
+    {
+        $this->codeDetector = $codeDetector ?? new CodeDetectionService();
+    }
+
     public function split(string $input, int $maxSegments = self::DEFAULT_MAX_SEGMENTS): array
     {
         $input = $this->normalizeInput($input);
@@ -26,10 +33,7 @@ class MemorySemanticSegmentationPipeline
                 continue;
             }
 
-            $sourceKind = $this->detectSourceKind(
-                $block['kind'],
-                $block['contains_code']
-            );
+            $blockHasExplicitCode = $block['contains_code'];
 
             $delimiter = $block['delimiter'] ?? $this->inferDelimiter($blockText);
 
@@ -44,15 +48,22 @@ class MemorySemanticSegmentationPipeline
                     continue;
                 }
 
+                $pieceHasCode = $blockHasExplicitCode || $this->codeDetector->isCodeHeavy($restored);
+                
+                $pieceSourceKind = $this->detectSourceKind(
+                    $block['kind'],
+                    $pieceHasCode
+                );
+
                 $segments[] = [
                     'text' => $restored,
                     'metadata' => [
-                        'subject' => $sourceKind === 'code_snippet'
+                        'subject' => $pieceSourceKind === 'code_snippet'
                             ? 'general'
                             : $this->detectSubject($restored),
 
-                        'source_kind' => $sourceKind,
-                        'contains_code' => $block['contains_code'],
+                        'source_kind' => $pieceSourceKind,
+                        'contains_code' => $pieceHasCode,
                         'delimiter' => $delimiter,
                         'raw_excerpt' => $this->excerpt($restored),
                     ],

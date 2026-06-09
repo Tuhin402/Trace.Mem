@@ -2,8 +2,14 @@
 
 namespace App\Services\Memory;
 
+use App\Services\Memory\MemoryTemporalService;
+
 class MemorySemanticSegmentationService
 {
+    public function __construct(
+        private readonly MemoryTemporalService $temporalService,
+    ) {}
+
     public const ALLOWED_TYPES = ['preference', 'fact', 'rule', 'skill',];
 
     private const PREFERENCE_PATTERNS = [
@@ -133,7 +139,7 @@ class MemorySemanticSegmentationService
         $segments = $pipeline->split($input);
 
         // ── Detect global intent markers from the raw input ──────────
-        $inputLower = mb_strtolower($input, 'UTF-8');
+        $inputLower               = mb_strtolower($input, 'UTF-8');
         $isTransient              = $this->detectTransient($inputLower);
         $hasExplicitRemember      = $this->detectExplicitRemember($inputLower);
         $hasExplicitRememberCode  = $this->detectExplicitRememberCode($inputLower);
@@ -191,6 +197,9 @@ class MemorySemanticSegmentationService
                 }
             }
 
+            // ── Temporal Memory Store ────────────────────────────────
+            [$metadata, $confidence] = $this->enrichTemporalMetadata($text, $metadata, $confidence);
+
             $memories[] = [
                 'type'       => $type,
                 'content'    => $content,
@@ -200,6 +209,22 @@ class MemorySemanticSegmentationService
         }
 
         return array_values($memories);
+    }
+
+    private function enrichTemporalMetadata(string $text, array $metadata, float $confidence): array
+    {
+        $temporal = $this->temporalService->extract($text);
+
+        $metadata['temporal'] = $temporal;
+        $metadata['memory_kind'] = ($temporal['has_temporal'] ?? false)
+            ? ($temporal['kind'] ?? 'time_reference')
+            : ($metadata['memory_kind'] ?? 'note');
+
+        if (($temporal['has_temporal'] ?? false) && $confidence < 0.9) {
+            $confidence = min(1.0, round($confidence + 0.05, 4));
+        }
+
+        return [$metadata, $confidence];
     }
 
     public function detectSemanticType(string $text): string

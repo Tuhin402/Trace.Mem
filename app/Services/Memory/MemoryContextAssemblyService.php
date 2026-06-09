@@ -2,7 +2,10 @@
 
 namespace App\Services\Memory;
 
-use App\Models\Memory;
+use App\Services\Memory\MemorySemanticSegmentationService;
+use App\Services\Memory\MemoryScoringService;
+use App\Services\Memory\MemoryTemporalService;
+use App\Services\Memory\MemoryService;
 
 class MemoryContextAssemblyService
 {
@@ -10,6 +13,7 @@ class MemoryContextAssemblyService
         private readonly MemoryService $memoryService,
         private readonly MemoryScoringService $scoring,
         private readonly MemorySemanticSegmentationService $semanticSegmenter,
+        private readonly MemoryTemporalService $temporalService,
     ) {}
 
     public function assemble(
@@ -22,6 +26,7 @@ class MemoryContextAssemblyService
     ): array {
         $query = $this->normalizeText($query);
         $querySegments = $this->semanticSegmenter->split($query);
+        $queryTemporal = $this->temporalService->extract($query);
 
         $candidates = $this->memoryService->candidates(
             $tenantId,
@@ -30,7 +35,7 @@ class MemoryContextAssemblyService
         );
 
         $ranked = $candidates->map(function (Memory $memory) use ($query, $querySegments) {
-            $analysis = $this->scoreCandidate($query, $querySegments, $memory);
+            $analysis = $this->scoreCandidate($query, $querySegments, $queryTemporal, $memory);
             $promptLine = $this->formatForPrompt($memory);
 
             return [
@@ -105,7 +110,7 @@ class MemoryContextAssemblyService
         return $response;
     }
 
-    private function scoreCandidate(string $query, array $querySegments, Memory $memory): array
+    private function scoreCandidate(string $query, array $querySegments, array $queryTemporal, Memory $memory): array
     {
         $baseScore = $this->scoring->recallScore($memory);
 
@@ -166,7 +171,12 @@ class MemoryContextAssemblyService
 
         // ── Metadata-aware adjustments ───────────────────────────
         $meta = is_array($memory->metadata) ? $memory->metadata : [];
+        $memoryTemporal = is_array($meta['temporal'] ?? null) ? $meta['temporal'] : [];
         $metadataPenalty = 0.0;
+
+        $temporalBoost = $this->temporalMatchScore($queryTemporal, $memoryTemporal);
+        $score += $temporalBoost;
+        $breakdown['temporal_boost'] = round($temporalBoost, 4);
 
         // Code snippets without explicit_remember are deprioritized
         if (($meta['source_kind'] ?? null) === 'code_snippet'
@@ -180,6 +190,12 @@ class MemoryContextAssemblyService
             if (! $queryOverlapsMemory) {
                 $metadataPenalty += 0.08;
             }
+        }
+
+        // temporal memory with scoring and temporal penalty
+        if (($queryTemporal['has_temporal'] ?? false) && ! ($memoryTemporal['has_temporal'] ?? false)) {
+            $score -= 0.05;
+            $breakdown['temporal_penalty'] = 0.05;
         }
 
         // Transient memories deprioritized in context assembly
@@ -214,6 +230,54 @@ class MemoryContextAssemblyService
             ],
         ];
     }
+
+    // helpers for temporal metadata
+    private function temporalMatchScore(array $queryTemporal, array $memoryTemporal): float
+    {
+        if (! ($queryTemporal['has_temporal'] ?? false) || ! ($memoryTemporal['has_temporal'] ?? false)) {
+            return 0.0;
+        }
+
+        $qStart = $this->parseTemporalDate($queryTemporal['start_at'] ?? null);
+        $qEnd   = $this->parseTemporalDate($queryTemporal['end_at'] ?? null);
+        $mStart = $this->parseTemporalDate($memoryTemporal['start_at'] ?? null);
+        $mEnd   = $this->parseTemporalDate($memoryTemporal['end_at'] ?? null);
+
+        if ($qStart && $mStart && $qStart->isSameDay($mStart)) {return 0.35;}
+
+        if ($qStart && $mStart && $qEnd && $mEnd) {
+            $overlaps = $qStart->lessThanOrEqualTo($mEnd) && $mStart->lessThanOrEqualTo($qEnd);
+            if ($overlaps) {return 0.3;}
+        }
+
+        if (($queryTemporal['kind'] ?? null) === 'recurring'
+            && ($memoryTemporal['kind'] ?? null) === 'recurring'
+            && ($queryTemporal['recurrence_rule'] ?? null) === ($memoryTemporal['recurrence_rule'] ?? null)) {
+            return 0.3;
+        }
+
+        $qLabel = mb_strtolower((string) ($queryTemporal['label'] ?? ''), 'UTF-8');
+        $mLabel = mb_strtolower((string) ($memoryTemporal['label'] ?? ''), 'UTF-8');
+
+        if ($qLabel !== '' && $mLabel !== '' && str_contains($mLabel, $qLabel)) {
+            return 0.2;
+        }
+
+        if (($queryTemporal['schedule_like'] ?? false) && ($memoryTemporal['schedule_like'] ?? false)) {
+            return 0.1;
+        }
+
+        return 0.05;
+    }
+    private function parseTemporalDate(?string $value): ?\Carbon\CarbonImmutable
+    {
+        if (blank($value)) {return null;}
+
+        try {
+            return \Carbon\CarbonImmutable::parse($value);
+        } catch (\Throwable) {return null;}
+    }
+
 
     private function recencyBoost(Memory $memory): float
     {

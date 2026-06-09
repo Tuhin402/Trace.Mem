@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\Memory\MemorySemanticSegmentationService;
 use App\Services\Memory\CodeDetectionService;
+use App\Services\Memory\MemoryTemporalService;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,8 @@ class MemoryExtractionService extends BaseService
 {
     public function __construct(
         private readonly MemorySemanticSegmentationService $semanticSegmenter,
-        private readonly CodeDetectionService $codeDetector
+        private readonly CodeDetectionService $codeDetector,
+        private readonly MemoryTemporalService $temporalService,
     ) {}
 
     public function extract(string $input): array
@@ -183,11 +185,16 @@ class MemoryExtractionService extends BaseService
             // Build consistent metadata shape for AI-extracted items
             $isCodeHeavy = $this->isCodeHeavyContent($content);
 
+            // temporal memory
+            $temporal = $this->temporalService->extract($content);
+
             $metadata = [
                 'source_kind'   => $isCodeHeavy ? 'code_snippet' : 'plain',
                 'contains_code' => $isCodeHeavy,
                 'subject'       => 'general',
                 'source'        => 'ai_extraction',
+                'temporal'      => $temporal,
+                'memory_kind'   => ($temporal['has_temporal'] ?? false) ? ($temporal['kind'] ?? 'time_reference') : 'note',
             ];
 
             // Code-heavy AI output is gated the same way as pipeline code

@@ -271,15 +271,47 @@ class MemorySemanticSegmentationPipeline
     {
         $lower = mb_strtolower($text, 'UTF-8');
 
-        if (preg_match('/\b(?:my|our)\s+(?:gf|girlfriend|bf|boyfriend|wife|husband|partner|mother|mom|father|dad|brother|sister|son|daughter|friend|coworker|colleague|teammate|roommate|neighbor|neighbour|boss|manager|ex)\b/u', $lower)) {
+        $relations = [
+            'gf', 'gfs', 'girlfriend', 'girlfriends', 'bf', 'bfs', 'boyfriend', 'boyfriends', 
+            'wife', 'wives', 'husband', 'husbands', 'hubby', 'wifey',
+            'partner', 'partners', 'fiance', 'fiancee', 'spouse', 'spouses', 'lover', 'lovers',
+            'mother', 'mothers', 'mom', 'moms', 'momma', 'mama', 'mummy',
+            'father', 'fathers', 'dad', 'dads', 'daddy', 'papa',
+            'brother', 'brothers', 'bro', 'bros', 'sister', 'sisters', 'sis', 'sistas',
+            'son', 'sons', 'daughter', 'daughters', 'child', 'children', 'kid', 'kids', 'baby', 'babies',
+            'uncle', 'uncles', 'aunt', 'aunts', 'auntie', 'aunties', 'cousin', 'cousins', 'cuz',
+            'grandpa', 'grandma', 'granny', 'grandad', 'grandparent', 'grandparents',
+            'parent', 'parents', 'family', 'families', 'sibling', 'siblings',
+            'friend', 'friends', 'freind', 'freinds', 'fren', 'frens', 'frnd', 'frnds', 'bestie', 'besties', 'bff', 'bffs', 'buddy', 'buddies', 'pal', 'pals', 'mate', 'mates',
+            'roommate', 'roommates', 'roomie', 'roomies', 'neighbor', 'neighbors', 'neighbour', 'neighbours',
+            'coworker', 'coworkers', 'colleague', 'colleagues', 'teammate', 'teammates', 'teamate', 'teamates', 'classmate', 'classmates',
+            'boss', 'bosses', 'manager', 'managers', 'supervisor', 'supervisors', 'ex', 'exes',
+            'therapist', 'therapists', 'counselor', 'counselors', 'doctor', 'doctors', 'dr', 'drs', 'dentist', 'dentists', 'teacher', 'teachers', 'professor', 'professors', 'prof', 'profs',
+            'dog', 'dogs', 'cat', 'cats', 'pet', 'pets', 'puppy', 'puppies', 'kitten', 'kittens'
+        ];
+        $relationsPattern = implode('|', $relations);
+
+        if (preg_match('/\b(?:my|our|his|her|their)\W+(?:\w+\W+){0,2}(?:' . $relationsPattern . ')\b/u', $lower)) {
             return 'other';
         }
 
-        if (preg_match('/\b(?:he|she|they|them|their|theirs|his|her|hers|someone|somebody|another person|that person|this person)\b/u', $lower)) {
+        $standaloneOthers = [
+            'gf', 'gfs', 'bf', 'bfs', 'hubby', 'wifey', 
+            'mom', 'moms', 'momma', 'mama', 'dad', 'dads', 'daddy',
+            'bro', 'bros', 'sis', 'bestie', 'besties', 'bff', 'bffs', 
+            'roomie', 'roomies', 'roommate', 'roommates', 'boss', 'bosses'
+        ];
+        $standalonePattern = implode('|', $standaloneOthers);
+        
+        if (preg_match('/\b(?:' . $standalonePattern . ')\b/u', $lower)) {
             return 'other';
         }
 
-        if (preg_match('/\b(?:i|me|my|mine|myself|we|us|our|ours|ourselves)\b/u', $lower)) {
+        if (preg_match('/\b(?:he|he[\'’]?s|he[\'’]?ll|he[\'’]?d|him|his|she|she[\'’]?s|she[\'’]?ll|she[\'’]?d|her|hers|they|they[\'’]?re|they[\'’]?ll|they[\'’]?ve|they[\'’]?d|them|their|theirs|someone|somebody|another person|that person|this person|anyone|anybody|everyone|everybody|no one|nobody|the guy|the girl|this guy|that guy|some guy|some girl|some boy|some men|some women)\b/u', $lower)) {
+            return 'other';
+        }
+
+        if (preg_match('/\b(?:i|i[\'’]?m|i am|iam|i[\'’]?ll|i[\'’]?ve|i[\'’]?d|me|my|mine|myself|we|we[\'’]?re|we are|we[\'’]?ll|we[\'’]?ve|we[\'’]?d|us|our|ours|ourselves)\b/u', $lower)) {
             return 'self';
         }
 

@@ -123,7 +123,7 @@ const quickLinks = [
         icon: <Code2 size={18} />,
         label: 'Postman Workspace',
         sub: 'Fork and run API calls instantly',
-        href: import.meta.env.VITE_POSTMAN_WORKSPACE_URL ?? '#',
+        href: import.meta.env.VITE_POSTMAN_WORKSPACE_URL,
         external: true,
     },
     {
@@ -137,7 +137,7 @@ const quickLinks = [
 
 /* ════════════════════════════════════════════════════════════ */
 export default function Docs() {
-    const postmanUrl = import.meta.env.VITE_POSTMAN_WORKSPACE_URL ?? '#';
+    const postmanUrl = import.meta.env.VITE_POSTMAN_WORKSPACE_URL;
 
     return (
         <>

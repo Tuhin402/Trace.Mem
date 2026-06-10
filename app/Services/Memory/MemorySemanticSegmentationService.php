@@ -220,6 +220,12 @@ class MemorySemanticSegmentationService
             ? ($temporal['kind'] ?? 'time_reference')
             : ($metadata['memory_kind'] ?? 'note');
 
+        // Flag schedule-type events for downstream consumers
+        $temporalKind = $temporal['kind'] ?? null;
+        if (in_array($temporalKind, ['recurring', 'schedule', 'event'], true) && ($temporal['schedule_like'] ?? false)) {
+            $metadata['schedule_event'] = true;
+        }
+
         if (($temporal['has_temporal'] ?? false) && $confidence < 0.9) {
             $confidence = min(1.0, round($confidence + 0.05, 4));
         }

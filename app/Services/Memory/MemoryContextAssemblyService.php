@@ -34,7 +34,7 @@ class MemoryContextAssemblyService
             $candidateLimit
         );
 
-        $ranked = $candidates->map(function (Memory $memory) use ($query, $querySegments) {
+        $ranked = $candidates->map(function (Memory $memory) use ($query, $querySegments, $queryTemporal) {
             $analysis = $this->scoreCandidate($query, $querySegments, $queryTemporal, $memory);
             $promptLine = $this->formatForPrompt($memory);
 
@@ -170,13 +170,16 @@ class MemoryContextAssemblyService
         $confidencePenalty = ((float) $memory->confidence < 0.4) ? 0.1 : 0.0;
 
         // ── Metadata-aware adjustments ───────────────────────────
-        $meta = is_array($memory->metadata) ? $memory->metadata : [];
         $memoryTemporal = is_array($meta['temporal'] ?? null) ? $meta['temporal'] : [];
         $metadataPenalty = 0.0;
 
         $temporalBoost = $this->temporalMatchScore($queryTemporal, $memoryTemporal);
-        $score += $temporalBoost;
-        $breakdown['temporal_boost'] = round($temporalBoost, 4);
+
+        // Temporal penalty: query has temporal but memory doesn't
+        $temporalPenalty = 0.0;
+        if (($queryTemporal['has_temporal'] ?? false) && ! ($memoryTemporal['has_temporal'] ?? false)) {
+            $temporalPenalty = 0.05;
+        }
 
         // Code snippets without explicit_remember are deprioritized
         if (($meta['source_kind'] ?? null) === 'code_snippet'
@@ -192,12 +195,6 @@ class MemoryContextAssemblyService
             }
         }
 
-        // temporal memory with scoring and temporal penalty
-        if (($queryTemporal['has_temporal'] ?? false) && ! ($memoryTemporal['has_temporal'] ?? false)) {
-            $score -= 0.05;
-            $breakdown['temporal_penalty'] = 0.05;
-        }
-
         // Transient memories deprioritized in context assembly
         if ($meta['transient'] ?? false) {
             $metadataPenalty += 0.06;
@@ -209,9 +206,11 @@ class MemoryContextAssemblyService
             + $phraseBonus
             + $recencyBonus
             + $importanceBonus
+            + $temporalBoost
             - $conflictPenalty
             - $confidencePenalty
-            - $metadataPenalty;
+            - $metadataPenalty
+            - $temporalPenalty;
 
         return [
             'score' => max(0.0, $final),
@@ -223,9 +222,11 @@ class MemoryContextAssemblyService
                 'phrase_bonus'        => round($phraseBonus, 4),
                 'recency_bonus'       => round($recencyBonus, 4),
                 'importance_bonus'    => round($importanceBonus, 4),
+                'temporal_boost'      => round($temporalBoost, 4),
                 'conflict_penalty'    => round($conflictPenalty, 4),
                 'confidence_penalty'  => round($confidencePenalty, 4),
                 'metadata_penalty'    => round($metadataPenalty, 4),
+                'temporal_penalty'    => round($temporalPenalty, 4),
                 'final_score'         => round(max(0.0, $final), 4),
             ],
         ];

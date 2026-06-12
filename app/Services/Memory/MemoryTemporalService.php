@@ -150,6 +150,115 @@ class MemoryTemporalService
     }
 
     // ═════════════════════════════════════════════════════════════
+    //  PUBLIC — Query-level temporal classification
+    // ═════════════════════════════════════════════════════════════
+
+    /**
+     * Classify a query string to determine its temporal intent.
+     *
+     * Used by MemoryContextAssemblyService to adapt scoring weights
+     * when the query is schedule-like, event-like, recurring, etc.
+     *
+     * @return array{is_schedule_like: bool, is_event_like: bool, is_recurring: bool, is_time_range: bool, is_exact_date: bool, is_future_oriented: bool, temporal_extract: array, intent_strength: float}
+     */
+    public function classifyQuery(string $text, ?CarbonImmutable $reference = null): array
+    {
+        $reference ??= CarbonImmutable::now(config('app.timezone', 'UTC'));
+
+        $normalized = $this->normalize($text);
+        $temporal   = $this->extract($text, $reference);
+
+        $isScheduleLike = $this->containsScheduleIntent($normalized);
+
+        // ── Recurring intent: query asks about repeating patterns ──
+        $isRecurring = (bool) preg_match(
+            '/\b(?:every|daily|weekly|monthly|yearly|annually|recurring|repeating|routine|each\s+(?:day|week|month|year))\b/ui',
+            $normalized
+        );
+
+        // ── Future-oriented: query looks ahead ──────────────────────
+        $isFutureOriented = (bool) preg_match(
+            '/\b(?:upcoming|coming\s+up|next|future|later|ahead|what(?:\'s|\s+is|\s+are)\s+(?:coming|planned|scheduled|happening)|what\s+do\s+i\s+have|plans?\s+for|scheduled\s+(?:for|in|this|next))\b/ui',
+            $normalized
+        );
+
+        // ── Event-like: query targets specific events ───────────────
+        $eventKeywords = [
+            'meeting', 'meetings', 'appointment', 'appointments',
+            'event', 'events', 'deadline', 'deadlines',
+            'exam', 'exams', 'interview', 'interviews',
+            'flight', 'trip', 'doctor', 'dentist',
+            'call', 'standup', 'demo', 'review',
+            'birthday', 'anniversary', 'wedding', 'party',
+            'class', 'lecture', 'workshop', 'seminar',
+            'concert', 'dinner', 'lunch', 'brunch',
+        ];
+        $isEventLike = false;
+        foreach ($eventKeywords as $kw) {
+            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/u', $normalized)) {
+                $isEventLike = true;
+                break;
+            }
+        }
+
+        // ── Derive exact-date vs time-range from temporal extract ───
+        $kind        = $temporal['kind'] ?? null;
+        $hasTemporal = $temporal['has_temporal'] ?? false;
+
+        $isExactDate = $hasTemporal && in_array($kind, ['event', 'time_reference', 'schedule'], true)
+            && !empty($temporal['start_at'])
+            && (
+                empty($temporal['end_at'])
+                || $this->isSameDay($temporal['start_at'], $temporal['end_at'])
+            );
+
+        $isTimeRange = $hasTemporal && (
+            $kind === 'range'
+            || (
+                !empty($temporal['start_at'])
+                && !empty($temporal['end_at'])
+                && !$this->isSameDay($temporal['start_at'], $temporal['end_at'])
+            )
+        );
+
+        // ── Compute intent strength (0.0–1.0) ──────────────────────
+        $strength = 0.0;
+        if ($isScheduleLike)   { $strength += 0.35; }
+        if ($hasTemporal)      { $strength += 0.25; }
+        if ($isFutureOriented) { $strength += 0.15; }
+        if ($isEventLike)      { $strength += 0.15; }
+        if ($isRecurring)      { $strength += 0.10; }
+        $strength = round(min(1.0, $strength), 4);
+
+        return [
+            'is_schedule_like'   => $isScheduleLike,
+            'is_event_like'      => $isEventLike,
+            'is_recurring'       => $isRecurring,
+            'is_time_range'      => $isTimeRange,
+            'is_exact_date'      => $isExactDate,
+            'is_future_oriented' => $isFutureOriented,
+            'temporal_extract'   => $temporal,
+            'intent_strength'    => $strength,
+        ];
+    }
+
+    /**
+     * Helper: check whether two ISO date strings fall on the same calendar day.
+     */
+    private function isSameDay(?string $a, ?string $b): bool
+    {
+        if (blank($a) || blank($b)) {
+            return false;
+        }
+
+        try {
+            return CarbonImmutable::parse($a)->isSameDay(CarbonImmutable::parse($b));
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    // ═════════════════════════════════════════════════════════════
     //  PRIVATE — Empty payload helper
     // ═════════════════════════════════════════════════════════════
 
@@ -1574,10 +1683,10 @@ class MemoryTemporalService
     }
 
     // ═════════════════════════════════════════════════════════════
-    //  PRIVATE — Schedule intent detection
+    //  PUBLIC — Schedule intent detection
     // ═════════════════════════════════════════════════════════════
 
-    private function containsScheduleIntent(string $text): bool
+    public function containsScheduleIntent(string $text): bool
     {
         $keywords = [
             // ── Original keywords (preserved) ────────────────────

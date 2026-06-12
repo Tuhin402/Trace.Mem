@@ -439,6 +439,241 @@
 .docs-memory-card-accent.rule       { background: var(--tm-tertiary); }
 .docs-memory-card-accent.skill      { background: #a0f0c0; }
 
+.docs-postman-btn {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 rgba(255, 108, 51, 0.4);
+    background: rgba(255, 108, 51, 0.05);
+}
+
+.docs-postman-btn-label {
+    padding: 12px 20px;
+    color: #ff6c33;
+}
+
+.docs-postman-btn-arrow {
+    padding: 12px 16px;
+    background: rgba(255, 108, 51, 0.1);
+    color: #ff6c33;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid rgba(255, 108, 51, 0.2);
+}
+
+.docs-postman-info-card {
+    background: var(--tm-surface-2);
+    border: 1px solid var(--tm-border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.2s ease;
+}
+
+.docs-postman-info-card:hover {
+    background: var(--tm-surface-3);
+}
+
+.docs-postman-info-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tm-text-dim);
+}
+
+.docs-postman-info-value {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--tm-text);
+}
+
+.docs-postman-info-sub {
+    font-size: 13px;
+    color: var(--tm-text-muted);
+    line-height: 1.6;
+    margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+    .docs-postman-wrap {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   Docs Use Cases Section
+   ============================================================ */
+.docs-use-cases-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 40px;
+}
+
+.docs-uc-card {
+    background: var(--tm-surface-2);
+    border: 1px solid var(--tm-border);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.docs-uc-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--tm-border-strong);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+}
+
+.docs-uc-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.docs-uc-card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tm-surface-3);
+    border: 1px solid var(--tm-border-strong);
+    border-radius: 8px;
+    color: var(--tm-primary);
+}
+
+.docs-uc-card-title {
+    font-family: var(--font-headline);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tm-text);
+}
+
+.docs-uc-card-desc {
+    font-size: 14px;
+    color: var(--tm-text-muted);
+    line-height: 1.65;
+    flex: 1;
+}
+
+.docs-uc-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.docs-uc-card-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tm-text-dim);
+    padding: 4px 10px;
+    background: var(--tm-surface-4);
+    border: 1px solid var(--tm-border);
+    border-radius: 4px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.docs-uc-card:hover .docs-uc-card-tag {
+    background: rgba(225, 78, 246, 0.1);
+    color: var(--tm-primary);
+    border-color: rgba(225, 78, 246, 0.2);
+}
+
+@media (max-width: 900px) {
+    .docs-use-cases-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .docs-use-cases-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   Docs Architecture Flow
+   ============================================================ */
+.docs-architecture {
+    margin-top: 60px;
+}
+
+.arch-flow-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--tm-surface-2);
+    border: 1px solid var(--tm-border);
+    padding: 32px;
+}
+
+.arch-node {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: var(--tm-surface-3);
+    border: 1px solid var(--tm-border-strong);
+    position: relative;
+    transition: border-color 0.2s ease;
+}
+
+.arch-node:hover {
+    border-color: var(--tm-primary);
+}
+
+.arch-node-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tm-bg);
+    border: 1px solid var(--tm-border);
+    border-radius: 6px;
+    color: var(--tm-primary);
+    flex-shrink: 0;
+}
+
+.arch-node-content {
+    flex: 1;
+}
+
+.arch-node-title {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tm-text);
+    margin-bottom: 4px;
+}
+
+.arch-node-desc {
+    font-size: 14px;
+    color: var(--tm-text-muted);
+}
+
+.arch-arrow {
+    display: flex;
+    justify-content: center;
+    color: var(--tm-text-dim);
+}
+
+@media (max-width: 768px) {
+    .arch-node {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
 .docs-memory-card-header {
     display: flex;
     align-items: center;

@@ -1,8 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, BookOpen, Zap, Brain, Layers, Code2, Target, Pin, Scale, Wrench, Inbox, Wand2, GitMerge, PackageCheck } from 'lucide-react';
+import { ArrowRight, BookOpen, Zap, Brain, Layers, Code2, Target, Pin, Scale, Wrench, Inbox, Wand2, GitMerge, PackageCheck, Briefcase, Calendar, LayoutTemplate, Database, Users } from 'lucide-react';
 import CtaButton from '@/components/public/cta-button';
 import FaqAccordion from '@/components/public/faq-accordion';
+import UseCaseCard from '@/components/public/use-case-card';
 
 /* ── Memory types data ────────────────────────────────────── */
 const memoryTypes = [
@@ -313,6 +314,101 @@ export default function Docs() {
                                     returned context into your LLM prompt. No infrastructure changes.
                                     Works with any model.
                                 </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ══ 2.5 USE CASES & SCOPE ════════════════════════════════ */}
+                <section className="docs-section docs-section-alt" aria-label="Use cases and architecture">
+                    <div className="docs-section-inner">
+                        <div className="docs-section-head">
+                            <span className="docs-section-tag">Scope & Fit</span>
+                            <h2 className="docs-section-h2">Where TraceMem Fits</h2>
+                            <p className="docs-section-lead">
+                                TraceMem is designed for production applications that require persistent, semantic memory for their AI features.
+                            </p>
+                        </div>
+                        
+                        <div className="docs-use-cases-grid">
+                            <UseCaseCard 
+                                icon={<Briefcase size={20} />} 
+                                title="B2B SaaS" 
+                                desc="Maintain state across sessions. Remember tenant-specific business rules, user workflows, and preferences." 
+                                tags={['Tenant Isolated', 'Rules']}
+                            />
+                            <UseCaseCard 
+                                icon={<Users size={20} />} 
+                                title="Support CRMs" 
+                                desc="Equip AI agents with complete historical context of user issues to prevent repetitive context-gathering." 
+                                tags={['Zero Repetition', 'Facts']}
+                            />
+                            <UseCaseCard 
+                                icon={<Calendar size={20} />} 
+                                title="Scheduling & Productivity" 
+                                desc="Remember upcoming events, routines, and temporal data automatically without manual calendar syncing." 
+                                tags={['Events', 'Temporal']}
+                            />
+                            <UseCaseCard 
+                                icon={<LayoutTemplate size={20} />} 
+                                title="Note-taking Apps" 
+                                desc="Extract structured knowledge from unstructured notes to assemble highly relevant context graphs." 
+                                tags={['Extraction', 'RAG']}
+                            />
+                            <UseCaseCard 
+                                icon={<Code2 size={20} />} 
+                                title="Developer Tools" 
+                                desc="Persist code styles, architectural preferences, and snippets across the entire developer lifecycle." 
+                                tags={['Code Aware', 'Skills']}
+                            />
+                            <UseCaseCard 
+                                icon={<Brain size={20} />} 
+                                title="AI Assistants" 
+                                desc="Give personal copilots a human-like memory that evolves with the user, learning their habits over time." 
+                                tags={['Personalized', 'Habits']}
+                            />
+                        </div>
+
+                        <div className="docs-architecture">
+                            <div className="docs-section-head" style={{ marginBottom: '32px' }}>
+                                <h3 className="docs-section-h2" style={{ fontSize: '24px' }}>Architecture & Project Flow</h3>
+                                <p className="docs-section-lead">
+                                    TraceMem operates as a fast, stateless middleware layer between your app's frontend/backend and your LLM provider.
+                                </p>
+                            </div>
+
+                            <div className="arch-flow-diagram">
+                                <div className="arch-node">
+                                    <div className="arch-node-icon"><Users size={24} /></div>
+                                    <div className="arch-node-content">
+                                        <div className="arch-node-title">1. Your Application</div>
+                                        <div className="arch-node-desc">User interacts with your SaaS, CRM, or AI assistant. Your backend sends the raw conversational turn to TraceMem.</div>
+                                    </div>
+                                </div>
+                                <div className="arch-arrow">↓</div>
+                                <div className="arch-node">
+                                    <div className="arch-node-icon"><Inbox size={24} /></div>
+                                    <div className="arch-node-content">
+                                        <div className="arch-node-title">2. Memory Ingestion & Classification</div>
+                                        <div className="arch-node-desc">TraceMem detects if the input contains schedule-like, code-like, preference-like, or factual data, and breaks it into atomic pieces.</div>
+                                    </div>
+                                </div>
+                                <div className="arch-arrow">↓</div>
+                                <div className="arch-node">
+                                    <div className="arch-node-icon"><Database size={24} /></div>
+                                    <div className="arch-node-content">
+                                        <div className="arch-node-title">3. Secure Storage</div>
+                                        <div className="arch-node-desc">The extracted semantic memories are embedded and stored in a cryptographically isolated tenant vault.</div>
+                                    </div>
+                                </div>
+                                <div className="arch-arrow">↓</div>
+                                <div className="arch-node">
+                                    <div className="arch-node-icon"><Zap size={24} /></div>
+                                    <div className="arch-node-content">
+                                        <div className="arch-node-title">4. Context Assembly</div>
+                                        <div className="arch-node-desc">Before generating a response, your app queries TraceMem. Relevant memories are recalled and assembled into prompt-ready context.</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

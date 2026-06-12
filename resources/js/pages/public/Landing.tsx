@@ -9,6 +9,7 @@ import CtaButton from '@/components/public/cta-button';
 import FaqAccordion from '@/components/public/faq-accordion';
 import AppLogo from '@/components/app-logo';
 import PlaygroundSection from '@/components/public/playground-section';
+import ChatDemoPanel from '@/components/public/chat-demo-panel';
 
 /* ── Code snippets ────────────────────────────────────────── */
 const snippets = {
@@ -384,6 +385,30 @@ export default function Landing() {
 
             {/* ══ 2b. PLAYGROUND ═════════════════════════════════════ */}
             <PlaygroundSection />
+
+            {/* ══ 2c. MEMORY PROMO ═══════════════════════════════════ */}
+            <section className="promo-section" aria-label="Memory in Action">
+                <div className="lp-section-inner promo-grid">
+                    <div className="promo-left">
+                        <span className="lp-section-tag">Memory in Action</span>
+                        <h2 className="promo-title">
+                            Human-like memory,<br />
+                            built for production.
+                        </h2>
+                        <p className="promo-lead">
+                            TraceMem seamlessly handles real-world inputs: schedules, events, complex logic, and code snippets. 
+                            It breaks down messy prompts into atomic, structured memory pieces and retrieves them precisely when needed.
+                        </p>
+                        <div className="promo-actions">
+                            <CtaButton href={getStartedHref} label="Start Building" size="md" />
+                            <span className="promo-note">No training required.</span>
+                        </div>
+                    </div>
+                    <div className="promo-right">
+                        <ChatDemoPanel />
+                    </div>
+                </div>
+            </section>
 
             {/* ══ 3. BUILT FOR DEVS ════════════════════════════════ */}
             <section className="lp-section devs-section" aria-label="Built for Developers">

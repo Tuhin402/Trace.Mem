@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\AggregateUsageStatsJob;
 use App\Models\BillingTransaction;
 use App\Models\SubscriptionPlan;
 use App\Models\UserSubscription;
+use App\Services\Auth\SubscriptionCacheService;
 use App\Services\Billing\BillingCatalogService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +16,7 @@ class BillingController extends Controller
 {
     public function __construct(
         private readonly BillingCatalogService $catalog,
+        private readonly SubscriptionCacheService $subscriptionCache,
     ) {}
 
     public function index(Request $request)
@@ -49,7 +52,7 @@ class BillingController extends Controller
         }
 
         return Inertia::render('app/Billing', [
-            'plan'         => $plan,                          
+            'plan'         => $plan,
             'plans'        => $this->catalog->activePlans(),
             'subscription' => $displaySub
                 ? [
@@ -96,11 +99,18 @@ class BillingController extends Controller
         }
 
         $subscription->update([
-            'cancelled_at'         => now(),
-            'cancellation_reason'  => $data['reason'],
-            'status'               => 'canceled',
-            'auto_renew'           => false,
+            'cancelled_at'        => now(),
+            'cancellation_reason' => $data['reason'],
+            'status'              => 'canceled',
+            'auto_renew'          => false,
         ]);
+
+        // ── Invalidate caches + dispatch analytics job ─────────────────────
+        // Entitlements must be invalidated — user has lost their active subscription.
+        // Analytics must be invalidated — subscription state changed.
+        $this->subscriptionCache->forgetEntitlements($user);
+        $this->subscriptionCache->forgetUserAnalytics($user);
+        AggregateUsageStatsJob::dispatch($user->id, 'all_time')->onQueue('default');
 
         return redirect()
             ->route('billing.index')
@@ -110,7 +120,7 @@ class BillingController extends Controller
     public function checkout(Request $request)
     {
         $data = $request->validate([
-            'plan_slug' => ['required', 'string'],
+            'plan_slug'     => ['required', 'string'],
             'billing_cycle' => ['required', 'in:monthly,quarterly,yearly'],
         ]);
 
@@ -120,21 +130,21 @@ class BillingController extends Controller
             ->firstOrFail();
 
         $amount = match ($data['billing_cycle']) {
-            'monthly' => $plan->price_monthly,
+            'monthly'   => $plan->price_monthly,
             'quarterly' => $plan->price_quarterly,
-            'yearly' => $plan->price_yearly,
+            'yearly'    => $plan->price_yearly,
         };
 
         $stripe = new StripeClient(config('services.stripe.secret'));
 
         $session = $stripe->checkout->sessions->create([
-            'mode' => 'subscription',
+            'mode'        => 'subscription',
             'success_url' => route('billing.success') . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('billing.cancel'),
+            'cancel_url'  => route('billing.cancel'),
             'customer_email' => $request->user()->email,
             'line_items' => [[
                 'price_data' => [
-                    'currency' => 'usd',
+                    'currency'     => 'usd',
                     'product_data' => [
                         'name' => $plan->name,
                     ],
@@ -142,31 +152,31 @@ class BillingController extends Controller
                     'recurring' => [
                         'interval' => 'month',
                         'interval_count' => match ($data['billing_cycle']) {
-                            'monthly' => 1,
+                            'monthly'   => 1,
                             'quarterly' => 3,
-                            'yearly' => 12,
+                            'yearly'    => 12,
                         },
                     ],
                 ],
                 'quantity' => 1,
             ]],
             'metadata' => [
-                'user_id' => (string) $request->user()->id,
-                'plan_id' => (string) $plan->id,
+                'user_id'       => (string) $request->user()->id,
+                'plan_id'       => (string) $plan->id,
                 'billing_cycle' => $data['billing_cycle'],
             ],
         ]);
 
         BillingTransaction::create([
-            'user_id' => $request->user()->id,
-            'subscription_plan_id' => $plan->id,
-            'provider' => 'stripe',
+            'user_id'                      => $request->user()->id,
+            'subscription_plan_id'         => $plan->id,
+            'provider'                     => 'stripe',
             'provider_checkout_session_id' => $session->id,
-            'billing_cycle' => $data['billing_cycle'],
-            'currency' => 'usd',
-            'amount_total' => (int) round(((float) $amount) * 100),
-            'status' => 'pending',
-            'raw_payload' => ['checkout_session_id' => $session->id],
+            'billing_cycle'                => $data['billing_cycle'],
+            'currency'                     => 'usd',
+            'amount_total'                 => (int) round(((float) $amount) * 100),
+            'status'                       => 'pending',
+            'raw_payload'                  => ['checkout_session_id' => $session->id],
         ]);
 
         return redirect()->away($session->url);

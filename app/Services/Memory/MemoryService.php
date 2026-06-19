@@ -2,6 +2,7 @@
 
 namespace App\Services\Memory;
 
+use App\Jobs\ReinforceMemoriesJob;
 use App\Models\Memory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -159,9 +160,16 @@ class MemoryService
             ->take($limit)
             ->values();
 
-        return $memories
-            ->map(fn (Memory $memory) => $this->lifecycle->reinforceOnRecall($memory))
-            ->values();
+        // ── Batched async reinforcement ────────────────────────────────────
+        // One job per recall request — not one per memory. This eliminates
+        // N synchronous DB writes from the hot path. The caller receives the
+        // pre-reinforcement state of each memory (response shape unchanged).
+        $ids = $memories->pluck('id')->all();
+        if (! empty($ids)) {
+            ReinforceMemoriesJob::dispatch($ids)->onQueue('low');
+        }
+
+        return $memories->values();
     }
 
     public function candidates(string $tenantId, string $userId, int $limit = 50): Collection

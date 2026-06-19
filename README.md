@@ -109,6 +109,90 @@ TraceMem supports dual-key environments to protect your production data:
 * **Test Keys:** Strictly sandboxed. Test keys can only be used from `localhost` or API clients like Postman. Test keys enforce a `semantic_only` mode, which prevents real AI pipeline processing to save costs during development.
 * **Live Keys:** Production-ready keys that require secure HTTPS connections. You can whitelist specific origins via the dashboard to prevent unauthorized usage.
 
+---
+
+## Production Operations
+
+### Queue Worker
+
+TraceMem uses three priority queues. The worker must process them in order:
+
+```bash
+# Local dev (handled automatically by composer run dev)
+php artisan queue:work redis --queue=high,default,low
+
+# Production — Supervisor config
+[program:tracemem-worker]
+command=php /var/www/artisan queue:work redis --queue=high,default,low --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+numprocs=2
+stderr_logfile=/var/log/tracemem-worker.err.log
+stdout_logfile=/var/log/tracemem-worker.out.log
+```
+
+| Queue | Contents |
+|-------|----------|
+| `high` | `ProcessStripeWebhookJob` — billing-critical, never blocked by lower queues |
+| `default` | `AggregateUsageStatsJob`, notifications |
+| `low` | `ReinforceMemoriesJob`, `DecayMemoryJob`, `DecayMemoriesSweepJob`, cleanup |
+
+### Failed Job Operations
+
+```bash
+php artisan queue:failed                     # list all failed jobs
+php artisan queue:retry {id}                 # retry one job by ID
+php artisan queue:retry all                  # retry all failed jobs
+php artisan queue:prune-failed --hours=168   # delete failures older than 7 days
+```
+
+### Cache Version Bump (Schema Migration)
+
+When analytics schema or cache key structure changes, bump the global version.
+All stale cached data becomes immediately unreachable — no key scans required:
+
+```bash
+php artisan tinker
+>>> app(\App\Services\Cache\TraceMemCache::class)->bumpVersion();
+```
+
+This is an O(1) operation. Old keys expire naturally via their TTLs.
+
+### Redis Memory Management
+
+Add to your Redis configuration (`/etc/redis/redis.conf`):
+
+```conf
+maxmemory 256mb
+maxmemory-policy allkeys-lru
+```
+
+> **⚠️ Production Warning:** `allkeys-lru` allows Redis to evict keys under memory pressure.
+> If the same Redis instance serves both cache **and** queues, eviction can delete queued jobs.
+> For production, use a **dedicated Redis instance for queues** (no eviction policy) and a
+> separate instance for cache (`allkeys-lru`). Configure with `REDIS_QUEUE_*` and
+> `REDIS_CACHE_*` env vars in `config/database.php`.
+
+### Future Upgrade Path — Laravel Horizon
+
+When queue monitoring and operational visibility become a priority:
+
+```bash
+composer require laravel/horizon
+php artisan horizon:install
+php artisan horizon
+```
+
+Horizon provides:
+- Real-time queue throughput dashboard
+- Per-queue metrics and wait time tracking
+- Failed job visibility with one-click retry
+- Worker health monitoring
+- Tag-based job searching and filtering
+- Supervisor-compatible process management
+
+This is not required for the current implementation but is the recommended long-term operations upgrade for Redis-backed queues.
+
 ## License
 
 This project is proprietary software. All rights reserved.

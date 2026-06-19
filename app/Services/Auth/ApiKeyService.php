@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 class ApiKeyService
 {
     public function __construct(
-        private readonly SubscriptionEntitlementService $entitlements
+        private readonly SubscriptionEntitlementService $entitlements,
+        private readonly SubscriptionCacheService $subscriptionCache,
     ) {}
 
     public function createForUser(User $user, string $name, string $environment = 'test', array $options = [], ?ApiKey $replacing = null): array
@@ -20,7 +21,7 @@ class ApiKeyService
             $policy = $this->entitlements->resolveForUser($user);
             $plan = $policy['plan'];
             $subscription = $policy['subscription'];
-            
+
 
             if ($environment === 'test' && ! $policy['allow_test_keys']) {
                 abort(403, 'This plan does not allow test keys.');
@@ -40,7 +41,7 @@ class ApiKeyService
             $activeCount = $user->apiKeys()
             ->where('environment', $environment)
             ->whereNull('revoked_at')
-            ->whereNull('cancelled_at') 
+            ->whereNull('cancelled_at')
             ->when($replacing?->id, fn ($query) => $query->where('id', '!=', $replacing->id))
             ->where(function ($query) {
                 $query->whereNull('expires_at')
@@ -136,6 +137,9 @@ class ApiKeyService
             ],
             'rotated_at' => now(),
         ]);
+
+        // Invalidate entitlements cache — the old key is now revoked
+        $this->subscriptionCache->forgetEntitlements($user);
 
         return $created;
     }

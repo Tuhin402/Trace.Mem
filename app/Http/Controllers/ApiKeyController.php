@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\AggregateUsageStatsJob;
 use App\Models\ApiKey;
 use App\Services\Auth\ApiKeyService;
+use App\Services\Auth\SubscriptionCacheService;
 use App\Services\Billing\ApiUsageAnalyticsService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +15,7 @@ class ApiKeyController extends Controller
 {
     public function __construct(
         private readonly ApiUsageAnalyticsService $analytics,
+        private readonly SubscriptionCacheService $subscriptionCache,
     ) {}
 
     public function index(Request $request)
@@ -52,6 +55,13 @@ class ApiKeyController extends Controller
                 ->with('error', $e->getMessage());
         }
 
+        $user = $request->user();
+
+        // Key created — analytics state changed: invalidate analytics + dispatch job.
+        // Entitlements are NOT invalidated — creating a key doesn't change entitlements.
+        $this->subscriptionCache->forgetUserAnalytics($user);
+        AggregateUsageStatsJob::dispatch($user->id, 'all_time')->onQueue('default');
+
         return redirect()
             ->route('api.keys')
             ->with([
@@ -64,7 +74,14 @@ class ApiKeyController extends Controller
     {
         abort_unless($apiKey->user_id === $request->user()->id, 403);
 
+        $user = $request->user();
+
         $service->revoke($apiKey);
+
+        // Key revoked — both entitlements and analytics are stale.
+        $this->subscriptionCache->forgetEntitlements($user);
+        $this->subscriptionCache->forgetUserAnalytics($user);
+        AggregateUsageStatsJob::dispatch($user->id, 'all_time')->onQueue('default');
 
         return response()->noContent();
     }
@@ -72,7 +89,14 @@ class ApiKeyController extends Controller
     public function rotate(Request $request, ApiKey $apiKey, ApiKeyService $service)
     {
         abort_unless($apiKey->user_id === $request->user()->id, 403);
-        $result = $service->rotateForUser($request->user(), $apiKey);
+
+        $user   = $request->user();
+        $result = $service->rotateForUser($user, $apiKey);
+        // Note: ApiKeyService::rotateForUser() already calls forgetEntitlements()
+        // after revocation. We additionally invalidate analytics here.
+
+        $this->subscriptionCache->forgetUserAnalytics($user);
+        AggregateUsageStatsJob::dispatch($user->id, 'all_time')->onQueue('default');
 
         return redirect()
             ->route('api.keys')

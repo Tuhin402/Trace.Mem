@@ -38,8 +38,11 @@ class ApiUsageAnalyticsService
                 'slow_requests'       => (clone $filtered)->where('latency_ms', '>=', 2000)->count(),
                 'avg_latency_ms'      => (int) round((clone $filtered)->avg('latency_ms') ?: 0),
             ],
-            'recent'  => $this->recentLogs($filtered, 20),
-            'months'  => $this->availableMonths($base),
+            // toArray() — store plain arrays in Redis cache, not Eloquent objects.
+            // phpredis uses PHP serialize(), which produces __PHP_Incomplete_Class when
+            // a new process deserializes models whose classes haven't been autoloaded yet.
+            'recent'  => $this->recentLogs($filtered, 20)->toArray(),
+            'months'  => $this->availableMonths($base)->toArray(),
         ];
     }
 
@@ -133,13 +136,14 @@ class ApiUsageAnalyticsService
             'memory_writes'     => $memoryWrites,
             'recall_hit_rate'   => $recallHitRate,
             'total_tokens'      => (int) $totalTokens,
-            'top_endpoints'     => $topEndpoints,
+            // toArray() — store plain arrays in Redis cache, not Eloquent Collections.
+            'top_endpoints'     => $topEndpoints->toArray(),
             'split'             => ['test' => $testUsage, 'live' => $liveUsage],
-            'latency_trend'     => $latencyTrend,
-            'error_trend'       => $errorTrend,
-            'request_trend'     => $requestTrend,
-            'mode_distribution' => $modeDistribution,
-            'key_usage'         => $keyUsage,
+            'latency_trend'     => $latencyTrend->toArray(),
+            'error_trend'       => $errorTrend->toArray(),
+            'request_trend'     => $requestTrend->toArray(),
+            'mode_distribution' => $modeDistribution->toArray(),
+            'key_usage'         => $keyUsage->toArray(),
             'error_rate'        => $errorRate,
             'total_requests'    => $totalRequests,
         ];
@@ -291,8 +295,9 @@ class ApiUsageAnalyticsService
                 'slow_requests'       => 0,
                 'avg_latency_ms'      => 0,
             ],
-            'recent'  => collect(),
-            'months'  => collect(),
+            // Plain arrays — consistent shape with the non-empty path (which uses ->toArray()).
+            'recent'  => [],
+            'months'  => [],
         ];
     }
 

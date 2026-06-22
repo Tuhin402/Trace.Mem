@@ -15,15 +15,24 @@ class BillingCatalogService
     /**
      * Return all active subscription plans with their features.
      * Result is cached via TraceMemCache (tags: ['plans'] on Redis).
+     *
+     * We cache plain arrays (via ->toArray()) rather than Eloquent models.
+     * phpredis uses PHP's native serialize(), which produces __PHP_Incomplete_Class
+     * when a new process deserializes an object whose class hasn't been autoloaded yet.
+     * Arrays are always safely portable across process restarts and serializers.
      */
     public function activePlans(): Collection
     {
-        return $this->cache->rememberPricing(fn () => SubscriptionPlan::query()
+        $rows = $this->cache->rememberPricing(fn () => SubscriptionPlan::query()
             ->where('is_active', true)
             ->with('features')
             ->orderBy('price_monthly')
             ->get()
+            ->toArray()   // store as plain array — serializer-safe
         );
+
+        // Wrap back into a Collection so callers and return type are unaffected.
+        return collect($rows);
     }
 
     /**

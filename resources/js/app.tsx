@@ -24,6 +24,7 @@ import '../css/pages/status.css';
 import '../css/pages/docs.css';
 import '../css/pages/pricing.css';
 import '../css/pages/usecases.css';
+import '../css/pages/legal.css';
 
 // App shell design system
 import '../css/app/app-shell.css';

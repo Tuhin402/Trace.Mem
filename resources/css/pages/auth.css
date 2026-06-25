@@ -799,3 +799,39 @@
 .auth-shell [data-slot="input"]::placeholder {
     color: #524251 !important;
 }
+
+/* ── Consent checkbox row ───────────────────────────────────── */
+.auth-consent-row {
+    gap: 10px;
+}
+
+.auth-consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.auth-consent-label .auth-checkbox {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.auth-consent-text {
+    font-family: 'Mona Sans', sans-serif;
+    font-size: 13px;
+    color: #9f8b9d;
+    line-height: 1.55;
+}
+
+.auth-consent-text .auth-link {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Ensure checkbox focus ring is always visible */
+.auth-consent-label:focus-within .auth-checkbox {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(225, 78, 246, 0.22);
+}

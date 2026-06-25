@@ -26,11 +26,12 @@ class AuthController extends Controller
     public function register(Request $request, EmailBloomFilterService $bloom)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'account_type' => ['required', 'in:individual,tenant'],
-            'company_name' => ['nullable', 'string', 'max:255'],
+            'name'             => ['required', 'string', 'max:255'],
+            'email'            => ['required', 'email', 'max:255'],
+            'password'         => ['required', 'string', 'min:8', 'confirmed'],
+            'account_type'     => ['required', 'in:individual,tenant'],
+            'company_name'     => ['nullable', 'string', 'max:255'],
+            'terms_accepted'   => ['required', 'accepted'],
         ]);
 
         $email = strtolower(trim($data['email']));

@@ -13,6 +13,7 @@ export default function Register() {
         password_confirmation: '',
         account_type: 'individual',
         company_name: '',
+        terms_accepted: false,
     });
     const [showPw, setShowPw] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -193,12 +194,50 @@ export default function Register() {
                             )}
                         </div>
 
+                        {/* Consent checkbox */}
+                        <div className="auth-field auth-consent-row">
+                            <label
+                                className="auth-consent-label"
+                                htmlFor="reg-terms-accepted"
+                            >
+                                <input
+                                    id="reg-terms-accepted"
+                                    type="checkbox"
+                                    className="auth-checkbox"
+                                    checked={data.terms_accepted}
+                                    onChange={(e) => setData('terms_accepted', e.target.checked)}
+                                    aria-required="true"
+                                    aria-describedby={errors.terms_accepted ? 'terms-error' : undefined}
+                                />
+                                <span className="auth-consent-text">
+                                    I have read and agree to the{' '}
+                                    <Link href="/terms-of-use" className="auth-link">
+                                        Terms of Use
+                                    </Link>
+                                    {' '}and{' '}
+                                    <Link href="/privacy-policy" className="auth-link">
+                                        Privacy Policy
+                                    </Link>.
+                                </span>
+                            </label>
+                            {errors.terms_accepted && (
+                                <div
+                                    id="terms-error"
+                                    className="auth-error"
+                                    role="alert"
+                                >
+                                    {errors.terms_accepted}
+                                </div>
+                            )}
+                        </div>
+
                         {/* Submit */}
                         <button
                             type="submit"
                             className="auth-btn"
-                            disabled={processing}
+                            disabled={processing || !data.terms_accepted}
                             id="register-submit-btn"
+                            aria-disabled={processing || !data.terms_accepted}
                         >
                             {processing && <span className="auth-spinner" aria-hidden="true" />}
                             {processing ? 'Creating account…' : 'Create account'}

@@ -133,16 +133,17 @@ export default function PublicFooter() {
     const isDesktop = useIsDesktop();
 
     const [open, setOpen] = useState<Record<string, boolean>>({
-        check: false,
-        connect: false,
+        product: false,
+        resources: false,
+        policies: false,
     });
 
     /* Sync dropdown state when screen size crosses breakpoint */
     useEffect(() => {
-        setOpen({ check: isDesktop, connect: isDesktop });
+        setOpen({ product: isDesktop, resources: isDesktop, policies: isDesktop });
     }, [isDesktop]);
 
-    const toggle = (key: 'check' | 'connect') => {
+    const toggle = (key: 'product' | 'resources' | 'policies') => {
         if (isDesktop) return;
         setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
     };
@@ -216,45 +217,60 @@ export default function PublicFooter() {
 
                     {/* Link groups */}
                     <div className="footer-link-groups">
-                        {/* Check yourself */}
+                        {/* Product */}
                         <div className="footer-link-group">
                             <button
                                 type="button"
-                                className={`footer-group-head ${open.check ? 'open' : ''}`}
-                                onClick={() => toggle('check')}
-                                aria-expanded={open.check}
+                                className={`footer-group-head ${open.product ? 'open' : ''}`}
+                                onClick={() => toggle('product')}
+                                aria-expanded={open.product}
                             >
-                                <span>Check yourself</span>
+                                <span>Product</span>
                                 <ChevronDown size={14} className="fg-chevron" />
                             </button>
 
-                            <div className={`footer-group-body ${open.check ? 'open' : ''}`}>
-                                <Link href="/docs"          className="footer-link">Docs</Link>
-                                <Link href="/api-reference" className="footer-link">API Reference</Link>
-                                <Link href="/pricing"       className="footer-link">Pricing</Link>
-                                <Link href="/status"        className="footer-link">Status</Link>
+                            <div className={`footer-group-body ${open.product ? 'open' : ''}`}>
+                                <Link href="/pricing"   className="footer-link">Pricing</Link>
+                                <Link href="/usecases"  className="footer-link">Use Cases</Link>
+                                <Link href="/status"    className="footer-link">Status</Link>
                             </div>
                         </div>
 
-                        {/* Connect */}
+                        {/* Resources */}
                         <div className="footer-link-group">
                             <button
                                 type="button"
-                                className={`footer-group-head ${open.connect ? 'open' : ''}`}
-                                onClick={() => toggle('connect')}
-                                aria-expanded={open.connect}
+                                className={`footer-group-head ${open.resources ? 'open' : ''}`}
+                                onClick={() => toggle('resources')}
+                                aria-expanded={open.resources}
                             >
-                                <span>Connect</span>
+                                <span>Resources</span>
                                 <ChevronDown size={14} className="fg-chevron" />
                             </button>
 
-                            <div className={`footer-group-body ${open.connect ? 'open' : ''}`}>
-                                <a href="mailto:trace.mem.official@gmail.com" className="footer-link">
-                                    Contact
-                                </a>
-                                <a href="https://forms.gle/V4ppSDPuforoYKqu7" target="_blank" className="footer-link">
-                                    Feedback
-                                </a>
+                            <div className={`footer-group-body ${open.resources ? 'open' : ''}`}>
+                                <Link href="/docs"          className="footer-link">Docs</Link>
+                                <Link href="/api-reference" className="footer-link">API Reference</Link>
+                                <a href="mailto:trace.mem.official@gmail.com" className="footer-link">Contact</a>
+                                <a href="https://forms.gle/V4ppSDPuforoYKqu7" target="_blank" className="footer-link">Feedback</a>
+                            </div>
+                        </div>
+
+                        {/* Policies */}
+                        <div className="footer-link-group">
+                            <button
+                                type="button"
+                                className={`footer-group-head ${open.policies ? 'open' : ''}`}
+                                onClick={() => toggle('policies')}
+                                aria-expanded={open.policies}
+                            >
+                                <span>Policies</span>
+                                <ChevronDown size={14} className="fg-chevron" />
+                            </button>
+
+                            <div className={`footer-group-body ${open.policies ? 'open' : ''}`}>
+                                <Link href="/terms-of-use"   className="footer-link">Terms of Use</Link>
+                                <Link href="/privacy-policy" className="footer-link">Privacy Policy</Link>
                             </div>
                         </div>
                     </div>

@@ -23,6 +23,32 @@ import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 
+/**
+ * Strips <script> tags and inline event-handler attributes (on*="...") from
+ * an SVG string before it is injected via dangerouslySetInnerHTML.
+ *
+ * This is defense-in-depth. Laravel Fortify's BaconQrCode library never emits
+ * either of these patterns, so the function is a no-op in practice. If the
+ * endpoint were ever compromised or the response were intercepted/spoofed,
+ * this prevents script execution inside the injected SVG.
+ *
+ * Limitations: this is a regex-based approach, not a full DOM parser.
+ * For a complete solution in a future hardening pass, replace this with
+ * DOMPurify: `DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true } })`
+ * after running: npm install dompurify @types/dompurify
+ */
+function sanitizeSvg(svg: string): string {
+    return svg
+        // Remove any <script ...>...</script> blocks (case-insensitive, multiline)
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+        // Remove self-closing <script .../> variants
+        .replace(/<script\b[^\s]*\/>/gi, '')
+        // Remove all inline event-handler attributes: on*="..." or on*='...'
+        .replace(/\s+on\w+\s*=\s*(["'])[\s\S]*?\1/gi, '')
+        // Remove javascript: URIs in href/xlink:href attributes
+        .replace(/(href|xlink:href)\s*=\s*(?:"\s*javascript:[^"]*"|'\s*javascript:[^']*')/gi, '');
+}
+
 function GridScanIcon() {
     return (
         <div className="mb-3 rounded-full border border-border bg-card p-0.5 shadow-sm">
@@ -66,6 +92,11 @@ function TwoFactorSetupStep({
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
+    // Sanitize the server-generated SVG before DOM injection.
+    // In practice BaconQrCode never emits scripts or event handlers,
+    // but this prevents execution if the response is ever tampered with.
+    const safeSvg = useMemo(() => (qrCodeSvg ? sanitizeSvg(qrCodeSvg) : null), [qrCodeSvg]);
+
     return (
         <>
             {errors?.length ? (
@@ -75,11 +106,11 @@ function TwoFactorSetupStep({
                     <div className="mx-auto flex max-w-md overflow-hidden">
                         <div className="mx-auto aspect-square w-64 rounded-lg border border-border">
                             <div className="z-10 flex h-full w-full items-center justify-center p-5">
-                                {qrCodeSvg ? (
+                                {safeSvg ? (
                                     <div
                                         className="aspect-square w-full rounded-lg bg-white p-2 [&_svg]:size-full"
                                         dangerouslySetInnerHTML={{
-                                            __html: qrCodeSvg,
+                                            __html: safeSvg,
                                         }}
                                         style={{
                                             filter:

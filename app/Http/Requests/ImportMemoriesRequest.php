@@ -32,6 +32,12 @@ class ImportMemoriesRequest extends FormRequest
     /** Maximum allowed JSON nesting depth. */
     private const MAX_DEPTH = 5;
 
+    /** Maximum character length for a single memory content string. */
+    private const MAX_CONTENT_LENGTH = 10000;
+
+    /** Maximum character length for a content_hash value. */
+    private const MAX_HASH_LENGTH = 128;
+
     /** Allowed top-level keys in the import JSON. */
     private const ALLOWED_TOP_LEVEL_KEYS = [
         'version',
@@ -153,6 +159,24 @@ class ImportMemoriesRequest extends FormRequest
                 $this->failWith(
                     'file',
                     "Memory at index {$index} has an invalid 'type' (" . $memory['type'] . ').'
+                );
+            }
+
+            // Content length cap — prevents multi-megabyte payloads per row
+            if (isset($memory['content']) && mb_strlen((string) $memory['content']) > self::MAX_CONTENT_LENGTH) {
+                $this->failWith(
+                    'file',
+                    "Memory at index {$index}: 'content' exceeds the maximum allowed length of "
+                    . self::MAX_CONTENT_LENGTH . ' characters.'
+                );
+            }
+
+            // content_hash length cap — prevents hash field abuse
+            if (mb_strlen((string) $memory['content_hash']) > self::MAX_HASH_LENGTH) {
+                $this->failWith(
+                    'file',
+                    "Memory at index {$index}: 'content_hash' exceeds the maximum allowed length of "
+                    . self::MAX_HASH_LENGTH . ' characters.'
                 );
             }
 

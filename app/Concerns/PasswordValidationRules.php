@@ -10,11 +10,30 @@ trait PasswordValidationRules
     /**
      * Get the validation rules used to validate passwords.
      *
+     * Rules are enforced in ALL environments (local, staging, production)
+     * to ensure dev/prod parity and catch weak-password issues early.
+     *
+     * Requirements:
+     *   - Minimum 12 characters
+     *   - At least one uppercase letter
+     *   - At least one lowercase letter
+     *   - At least one number
+     *   - At least one symbol / special character
+     *
      * @return array<int, Rule|array<mixed>|string>
      */
     protected function passwordRules(): array
     {
-        return ['required', 'string', Password::default(), 'confirmed'];
+        return [
+            'required',
+            'string',
+            Password::min(12)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols(),
+            'confirmed',
+        ];
     }
 
     /**

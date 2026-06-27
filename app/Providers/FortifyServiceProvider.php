@@ -95,5 +95,13 @@ class FortifyServiceProvider extends ServiceProvider
 
             return Limit::perMinute(5)->by($throttleKey);
         });
+
+        // Resend verification email — throttled to prevent abuse.
+        // 5 resends per 10 minutes, keyed on user ID + IP.
+        RateLimiter::for('verification.send', function (Request $request) {
+            $userId = optional($request->user())->id ?? 'guest';
+
+            return Limit::perMinutes(10, 5)->by($userId . '|' . $request->ip());
+        });
     }
 }

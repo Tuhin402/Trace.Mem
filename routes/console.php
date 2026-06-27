@@ -18,6 +18,17 @@ Schedule::command('memory:archive-stale')
     ->withoutOverlapping()
     ->name('memory-archive-stale');
 
+// ── Database backup ────────────────────────────────────────────────────────────
+// Runs at 02:00 alongside memory archiving (withoutOverlapping is per-command,
+// not global, so both can run concurrently without blocking each other).
+// The command handles SQLite (copy), PostgreSQL (pg_dump), and MySQL (mysqldump).
+// For managed databases (RDS, Supabase, etc.) set BACKUP_DRIVER=managed in .env.
+Schedule::command('backup:database')
+    ->dailyAt('02:00')
+    ->withoutOverlapping()
+    ->name('backup-database');
+
+
 // ── New: Scheduled memory decay sweep ─────────────────────────────────────────
 // Replaces the silent no-op DecayMemoryJob(0) pattern.
 // Uses chunkById(200) — never loads the full memories table.

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImportMemoriesRequest;
 use App\Models\Memory;
 use App\Services\Memory\MemoryScoringService;
 use Illuminate\Http\Request;
@@ -223,7 +224,11 @@ class MemoryInspectorController extends Controller
     public function export(Request $request)
     {
         $user = $request->user();
-        $memories = Memory::where('user_id', $user->id)->get();
+
+        // Scope export strictly to this user AND their tenant — belt-and-suspenders.
+        $memories = Memory::where('user_id', $user->id)
+            ->where('tenant_id', $user->tenant_scope_id)
+            ->get();
 
         $data = [
             'version' => '1.0',
@@ -246,19 +251,12 @@ class MemoryInspectorController extends Controller
         ]);
     }
 
-    public function import(Request $request)
+    public function import(ImportMemoriesRequest $request)
     {
-        $request->validate([
-            'file' => ['required', 'file', 'mimetypes:application/json,text/plain', 'max:7168'], // 7MB max
-        ]);
-
-        $file = $request->file('file');
-        $content = file_get_contents($file->getRealPath());
-        $data = json_decode($content, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE || !isset($data['memories']) || !is_array($data['memories'])) {
-            return back()->withErrors(['file' => 'Invalid JSON structure. Must contain a "memories" array.']);
-        }
+        // All validation (size, UTF-8, depth, schema, duplicates) is handled
+        // by ImportMemoriesRequest::passedValidation() before we reach here.
+        // The decoded payload is attached to the request attributes.
+        $data = $request->attributes->get('decoded_import');
 
         $user = $request->user();
         $tenantId = $user->tenant_scope_id;
@@ -324,14 +322,33 @@ class MemoryInspectorController extends Controller
     public function resolveImport(Request $request)
     {
         $request->validate([
-            'resolutions' => ['required', 'array'],
+            'resolutions'          => ['required', 'array', 'max:500'],
             'resolutions.*.action' => ['required', 'in:overwrite,skip'],
             'resolutions.*.memory' => ['required', 'array'],
         ]);
 
-        $user = $request->user();
+        $user     = $request->user();
         $tenantId = $user->tenant_scope_id;
-        $userId = $user->id;
+        $userId   = $user->id;
+
+        // Strict allowlist — only these fields can be updated from an import.
+        // Prevents mass-assignment of tenant_id, user_id, id, or any future
+        // sensitive fields even if the client sends them.
+        $allowedFields = [
+            'content',
+            'normalized_content',
+            'content_hash',
+            'type',
+            'importance',
+            'confidence',
+            'decay_score',
+            'status',
+            'access_count',
+            'last_accessed_at',
+            'last_reinforced_at',
+            'archived_at',
+            'metadata',
+        ];
 
         $resolvedCount = 0;
 
@@ -341,7 +358,9 @@ class MemoryInspectorController extends Controller
             }
 
             $mem = $res['memory'];
-            if (empty($mem['content_hash']) || empty($mem['type'])) continue;
+            if (empty($mem['content_hash']) || empty($mem['type'])) {
+                continue;
+            }
 
             $existing = Memory::where('tenant_id', $tenantId)
                 ->where('user_id', $userId)
@@ -350,15 +369,15 @@ class MemoryInspectorController extends Controller
                 ->first();
 
             if ($existing) {
-                $updateData = $mem;
-                unset($updateData['id']); // just in case
-                unset($updateData['tenant_id']);
-                unset($updateData['user_id']);
-                
-                $meta = is_string($updateData['metadata']) ? json_decode($updateData['metadata'], true) : ($updateData['metadata'] ?? []);
-                if (!is_array($meta)) $meta = [];
-                // Migration marks should already be on the payload from the frontend if needed
-                $updateData['metadata'] = $meta;
+                // Only pick whitelisted fields — discard everything else.
+                $updateData = array_intersect_key($mem, array_flip($allowedFields));
+
+                $meta = isset($updateData['metadata'])
+                    ? (is_string($updateData['metadata'])
+                        ? json_decode($updateData['metadata'], true)
+                        : $updateData['metadata'])
+                    : [];
+                $updateData['metadata'] = is_array($meta) ? $meta : [];
 
                 $existing->update($updateData);
                 $resolvedCount++;
@@ -366,7 +385,7 @@ class MemoryInspectorController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'status'         => 'success',
             'resolved_count' => $resolvedCount,
         ]);
     }

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -28,7 +29,12 @@ class AuthController extends Controller
         $data = $request->validate([
             'name'             => ['required', 'string', 'max:255'],
             'email'            => ['required', 'email', 'max:255'],
-            'password'         => ['required', 'string', 'min:8', 'confirmed'],
+            'password'         => [
+                'required',
+                'string',
+                Password::min(12)->mixedCase()->letters()->numbers()->symbols(),
+                'confirmed',
+            ],
             'account_type'     => ['required', 'in:individual,tenant'],
             'company_name'     => ['nullable', 'string', 'max:255'],
             'terms_accepted'   => ['required', 'accepted'],

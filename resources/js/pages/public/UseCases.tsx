@@ -1,5 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
+import { useDomains } from '@/lib/domains';
 import { useState } from 'react';
 import {
     Brain,
@@ -285,6 +286,7 @@ const archPillars = [
 type PageProps = { auth?: { user?: unknown } };
 
 export default function UseCases() {
+    const { siteUrl } = useDomains();
     const { props } = usePage<PageProps>();
     const isLoggedIn = !!props.auth?.user;
     const getStartedHref = isLoggedIn ? '/dashboard' : '/register';
@@ -308,8 +310,8 @@ export default function UseCases() {
                 <meta property="og:title" content="TraceMem Use Cases" />
                 <meta property="og:description" content="See how TraceMem enables persistent, structured AI memory across SaaS copilots, support bots, internal tools, and autonomous agents." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.one/usecases" />
-                <link rel="canonical" href="https://tracemem.one/usecases" />
+                <meta property="og:url" content={`${siteUrl}/usecases`} />
+                <link rel="canonical" href={`${siteUrl}/usecases`} />
             </Helmet>
 
             <Head title="Use Cases" />

@@ -2,8 +2,10 @@ import { Head } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
+import { useDomains } from '@/lib/domains';
 
 export default function Overview() {
+    const { siteUrl } = useDomains();
     return (
         <>
             <Helmet>
@@ -13,7 +15,7 @@ export default function Overview() {
                 <meta property="og:title" content="TraceMem API Reference" />
                 <meta property="og:description" content="Full documentation for the TraceMem REST API. Learn how to store, recall, and contextually assemble memory for modern AI and LLM apps." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.one/api-reference" />
+                <meta property="og:url" content={`${siteUrl}/api-reference`} />
             </Helmet>
 
             <Head title="API Reference Overview" />

@@ -1,8 +1,11 @@
 import { Head } from '@inertiajs/react';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
+import { useDomains } from '@/lib/domains';
 
 export default function QuickStart() {
+    const { apiUrl } = useDomains();
+
     return (
         <>
             <Head title="Quick Start | TraceMem API" />
@@ -29,27 +32,27 @@ export default function QuickStart() {
                     python: `import requests
 
 requests.post(
-    "https://tracemem.one/api/v1/remember",
+    "${apiUrl}/api/v1/remember",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={"content": "User prefers short answers"}
 )`,
                     javascript: `import axios from "axios";
 
 await axios.post(
-  "https://tracemem.one/api/v1/remember",
+  "${apiUrl}/api/v1/remember",
   { content: "User prefers short answers" },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );`,
                     php: `Http::withToken('cmlive_xxx')
-    ->post('https://tracemem.one/api/v1/remember', [
+    ->post('${apiUrl}/api/v1/remember', [
         'content' => 'User prefers short answers',
     ]);`,
-                    curl: `curl -X POST "https://tracemem.one/api/v1/remember" \\
+                    curl: `curl -X POST "${apiUrl}/api/v1/remember" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{ "content": "User prefers short answers" }'`,
                     java: `HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://tracemem.one/api/v1/remember"))
+    .uri(URI.create("${apiUrl}/api/v1/remember"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(
@@ -57,7 +60,7 @@ await axios.post(
     ))
     .build();`,
                     go: `reqBody := strings.NewReader(\`{"content":"User prefers short answers"}\`)
-req, _ := http.NewRequest("POST", "https://tracemem.one/api/v1/remember", reqBody)
+req, _ := http.NewRequest("POST", "${apiUrl}/api/v1/remember", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
 req.Header.Set("Content-Type", "application/json")`,
                 }}

@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
+import { useDomains } from '@/lib/domains';
 import {
     LegalPageShell,
     LegalHero,
@@ -32,6 +33,7 @@ const tocEntries: TocEntry[] = [
 ];
 
 export default function TermsOfUse() {
+    const { siteUrl } = useDomains();
     return (
         <>
             <Head title="Terms of Use" />
@@ -41,10 +43,10 @@ export default function TermsOfUse() {
                     content="Read the terms governing the use of the Trace.Mem platform."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://tracemem.one/terms-of-use" />
+                <link rel="canonical" href={`${siteUrl}/terms-of-use`} />
                 <meta property="og:title" content="Terms of Use" />
                 <meta property="og:description" content="Read the terms governing the use of the Trace.Mem platform." />
-                <meta property="og:url" content="https://tracemem.one/terms-of-use" />
+                <meta property="og:url" content={`${siteUrl}/terms-of-use`} />
             </Helmet>
 
             <LegalPageShell

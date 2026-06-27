@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
+import { useDomains } from '@/lib/domains';
 import {
     Server,
     Brain,
@@ -123,6 +124,7 @@ const uptimeBars = generateUptimeBars();
 
 /* ── Component ─────────────────────────────────────────────── */
 export default function Status() {
+    const { siteUrl } = useDomains();
     return (
         <>
             <Helmet>
@@ -136,8 +138,8 @@ export default function Status() {
                     content="Live status of TraceMem services including API, Memory Engine, Context Assembly, and more."
                 />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.one/status" />
-                <link rel="canonical" href="https://tracemem.one/status" />
+                <meta property="og:url" content={`${siteUrl}/status`} />
+                <link rel="canonical" href={`${siteUrl}/status`} />
             </Helmet>
 
             <Head title="System Status | TraceMem" />

@@ -1,8 +1,11 @@
 import { Head } from '@inertiajs/react';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
+import { useDomains } from '@/lib/domains';
 
 export default function Remember() {
+    const { apiUrl } = useDomains();
+
     return (
         <>
             <Head title="Remember | TraceMem API" />
@@ -29,7 +32,7 @@ export default function Remember() {
                     python: `import requests
 
 response = requests.post(
-    "https://tracemem.one/api/v1/remember",
+    "${apiUrl}/api/v1/remember",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={"content": "User likes React"}
 )
@@ -38,25 +41,25 @@ print(response.json())
                     javascript: `import axios from "axios";
 
 const { data } = await axios.post(
-  "https://tracemem.one/api/v1/remember",
+  "${apiUrl}/api/v1/remember",
   { content: "User likes React" },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );
 console.log(data.memory.id); // "mem_abc123"`,
                     php: `$response = Http::withToken('cmlive_xxx')
-    ->post('https://tracemem.one/api/v1/remember', [
+    ->post('${apiUrl}/api/v1/remember', [
         'content' => 'User likes React',
     ]);
 
 $memory = $response->json('memory');`,
-                    curl: `curl -X POST "https://tracemem.one/api/v1/remember" \\
+                    curl: `curl -X POST "${apiUrl}/api/v1/remember" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{ "content": "User likes React" }'`,
                     java: `String body = "{\"content\":\"User likes React\"}";
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://tracemem.one/api/v1/remember"))
+    .uri(URI.create("${apiUrl}/api/v1/remember"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -66,7 +69,7 @@ HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
                     go: `reqBody := strings.NewReader(\`{"content":"User likes React"}\`)
 
-req, _ := http.NewRequest("POST", "https://tracemem.one/api/v1/remember", reqBody)
+req, _ := http.NewRequest("POST", "${apiUrl}/api/v1/remember", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
 req.Header.Set("Content-Type", "application/json")
 

@@ -45,6 +45,14 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state')
                 || $request->cookie('sidebar_state') === 'true',
+
+            // Domain constants — used by frontend for OG tags and API snippet URLs.
+            // Values come from config/domains.php → .env — never hardcoded.
+            'domains' => [
+                'root' => config('domains.root'),
+                'app'  => config('domains.app'),
+                'api'  => config('domains.api'),
+            ],
         ];
     }
 }

@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
+import { useDomains } from '@/lib/domains';
 import { ArrowRight, BookOpen, Zap, Brain, Layers, Code2, Target, Pin, Scale, Wrench, Inbox, Wand2, GitMerge, PackageCheck, Briefcase, Calendar, LayoutTemplate, Database, Users } from 'lucide-react';
 import CtaButton from '@/components/public/cta-button';
 import FaqAccordion from '@/components/public/faq-accordion';
@@ -138,6 +139,7 @@ const quickLinks = [
 
 /* ════════════════════════════════════════════════════════════ */
 export default function Docs() {
+    const { siteUrl } = useDomains();
     const postmanUrl = import.meta.env.VITE_POSTMAN_WORKSPACE_URL;
 
     return (
@@ -155,8 +157,8 @@ export default function Docs() {
                 <meta property="og:title" content="TraceMem Documentation" />
                 <meta property="og:description" content="Persistent memory infrastructure for AI and LLM applications." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.one/docs" />
-                <link rel="canonical" href="https://tracemem.one/docs" />
+                <meta property="og:url" content={`${siteUrl}/docs`} />
+                <link rel="canonical" href={`${siteUrl}/docs`} />
             </Helmet>
 
             <Head title="Documentation" />

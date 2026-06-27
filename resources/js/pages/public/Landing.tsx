@@ -1,6 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState, type ReactNode } from 'react';
+import { useDomains } from '@/lib/domains';
 import { Zap, Shield, Brain, Layers, Code2, Users, RefreshCw, MessageSquare, LayoutGrid, GitMerge, PackageCheck } from 'lucide-react';
 
 import Typewriter from '@/components/public/typewriter';
@@ -11,13 +12,14 @@ import AppLogo from '@/components/app-logo';
 import PlaygroundSection from '@/components/public/playground-section';
 import ChatDemoPanel from '@/components/public/chat-demo-panel';
 
-/* ── Code snippets ────────────────────────────────────────── */
-const snippets = {
+/* ── Code snippets (receives apiUrl at runtime) ────────────── */
+function buildSnippets(apiUrl: string) {
+    return {
     python: `import requests
 
 # Initialise the TraceMem client
 TM_KEY = "cmlive_your_key_here"
-BASE   = "https://tracemem.one/api/v1"
+BASE   = "${apiUrl}/api/v1"
 
 # ── Store a memory ──────────────────────────────────
 response = requests.post(
@@ -43,7 +45,7 @@ print(context.json())   # → [{"content": "User prefers concise ..."}]`,
 
 // Initialise the TraceMem client
 const TM_KEY = "cmlive_your_key_here";
-const BASE   = "https://tracemem.one/api/v1";
+const BASE   = "${apiUrl}/api/v1";
 const auth   = { headers: { Authorization: \`Bearer \${TM_KEY}\` } };
 
 // ── Store a memory ──────────────────────────────────
@@ -65,7 +67,7 @@ console.log(data); // → [{ content: "User prefers concise ..." }]`,
 
 // Initialise the TraceMem client
 $key  = 'cmlive_your_key_here';
-$base = 'https://tracemem.one/api/v1';
+$base = '${apiUrl}/api/v1';
 
 // ── Store a memory ──────────────────────────────────
 Http::withToken($key)->post("{$base}/remember", [
@@ -83,6 +85,7 @@ $context = Http::withToken($key)->post("{$base}/recall", [
 // → [['content' => 'User prefers concise ...']]
 dd($context);`,
 };
+}
 
 /* ── How It Works steps ───────────────────────────────────── */
 const howSteps = [
@@ -282,6 +285,8 @@ export default function Landing() {
     const { props } = usePage<{ auth?: { user?: unknown } }>();
     const isLoggedIn = !!props.auth?.user;
     const getStartedHref = isLoggedIn ? '/dashboard' : '/register';
+    const { siteUrl, apiUrl } = useDomains();
+    const snippets = buildSnippets(apiUrl);
 
     /* How it Works auto-cycle */
     const [activeStep, setActiveStep] = useState(0);
@@ -314,12 +319,12 @@ export default function Landing() {
                 <meta property="og:title"       content="TraceMem" />
                 <meta property="og:description" content="Long-term memory infrastructure for AI applications." />
                 <meta property="og:type"        content="website" />
-                <meta property="og:url"         content="https://tracemem.one" />
-                <meta property="og:image"       content="https://tracemem.one/og-image.png" />
+                <meta property="og:url"         content={siteUrl} />
+                <meta property="og:image"       content={`${siteUrl}/og-image.png`} />
                 <meta name="twitter:card"        content="summary_large_image" />
                 <meta name="twitter:title"       content="TraceMem" />
                 <meta name="twitter:description" content="Long-term memory infrastructure for AI applications." />
-                <link rel="canonical"            href="https://tracemem.one" />
+                <link rel="canonical"            href={siteUrl} />
             </Helmet>
 
             <Head title="TraceMem | Long-Term Contextual Memory Infrastructure" />
@@ -400,7 +405,7 @@ export default function Landing() {
                             It breaks down messy prompts into atomic, structured memory pieces and retrieves them precisely when needed.
                         </p>
                         <div className="promo-actions">
-                            <CtaButton href={getStartedHref} label="Start Building" size="md" />
+                            <CtaButton href={getStartedHref} label="Start Building" size="default" />
                             <span className="promo-note">No training required.</span>
                         </div>
                     </div>

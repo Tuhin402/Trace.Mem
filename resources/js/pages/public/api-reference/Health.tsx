@@ -1,8 +1,11 @@
 import { Head } from '@inertiajs/react';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
+import { useDomains } from '@/lib/domains';
 
 export default function Health() {
+    const { apiUrl } = useDomains();
+
     return (
         <>
             <Head title="Health | TraceMem API" />
@@ -21,26 +24,26 @@ export default function Health() {
                 snippets={{
                     python: `import requests
 
-response = requests.get("https://tracemem.one/api/v1/health")
+response = requests.get("${apiUrl}/api/v1/health")
 print(response.json())
 # {"ok": true, "service": "memory-layer", "version": "1.0.0"}`,
-                    javascript: `const res  = await fetch("https://tracemem.one/api/v1/health");
+                    javascript: `const res  = await fetch("${apiUrl}/api/v1/health");
 const data = await res.json();
 console.log(data);
 // { ok: true, service: "memory-layer", version: "1.0.0" }`,
-                    php: `$response = Http::get('https://tracemem.one/api/v1/health')->json();
+                    php: `$response = Http::get('${apiUrl}/api/v1/health')->json();
 // ["ok" => true, "service" => "memory-layer", "version" => "1.0.0"]`,
-                    curl: `curl "https://tracemem.one/api/v1/health"
+                    curl: `curl "${apiUrl}/api/v1/health"
 # {"ok":true,"service":"memory-layer","version":"1.0.0"}`,
                     java: `HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://tracemem.one/api/v1/health"))
+    .uri(URI.create("${apiUrl}/api/v1/health"))
     .GET()
     .build();
 
 HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());
 System.out.println(response.body());`,
-                    go: `resp, _ := http.Get("https://tracemem.one/api/v1/health")
+                    go: `resp, _ := http.Get("${apiUrl}/api/v1/health")
 defer resp.Body.Close()
 
 body, _ := io.ReadAll(resp.Body)

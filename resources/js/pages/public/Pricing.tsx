@@ -1,5 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
+import { useDomains } from '@/lib/domains';
 import { Fragment, useState } from 'react';
 import { Check, X, ArrowRight } from 'lucide-react';
 import CtaButton from '@/components/public/cta-button';
@@ -183,6 +184,7 @@ const contactUrl =
 
 /* ════════════════════════════════════════════════════════════ */
 export default function Pricing() {
+    const { siteUrl } = useDomains();
     const { props } = usePage<PageProps>();
     const isLoggedIn = !!props.auth?.user;
     const getStartedHref = isLoggedIn ? '/dashboard' : '/register';
@@ -229,8 +231,8 @@ export default function Pricing() {
                 <meta property="og:title" content="TraceMem Pricing" />
                 <meta property="og:description" content="Simple, transparent pricing for persistent AI memory infrastructure." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://tracemem.one/pricing" />
-                <link rel="canonical" href="https://tracemem.one/pricing" />
+                <meta property="og:url" content={`${siteUrl}/pricing`} />
+                <link rel="canonical" href={`${siteUrl}/pricing`} />
             </Helmet>
 
             <Head title="Pricing" />

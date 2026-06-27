@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
+import { useDomains } from '@/lib/domains';
 import {
     LegalPageShell,
     LegalHero,
@@ -29,6 +30,7 @@ const tocEntries: TocEntry[] = [
 ];
 
 export default function PrivacyPolicy() {
+    const { siteUrl } = useDomains();
     return (
         <>
             <Head title="Privacy Policy" />
@@ -38,10 +40,10 @@ export default function PrivacyPolicy() {
                     content="Learn how Trace.Mem collects, stores and protects your data."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://tracemem.one/privacy-policy" />
+                <link rel="canonical" href={`${siteUrl}/privacy-policy`} />
                 <meta property="og:title" content="Privacy Policy" />
                 <meta property="og:description" content="Learn how Trace.Mem collects, stores and protects your data." />
-                <meta property="og:url" content="https://tracemem.one/privacy-policy" />
+                <meta property="og:url" content={`${siteUrl}/privacy-policy`} />
             </Helmet>
 
             <LegalPageShell

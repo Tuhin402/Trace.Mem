@@ -5,6 +5,10 @@ import CtaButton from './cta-button';
 /* ── Mode types ────────────────────────────────────────────── */
 type Mode = 'semantic' | 'ai-first';
 
+/** Maximum characters allowed in the playground input. Client-side only — prevents
+ *  the browser from running heavy regexes on a multi-megabyte paste. */
+const MAX_INPUT_LENGTH = 10_000;
+
 /* ── Mock memory result ────────────────────────────────────── */
 type ExtractedMemory = {
     type: 'fact' | 'preference' | 'skill' | 'intent';
@@ -229,11 +233,13 @@ export default function PlaygroundSection() {
                                 className="pg-textarea"
                                 value={input}
                                 onChange={(e) => {
-                                    setInput(e.target.value);
+                                    const val = e.target.value;
+                                    setInput(val.length > MAX_INPUT_LENGTH ? val.slice(0, MAX_INPUT_LENGTH) : val);
                                     setResults(null);
                                 }}
-                                placeholder="Paste a sample conversation here...&#10;&#10;Example:&#10;User: I prefer dark mode in all my tools.&#10;Assistant: Got it!"
+                                placeholder={"Paste a sample conversation here...\n\nExample:\nUser: I prefer dark mode in all my tools.\nAssistant: Got it!"}
                                 aria-label="Sample conversation input"
+                                maxLength={MAX_INPUT_LENGTH}
                             />
 
                             {/* Mode toggle */}
@@ -276,6 +282,25 @@ export default function PlaygroundSection() {
                                     </button>
                                 ))}
                             </div>
+
+                            {/* Character counter — only visible when > 80% full */}
+                            {input.length > MAX_INPUT_LENGTH * 0.8 && (
+                                <div
+                                    style={{
+                                        fontSize: '11px',
+                                        textAlign: 'right',
+                                        paddingRight: '4px',
+                                        marginTop: '4px',
+                                        color: input.length >= MAX_INPUT_LENGTH
+                                            ? 'var(--app-error, #e05252)'
+                                            : 'var(--text-muted, #888)',
+                                    }}
+                                    aria-live="polite"
+                                >
+                                    {input.length.toLocaleString()} / {MAX_INPUT_LENGTH.toLocaleString()} chars
+                                    {input.length >= MAX_INPUT_LENGTH && ' — limit reached'}
+                                </div>
+                            )}
 
                             {/* Actions */}
                             <div className="pg-actions">

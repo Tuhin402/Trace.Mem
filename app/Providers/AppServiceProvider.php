@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Providers\EmailServiceProvider;
 use App\Services\Auth\SubscriptionCacheService;
 use App\Services\Auth\SubscriptionEntitlementService;
 use App\Services\Cache\TraceMemCache;
@@ -48,6 +49,10 @@ class AppServiceProvider extends ServiceProvider
                 return $cacheService;
             }
         );
+
+        // Email system — provider-agnostic binding + event wiring + observer registration.
+        // To switch email provider: change the binding inside EmailServiceProvider only.
+        $this->app->register(EmailServiceProvider::class);
     }
 
     /**

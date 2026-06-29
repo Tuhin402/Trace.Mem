@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Enums\EmailTemplate;
+use App\Jobs\SendEmailJob;
 use App\Models\BillingTransaction;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -13,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * ProcessRazorpayWebhookJob — queue: 'high'
@@ -270,6 +273,29 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
 
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
+
+            // Dispatch subscription purchased notification email
+            $sub = $this->subscriptionEntity();
+            $planId = (int) data_get($sub, 'notes.plan_id');
+            $cycle  = (string) data_get($sub, 'notes.billing_cycle', 'monthly');
+            $plan   = \App\Models\SubscriptionPlan::find($planId);
+
+            SendEmailJob::dispatch(
+                template:       EmailTemplate::SubscriptionPurchased,
+                data:           [
+                    'user_name'     => $user->name,
+                    'plan_name'     => $plan?->name ?? 'Trace.Mem Plan',
+                    'billing_cycle' => $cycle,
+                    'amount'        => 'See billing page',
+                    'starts_at'     => now()->format('M j, Y'),
+                    'renews_at'     => $currentEnd ? Carbon::createFromTimestamp($currentEnd)->format('M j, Y') : null,
+                    'dashboard_url' => url('/dashboard'),
+                    'billing_url'   => url('/billing'),
+                ],
+                recipientEmail: $user->email,
+                userId:         $user->id,
+                requestId:      Str::uuid()->toString(),
+            )->onQueue('emails');
         }
     }
 
@@ -356,6 +382,44 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
 
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
+
+            // Dispatch subscription renewed + payment received notification emails
+            $sub      = $this->subscriptionEntity();
+            $planId   = (int) data_get($sub, 'notes.plan_id');
+            $plan     = \App\Models\SubscriptionPlan::find($planId);
+            $payment  = $this->paymentEntity();
+            $paidAt   = now()->format('M j, Y \a\t g:i A T');
+            $amountFmt = '₹' . number_format(((int) data_get($payment, 'amount', 0)) / 100, 2);
+
+            SendEmailJob::dispatch(
+                template:       EmailTemplate::SubscriptionRenewed,
+                data:           [
+                    'user_name'        => $user->name,
+                    'plan_name'        => $plan?->name ?? 'Trace.Mem Plan',
+                    'amount'           => $amountFmt,
+                    'renewed_at'       => $paidAt,
+                    'next_renewal_at'  => $currentEnd ? Carbon::createFromTimestamp($currentEnd)->format('M j, Y') : 'To be confirmed',
+                    'billing_url'      => url('/billing'),
+                ],
+                recipientEmail: $user->email,
+                userId:         $user->id,
+                requestId:      Str::uuid()->toString(),
+            )->onQueue('emails');
+
+            SendEmailJob::dispatch(
+                template:       EmailTemplate::PaymentReceived,
+                data:           [
+                    'user_name'  => $user->name,
+                    'plan_name'  => $plan?->name ?? 'Trace.Mem Plan',
+                    'amount'     => $amountFmt,
+                    'payment_id' => data_get($payment, 'id') ?? 'N/A',
+                    'paid_at'    => $paidAt,
+                    'billing_url' => url('/billing'),
+                ],
+                recipientEmail: $user->email,
+                userId:         $user->id,
+                requestId:      Str::uuid()->toString(),
+            )->onQueue('emails');
         }
     }
 
@@ -464,6 +528,25 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
 
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
+
+            // Dispatch subscription cancelled notification email
+            $sub    = $this->subscriptionEntity();
+            $planId = (int) data_get($sub, 'notes.plan_id');
+            $plan   = \App\Models\SubscriptionPlan::find($planId);
+
+            SendEmailJob::dispatch(
+                template:       EmailTemplate::SubscriptionCancelled,
+                data:           [
+                    'user_name'       => $user->name,
+                    'plan_name'       => $plan?->name ?? 'Trace.Mem Plan',
+                    'cancelled_at'    => now()->format('M j, Y \a\t g:i A T'),
+                    'access_ends_at'  => 'Immediately',
+                    'billing_url'     => url('/billing'),
+                ],
+                recipientEmail: $user->email,
+                userId:         $user->id,
+                requestId:      Str::uuid()->toString(),
+            )->onQueue('emails');
         }
     }
 
@@ -725,11 +808,30 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
                 'error_description' => $errorDesc,
             ]);
 
-            // TODO: dispatch PaymentFailedNotification email job here
+            // Dispatch payment failed notification email (after transaction commits)
         });
 
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
+
+            $tx        = BillingTransaction::where('provider_subscription_id', $rzpSubId ?? '')->first();
+            $plan      = $tx ? \App\Models\SubscriptionPlan::find($tx->subscription_plan_id) : null;
+            $amountFmt = $tx ? '₹' . number_format($tx->amount_total / 100, 2) : 'Unknown';
+
+            SendEmailJob::dispatch(
+                template:       EmailTemplate::PaymentFailed,
+                data:           [
+                    'user_name'          => $user->name,
+                    'plan_name'          => $plan?->name ?? 'Trace.Mem Plan',
+                    'amount'             => $amountFmt,
+                    'failed_at'          => now()->format('M j, Y \a\t g:i A T'),
+                    'error_description'  => $errorDesc ?? 'Payment declined',
+                    'billing_url'        => url('/billing'),
+                ],
+                recipientEmail: $user->email,
+                userId:         $user->id,
+                requestId:      Str::uuid()->toString(),
+            )->onQueue('emails');
         }
     }
 
@@ -771,7 +873,25 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
                 'amount_paise'   => $amount,
             ]);
 
-            // TODO: dispatch RefundProcessedNotification email job here
+            // Dispatch refund processed notification email — find user via payment
+            if ($paymentId) {
+                $txForRefund = BillingTransaction::where('provider_payment_intent_id', $paymentId)->with('user')->first();
+                if ($txForRefund && $txForRefund->user) {
+                    $refundUser = $txForRefund->user;
+                    SendEmailJob::dispatch(
+                        template:       EmailTemplate::RefundProcessed,
+                        data:           [
+                            'user_name'     => $refundUser->name,
+                            'refund_amount' => '₹' . number_format($amount / 100, 2),
+                            'refund_id'     => $refundId ?? 'N/A',
+                            'refunded_at'   => now()->format('M j, Y \a\t g:i A T'),
+                        ],
+                        recipientEmail: $refundUser->email,
+                        userId:         $refundUser->id,
+                        requestId:      Str::uuid()->toString(),
+                    )->onQueue('emails');
+                }
+            }
         });
     }
 

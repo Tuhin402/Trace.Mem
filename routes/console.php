@@ -52,3 +52,18 @@ Schedule::call(function () {
 ->everyMinute()
 ->name('queue-heartbeat')
 ->withoutOverlapping();
+
+// ── Email: API key expiry reminders ───────────────────────────────────────────────────
+// Sends reminder emails for API keys expiring in 7 days.
+// Jobs are dispatched to the 'emails' queue.
+Schedule::command('email:api-key-expiry-reminders')
+    ->dailyAt('09:00')
+    ->withoutOverlapping()
+    ->name('api-key-expiry-reminders');
+
+// ── Email: Plan expiry reminders ──────────────────────────────────────────────────────
+// Sends reminder emails for active subscriptions ending in 7 days.
+Schedule::command('email:plan-expiry-reminders')
+    ->dailyAt('09:00')
+    ->withoutOverlapping()
+    ->name('plan-expiry-reminders');

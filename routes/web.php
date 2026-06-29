@@ -8,6 +8,7 @@ use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MemoryInspectorController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\RazorpayWebhookController;
+use App\Http\Controllers\ResendWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'public/Landing')->name('home');
@@ -65,5 +66,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::post('/razorpay/webhook', [RazorpayWebhookController::class, 'handle'])->name('razorpay.webhook');
+Route::post('/resend/webhook', [ResendWebhookController::class, 'handle'])->name('resend.webhook');
 
 require __DIR__.'/settings.php';

@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\EmailTemplate;
+use App\Jobs\SendEmailJob;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -69,5 +73,62 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('is_active', true)
             ->whereNull('cancelled_at')     
             ->latestOfMany('starts_at');
+    }
+
+    // ── Email notification overrides ─────────────────────────────────────────
+    // These replace Fortify's default notifications so verification and password
+    // reset emails route through the unified SendEmailJob pipeline.
+    // The signed URL logic remains 100% Laravel — only delivery changes.
+
+    /**
+     * Override Fortify's email verification notification.
+     * Generates Laravel's signed verification URL and delivers via SendEmailJob.
+     * Prevents duplicate emails (Fortify's listener is bypassed by this override).
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(config('auth.verification.expire', 60)),
+            ['id' => $this->getKey(), 'hash' => sha1($this->getEmailForVerification())],
+        );
+
+        SendEmailJob::dispatch(
+            template:       EmailTemplate::Verification,
+            data:           [
+                'user_name'        => $this->name,
+                'verification_url' => $verificationUrl,
+            ],
+            recipientEmail: $this->email,
+            userId:         $this->id,
+            requestId:      Str::uuid()->toString(),
+        );
+    }
+
+    /**
+     * Override Fortify's password reset link notification.
+     * Builds the reset URL and delivers via SendEmailJob.
+     * Ensures password reset emails participate in logging, retry, and analytics.
+     *
+     * @param  string  $token  The password reset token from PasswordBroker
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $resetUrl = url(route(
+            'password.reset',
+            ['token' => $token, 'email' => $this->email],
+            absolute: false,
+        ));
+
+        SendEmailJob::dispatch(
+            template:       EmailTemplate::PasswordReset,
+            data:           [
+                'user_name' => $this->name,
+                'reset_url' => $resetUrl,
+            ],
+            recipientEmail: $this->email,
+            userId:         $this->id,
+            requestId:      Str::uuid()->toString(),
+        );
     }
 }

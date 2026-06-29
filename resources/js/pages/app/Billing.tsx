@@ -1,5 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 import {
     CreditCard,
     CheckCircle2,
@@ -10,6 +11,7 @@ import {
     XCircle,
     ChevronDown,
     X,
+    Loader2,
 } from 'lucide-react';
 import { useToast } from '@/components/app/toast';
 
@@ -72,6 +74,14 @@ type PageProps = {
     };
 };
 
+/* ── Razorpay global type ────────────────────────────────── */
+declare global {
+    interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Razorpay: new (options: Record<string, any>) => { open: () => void };
+    }
+}
+
 /* ── Cancellation reasons ────────────────────────────────── */
 const CANCEL_REASONS = [
     'Too expensive for my current use case',
@@ -85,11 +95,38 @@ const CANCEL_REASONS = [
 /* ── Helpers ─────────────────────────────────────────────── */
 function money(value: string | number | null | undefined): string {
     const n = Number(value ?? 0);
-    return `$${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`;
+    return `₹${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`;
 }
 
 function formatMode(mode: string) {
     return mode === 'ai_first' ? 'AI First' : 'Semantic Only';
+}
+
+/**
+ * Dynamically loads the Razorpay Checkout.js script once and caches the result.
+ * Returns a promise that resolves when the script is ready.
+ */
+function loadRazorpayScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (typeof window.Razorpay !== 'undefined') {
+            resolve();
+            return;
+        }
+        const existing = document.getElementById('razorpay-checkout-js');
+        if (existing) {
+            // Script tag exists but may still be loading — wait for it
+            existing.addEventListener('load', () => resolve());
+            existing.addEventListener('error', () => reject(new Error('Razorpay script failed to load')));
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = 'razorpay-checkout-js';
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Razorpay script failed to load'));
+        document.head.appendChild(script);
+    });
 }
 
 /* ── Quota bar ───────────────────────────────────────────── */
@@ -116,10 +153,12 @@ function PlanCard({
     plan,
     currentPlanSlug,
     onSelect,
+    checkingOut,
 }: {
     plan: SubscriptionPlan;
     currentPlanSlug?: string | null;
     onSelect: (slug: string, cycle: 'monthly' | 'quarterly' | 'yearly') => void;
+    checkingOut: boolean;
 }) {
     const isCurrent = plan.slug === currentPlanSlug;
 
@@ -167,6 +206,7 @@ function PlanCard({
                             className={`app-btn ${isPrimary ? 'app-btn-primary' : 'app-btn-ghost'}`}
                             style={{ width: '100%', justifyContent: 'space-between' }}
                             onClick={() => onSelect(plan.slug, cycle)}
+                            disabled={checkingOut}
                         >
                             <span style={{ textTransform: 'capitalize' }}>{cycle}</span>
                             <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
@@ -188,7 +228,7 @@ function CancelModal({
     subscription: UserSubscription;
     onClose: () => void;
 }) {
-    const [reason, setReason]       = useState('');
+    const [reason, setReason]         = useState('');
     const [submitting, setSubmitting] = useState(false);
 
     const handleSubmit = () => {
@@ -295,8 +335,8 @@ function CancelModal({
 
 /* ── Main page ───────────────────────────────────────────── */
 export default function Billing() {
-    const { props }           = usePage<PageProps>();
-    const { toast, Toasts }   = useToast();
+    const { props }         = usePage<PageProps>();
+    const { toast, Toasts } = useToast();
 
     const plan         = props.plan ?? null;
     const plans        = props.plans ?? [];
@@ -305,16 +345,147 @@ export default function Billing() {
     const flashMsg     = props.flash?.message ?? null;
     const flashErr     = props.flash?.error ?? null;
 
-    const [cancelOpen,  setCancelOpen]  = useState(false);
-    const [showModal,   setShowModal]   = useState(false);
+    const [cancelOpen,   setCancelOpen]   = useState(false);
+    const [showModal,    setShowModal]    = useState(false);
+    const [checkingOut,  setCheckingOut]  = useState(false);
+
+    // Track whether a Razorpay modal is currently open so we can reset
+    // loading state correctly when the user dismisses it.
+    const razorpayOpenRef = useRef(false);
 
     useEffect(() => {
         if (flashMsg) toast(flashMsg, 'success');
         if (flashErr) toast(flashErr, 'error');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const startCheckout = (planSlug: string, billingCycle: 'monthly' | 'quarterly' | 'yearly') => {
-        router.post('/billing/checkout', { plan_slug: planSlug, billing_cycle: billingCycle });
+    /* ── Checkout — opens Razorpay modal inline ──────────── */
+    const startCheckout = async (planSlug: string, billingCycle: 'monthly' | 'quarterly' | 'yearly') => {
+        setCheckingOut(true);
+
+        try {
+            // 1. Load Razorpay Checkout.js (cached after first load)
+            await loadRazorpayScript();
+        } catch {
+            toast('Payment provider failed to load. Please check your connection and try again.', 'error');
+            setCheckingOut(false);
+            return;
+        }
+
+        let orderData: {
+            subscription_id: string;
+            key_id: string;
+            amount: number;
+            currency: string;
+            name: string;
+            description: string;
+            prefill: { email: string; name: string };
+        };
+
+        try {
+            // 2. Create Razorpay Subscription on the backend
+            const response = await axios.post<typeof orderData>(
+                '/billing/checkout',
+                { plan_slug: planSlug, billing_cycle: billingCycle },
+                { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
+            );
+            orderData = response.data;
+        } catch (err: unknown) {
+            const message =
+                axios.isAxiosError(err) && err.response?.data?.error
+                    ? String(err.response.data.error)
+                    : 'Failed to initiate checkout. Please try again.';
+            toast(message, 'error');
+            setCheckingOut(false);
+            return;
+        }
+
+        // 3. Open Razorpay modal
+        razorpayOpenRef.current = true;
+
+        const rzp = new window.Razorpay({
+            key:             orderData.key_id,
+            subscription_id: orderData.subscription_id,
+            name:            orderData.name,
+            description:     orderData.description,
+            // Branding: use favicon as logo fallback; Razorpay will use configured
+            // Business Profile logo if set on the Razorpay dashboard.
+            image:           '/favicon.ico',
+            currency:        orderData.currency,
+            prefill:         orderData.prefill,
+            theme:           { color: '#6366f1' },    // matches var(--app-accent)
+            modal: {
+                backdropclose: false,
+                escape:        true,
+                handleback:    true,
+                confirm_close: false,
+
+                /* ── ondismiss ───────────────────────────────────────────────
+                 * Fired when the user explicitly closes the Razorpay modal
+                 * WITHOUT completing payment — e.g. clicking the ✕ button,
+                 * pressing Escape, or pressing the back button on mobile.
+                 *
+                 * Rules:
+                 *   • Reset all loading / in-progress UI state immediately.
+                 *   • Show a clear, non-alarming informational message.
+                 *   • Make NO API calls — no subscription, entitlement, API
+                 *     key, or billing state changes must occur.
+                 *   • The pending BillingTransaction (created at /checkout)
+                 *     remains in 'pending' status and will be cleaned up
+                 *     automatically by the scheduler if never completed.
+                 * ─────────────────────────────────────────────────────────── */
+                ondismiss: () => {
+                    razorpayOpenRef.current = false;
+                    setCheckingOut(false);
+                    toast(
+                        'Payment cancelled — your subscription has not been changed.',
+                        'info' as Parameters<typeof toast>[1],
+                    );
+                },
+            },
+
+            /* ── handler ─────────────────────────────────────────────────────
+             * Fired by Razorpay after a SUCCESSFUL payment authentication.
+             * The frontend NEVER activates anything itself — it sends the
+             * three tokens to the backend for HMAC-SHA256 verification.
+             * Subscription activation only happens after the server confirms
+             * the signature is valid.
+             * ─────────────────────────────────────────────────────────────── */
+            handler: async (response: {
+                razorpay_payment_id: string;
+                razorpay_subscription_id: string;
+                razorpay_signature: string;
+            }) => {
+                razorpayOpenRef.current = false;
+
+                try {
+                    await axios.post(
+                        '/billing/verify-payment',
+                        {
+                            razorpay_payment_id:      response.razorpay_payment_id,
+                            razorpay_subscription_id: response.razorpay_subscription_id,
+                            razorpay_signature:       response.razorpay_signature,
+                        },
+                        { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
+                    );
+
+                    toast('Subscription activated! Your plan is now active.', 'success');
+
+                    // Reload the Inertia page to reflect new subscription state
+                    router.reload({ only: ['plan', 'subscription', 'usage', 'flash'] });
+                } catch (verifyErr: unknown) {
+                    const message =
+                        axios.isAxiosError(verifyErr) && verifyErr.response?.data?.error
+                            ? String(verifyErr.response.data.error)
+                            : 'Payment was received but verification failed. Please contact support.';
+                    toast(message, 'error');
+                } finally {
+                    setCheckingOut(false);
+                }
+            },
+        });
+
+        rzp.open();
     };
 
     const isCancelled = subscription?.is_cancelled ?? false;
@@ -343,6 +514,14 @@ export default function Billing() {
                         </p>
                     </div>
                 </div>
+
+                {/* ── Checkout loading overlay ── */}
+                {checkingOut && (
+                    <div className="bl-checkout-loading">
+                        <Loader2 size={16} className="bl-checkout-loading-icon" />
+                        <span>Opening payment…</span>
+                    </div>
+                )}
 
                 {/* ── Current subscription / Cancelled / No plan ── */}
                 {isCancelled ? (
@@ -541,17 +720,18 @@ export default function Billing() {
                                     plan={p}
                                     currentPlanSlug={isCancelled ? null : plan?.slug}
                                     onSelect={startCheckout}
+                                    checkingOut={checkingOut}
                                 />
                             ))}
                         </div>
                     </div>
                 )}
 
-                {/* ── Stripe note ── */}
+                {/* ── Payment security note ── */}
                 <div className="bl-stripe-note">
                     <ShieldCheck size={14} />
                     <span>
-                        All payments are processed securely by Stripe. TraceMem never stores your
+                        All payments are processed securely by Razorpay. TraceMem never stores your
                         card details. You can cancel or change your plan at any time.
                     </span>
                 </div>

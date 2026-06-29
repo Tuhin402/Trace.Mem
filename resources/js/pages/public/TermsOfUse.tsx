@@ -421,22 +421,22 @@ export default function TermsOfUse() {
                         subscription begins or renews.
                     </p>
 
-                    <h3 className="legal-h3">Stripe Payments</h3>
+                    <h3 className="legal-h3">Razorpay Payments</h3>
                     <p className="legal-p">
-                        All payment processing is handled by Stripe, Inc. By subscribing to a paid
-                        plan, you agree to{' '}
-                        <a href="https://stripe.com/legal" target="_blank" rel="noreferrer" style={{ color: 'var(--tm-primary)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
-                            Stripe's Terms of Service
+                        All payment processing is handled by Razorpay Software Private Limited. By subscribing
+                        to a paid plan, you agree to{' '}
+                        <a href="https://razorpay.com/terms/" target="_blank" rel="noreferrer" style={{ color: 'var(--tm-primary)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+                            Razorpay's Terms of Service
                         </a>{' '}
-                        and authorise Stripe to charge your designated payment method on our behalf.
+                        and authorise Razorpay to charge your designated payment method on our behalf.
                         We do not store your full payment card details. All payment data is handled
-                        directly by Stripe in accordance with PCI-DSS standards.
+                        directly by Razorpay in accordance with PCI-DSS standards.
                     </p>
 
                     <h3 className="legal-h3">Failed Payments</h3>
                     <p className="legal-p">If a payment fails:</p>
                     <ul className="legal-ul">
-                        <li>We will retry the charge in accordance with Stripe's retry logic</li>
+                        <li>We will retry the charge in accordance with Razorpay's retry logic</li>
                         <li>We will notify you by email</li>
                         <li>If payment remains outstanding, your account may be downgraded or suspended</li>
                         <li>We reserve the right to terminate your account for prolonged non-payment</li>

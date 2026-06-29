@@ -72,7 +72,7 @@ const services = [
         icon: <Mail size={18} />,
     },
     {
-        name: 'Stripe Billing',
+        name: 'Razorpay Billing',
         status: 'operational' as const,
         description: 'Payment processing and webhook ingestion functioning correctly.',
         lastChecked: '4 min ago',

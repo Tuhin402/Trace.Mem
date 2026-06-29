@@ -154,7 +154,7 @@ export default function PrivacyPolicy() {
                     </ul>
                     <p className="legal-p"><strong>Billing Information:</strong></p>
                     <ul className="legal-ul">
-                        <li>Payment method details (processed and stored securely by Stripe)</li>
+                        <li>Payment method details (processed and stored securely by Razorpay)</li>
                         <li>Billing address</li>
                         <li>Invoice history</li>
                         <li>Subscription plan details</li>
@@ -162,14 +162,14 @@ export default function PrivacyPolicy() {
                     <div className="legal-callout">
                         <p>
                             We do not directly store full payment card details. Payment processing is
-                            handled by Stripe, Inc. Please refer to{' '}
+                            handled by Razorpay Software Private Limited. Please refer to{' '}
                             <a
-                                href="https://stripe.com/privacy"
+                                href="https://razorpay.com/privacy/"
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{ color: 'var(--tm-primary)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
                             >
-                                Stripe's Privacy Policy
+                                Razorpay's Privacy Policy
                             </a>{' '}
                             for details on how they handle payment data.
                         </p>
@@ -276,7 +276,7 @@ export default function PrivacyPolicy() {
 
                     <h3 className="legal-h3">To Process Payments and Manage Subscriptions</h3>
                     <ul className="legal-ul">
-                        <li>Processing subscription payments via Stripe</li>
+                        <li>Processing subscription payments via Razorpay</li>
                         <li>Managing billing, invoicing, and renewals</li>
                         <li>Handling payment failures and subscription changes</li>
                     </ul>
@@ -531,7 +531,7 @@ export default function PrivacyPolicy() {
                 <LegalSection id="international" num="12" title="International Transfers">
                     <p className="legal-p">
                         Trace.Mem is headquartered in India. However, some of our infrastructure,
-                        third-party service providers (including Stripe and AI model providers), and data
+                        third-party service providers (including Razorpay and AI model providers), and data
                         processing operations may be located outside India.
                     </p>
                     <p className="legal-p">
@@ -579,14 +579,14 @@ export default function PrivacyPolicy() {
 
                     <h3 className="legal-h3">Payment Processing</h3>
                     <p className="legal-p">
-                        Stripe, Inc. — for billing and subscription management.{' '}
+                        Razorpay Software Private Limited — for billing and subscription management.{' '}
                         <a
-                            href="https://stripe.com/privacy"
+                            href="https://razorpay.com/privacy/"
                             target="_blank"
                             rel="noreferrer"
                             style={{ color: 'var(--tm-primary)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
                         >
-                            Stripe Privacy Policy →
+                            Razorpay Privacy Policy →
                         </a>
                     </p>
 

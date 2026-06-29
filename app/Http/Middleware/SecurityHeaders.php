@@ -54,17 +54,19 @@ class SecurityHeaders
         //   object-src  'none'
         //   base-uri    'self'
         //   form-action 'self' + checkout.stripe.com (billing redirect)
+        //   Razorpay Checkout uses checkout.razorpay.com for the JS bundle and the
+        //   payment modal iframe, and api.razorpay.com for API calls.
         $csp = implode('; ', array_filter([
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' https://js.stripe.com" . ($isLocal ? ' http://localhost:5173' : ''),
+            "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com" . ($isLocal ? ' http://localhost:5173' : ''),
             "style-src 'self' 'unsafe-inline'",
-            "img-src 'self' data: blob:",
+            "img-src 'self' data: blob: https://checkout.razorpay.com",
             "font-src 'self' data:",
-            "connect-src 'self' https://api.stripe.com" . ($isLocal ? ' ws://localhost:5173 http://localhost:5173' : ''),
-            "frame-src https://js.stripe.com https://hooks.stripe.com",
+            "connect-src 'self' https://api.razorpay.com" . ($isLocal ? ' ws://localhost:5173 http://localhost:5173' : ''),
+            "frame-src https://api.razorpay.com https://checkout.razorpay.com",
             "object-src 'none'",
             "base-uri 'self'",
-            "form-action 'self' https://checkout.stripe.com",
+            "form-action 'self'",
         ]));
 
         // ── Strict-Transport-Security ─────────────────────────────────────────

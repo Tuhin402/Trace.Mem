@@ -164,7 +164,7 @@
     max-width: 500px;
 }
 
-/* ── Stripe security note ────────────────────────────────── */
+/* ── Payment security note ───────────────────────────────── */
 .bl-stripe-note {
     display: flex;
     align-items: center;
@@ -178,6 +178,33 @@
 .bl-stripe-note svg {
     flex-shrink: 0;
     color: var(--app-text-subtle);
+}
+
+/* ── Checkout loading indicator ──────────────────────────── */
+.bl-checkout-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--app-text-dim);
+    padding: 8px 0;
+    animation: bl-fade-in 0.2s ease;
+}
+
+@keyframes bl-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.bl-checkout-loading-icon {
+    flex-shrink: 0;
+    color: var(--app-accent);
+    animation: bl-spin 0.9s linear infinite;
+}
+
+@keyframes bl-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
 /* ── Responsive ──────────────────────────────────────────── */

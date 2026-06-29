@@ -17,7 +17,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $fillable = [
         'tenant_scope_id',
-        'stripe_customer_id',
+        'stripe_customer_id',    // kept for historical Stripe billing records
+        'razorpay_customer_id',  // Razorpay customer ID (set on first subscription)
         'name',
         'email',
         'password',

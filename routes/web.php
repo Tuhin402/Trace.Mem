@@ -7,7 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MemoryInspectorController;
 use App\Http\Controllers\PricingController;
-use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\RazorpayWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'public/Landing')->name('home');
@@ -57,12 +57,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/api-keys/{apiKey}/rotate', [ApiKeyController::class, 'rotate'])->name('api.keys.rotate');
 
     Route::post('/billing/checkout', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::post('/billing/verify-payment', [BillingController::class, 'verifyPayment'])->name('billing.verify-payment');
     Route::get('/billing/success', [BillingController::class, 'success'])->name('billing.success');
     Route::get('/billing/cancel', [BillingController::class, 'cancel'])->name('billing.cancel');
     Route::get('/billing', [BillingController::class, 'index'])->name('billing.index');
     Route::post('/billing/cancel-subscription', [BillingController::class, 'cancelSubscription'])->name('billing.cancel-subscription');
 });
 
-Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+Route::post('/razorpay/webhook', [RazorpayWebhookController::class, 'handle'])->name('razorpay.webhook');
 
 require __DIR__.'/settings.php';

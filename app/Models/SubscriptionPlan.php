@@ -28,6 +28,7 @@ class SubscriptionPlan extends Model
         'price_quarterly',
         'price_yearly',
         'is_active',
+        'razorpay_plan_ids', // JSON: {monthly: 'plan_xxx', quarterly: 'plan_yyy', yearly: 'plan_zzz'}
     ];
     
     protected $casts = [
@@ -47,7 +48,8 @@ class SubscriptionPlan extends Model
         'price_monthly' => 'decimal:2',
         'price_quarterly' => 'decimal:2',
         'price_yearly' => 'decimal:2',
-        'is_active' => 'boolean',
+        'is_active'         => 'boolean',
+        'razorpay_plan_ids' => 'array',
     ];
 
     public function features()

@@ -1,13 +1,35 @@
 import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
 import { useDomains } from '@/lib/domains';
 
 export default function CoreOperations() {
-    const { apiUrl } = useDomains();
+    const { apiUrl, siteUrl } = useDomains();
 
     return (
         <>
+            <Helmet>
+                <title>Core Operations | TraceMem API</title>
+                <meta name="description" content="TraceMem's three core memory operations: remember, recall, and context assemble. Learn the workflow for AI-powered persistent memory." />
+                <meta property="og:title" content="Core Operations | TraceMem API" />
+                <meta property="og:description" content="TraceMem's memory layer is built around three atomic operations: remember stores structured memory, recall fetches semantically relevant memories, and context assemble builds prompt-ready context." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${siteUrl}/api-reference/core-operations`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Core Operations | TraceMem API" />
+                <meta name="twitter:description" content="Three atomic memory operations: remember, recall, and context assemble. The foundation of TraceMem's AI memory layer." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/api-reference/core-operations`} />
+            </Helmet>
+
             <Head title="Core Operations | TraceMem API" />
 
             <ApiReferencePage

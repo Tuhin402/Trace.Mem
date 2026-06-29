@@ -228,10 +228,21 @@ export default function Pricing() {
                     name="keywords"
                     content="TraceMem pricing, AI memory pricing, semantic memory plan, LLM API pricing, context memory infrastructure"
                 />
-                <meta property="og:title" content="TraceMem Pricing" />
-                <meta property="og:description" content="Simple, transparent pricing for persistent AI memory infrastructure." />
+                <meta property="og:title" content="Pricing | TraceMem" />
+                <meta property="og:description" content="Simple, transparent pricing for persistent AI memory infrastructure. Compare Semantic Starter and AI First Pro plans." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/pricing`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Pricing | TraceMem" />
+                <meta name="twitter:description" content="Simple, transparent pricing for persistent AI memory infrastructure. Compare Semantic Starter and AI First Pro plans." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
                 <link rel="canonical" href={`${siteUrl}/pricing`} />
             </Helmet>
 

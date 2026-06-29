@@ -1,13 +1,35 @@
 import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
 import { useDomains } from '@/lib/domains';
 
 export default function Health() {
-    const { apiUrl } = useDomains();
+    const { apiUrl, siteUrl } = useDomains();
 
     return (
         <>
+            <Helmet>
+                <title>Health | TraceMem API</title>
+                <meta name="description" content="TraceMem health check endpoint for uptime monitoring, deployment readiness, and load balancer health probes. No API key required." />
+                <meta property="og:title" content="Health Check | TraceMem API" />
+                <meta property="og:description" content="A lightweight, unauthenticated endpoint for uptime monitoring, deployment readiness checks, and load balancer health probes." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${siteUrl}/api-reference/health`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Health Check | TraceMem API" />
+                <meta name="twitter:description" content="A lightweight, unauthenticated endpoint for uptime monitoring, deployment readiness checks, and load balancer health probes." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/api-reference/health`} />
+            </Helmet>
+
             <Head title="Health | TraceMem API" />
 
             <ApiReferencePage

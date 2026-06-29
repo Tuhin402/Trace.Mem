@@ -44,9 +44,21 @@ export default function TermsOfUse() {
                 />
                 <meta name="robots" content="index, follow" />
                 <link rel="canonical" href={`${siteUrl}/terms-of-use`} />
-                <meta property="og:title" content="Terms of Use" />
-                <meta property="og:description" content="Read the terms governing the use of the Trace.Mem platform." />
+                <meta property="og:title" content="Terms of Use | TraceMem" />
+                <meta property="og:description" content="Read the terms governing the use of the TraceMem platform, including API access, billing, acceptable use, and developer responsibilities." />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/terms-of-use`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Terms of Use | TraceMem" />
+                <meta name="twitter:description" content="Read the terms governing the use of the TraceMem platform." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
             </Helmet>
 
             <LegalPageShell
@@ -337,7 +349,7 @@ export default function TermsOfUse() {
                         <li>Use the Services in any way that could damage, disrupt, or impair the platform or other Developers' use of the Services</li>
                     </ul>
 
-                    <h3 className="legal-h3">Prohibited Data — Sensitive Personal Information</h3>
+                    <h3 className="legal-h3">Prohibited Data - Sensitive Personal Information</h3>
                     <p className="legal-p">
                         The Trace.Mem platform is not designed or intended for the storage or processing
                         of sensitive personal information. You must not use Trace.Mem APIs to transmit

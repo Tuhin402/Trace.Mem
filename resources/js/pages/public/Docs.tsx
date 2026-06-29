@@ -154,10 +154,21 @@ export default function Docs() {
                     name="keywords"
                     content="AI memory API, LLM memory layer, semantic memory, contextual memory, RAG memory, AI infrastructure, TraceMem docs"
                 />
-                <meta property="og:title" content="TraceMem Documentation" />
-                <meta property="og:description" content="Persistent memory infrastructure for AI and LLM applications." />
+                <meta property="og:title" content="Documentation | TraceMem" />
+                <meta property="og:description" content="Persistent memory infrastructure for AI and LLM applications. Learn how to store, recall, and assemble structured memory." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/docs`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Documentation | TraceMem" />
+                <meta name="twitter:description" content="Persistent memory infrastructure for AI and LLM applications. Learn how to store, recall, and assemble structured memory." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
                 <link rel="canonical" href={`${siteUrl}/docs`} />
             </Helmet>
 

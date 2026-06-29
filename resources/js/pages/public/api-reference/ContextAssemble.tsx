@@ -1,13 +1,35 @@
 import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
 import { useDomains } from '@/lib/domains';
 
 export default function ContextAssemble() {
-    const { apiUrl } = useDomains();
+    const { apiUrl, siteUrl } = useDomains();
 
     return (
         <>
+            <Helmet>
+                <title>Context Assemble | TraceMem API</title>
+                <meta name="description" content="Assemble prompt-ready context from stored memories. Pass a query and token budget, TraceMem returns a ranked, structured context block for your LLM prompts." />
+                <meta property="og:title" content="Context Assemble | TraceMem API" />
+                <meta property="og:description" content="Selects, ranks, and formats the most relevant memory units into a prompt-ready context window. Inject directly into your LLM prompt with a configurable token budget." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${siteUrl}/api-reference/context-assemble`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Context Assemble | TraceMem API" />
+                <meta name="twitter:description" content="Assemble prompt-ready context from stored memories. Ranked, structured, and token-budget aware, built for LLM prompts." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/api-reference/context-assemble`} />
+            </Helmet>
+
             <Head title="Context Assemble | TraceMem API" />
 
             <ApiReferencePage

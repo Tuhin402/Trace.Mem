@@ -307,10 +307,21 @@ export default function UseCases() {
                     name="keywords"
                     content="TraceMem use cases, AI memory use cases, semantic memory, LLM copilots, support automation, internal AI tools, developer memory API, agent memory, personalized AI"
                 />
-                <meta property="og:title" content="TraceMem Use Cases" />
+                <meta property="og:title" content="Use Cases | TraceMem" />
                 <meta property="og:description" content="See how TraceMem enables persistent, structured AI memory across SaaS copilots, support bots, internal tools, and autonomous agents." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/usecases`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Use Cases | TraceMem" />
+                <meta name="twitter:description" content="See how TraceMem enables persistent, structured AI memory across SaaS copilots, support bots, internal tools, and autonomous agents." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
                 <link rel="canonical" href={`${siteUrl}/usecases`} />
             </Helmet>
 

@@ -1,13 +1,35 @@
 import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
 import { useDomains } from '@/lib/domains';
 
 export default function Recall() {
-    const { apiUrl } = useDomains();
+    const { apiUrl, siteUrl } = useDomains();
 
     return (
         <>
+            <Helmet>
+                <title>Recall | TraceMem API</title>
+                <meta name="description" content="Retrieve semantically relevant memories for a user. Memories are ranked by relevance and recency for use in AI prompt context." />
+                <meta property="og:title" content="Recall | TraceMem API" />
+                <meta property="og:description" content="Retrieve the most semantically relevant memory units for the caller's tenant and user scope. Use this before generating AI responses to provide grounded, personalized context." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${siteUrl}/api-reference/recall`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Recall | TraceMem API" />
+                <meta name="twitter:description" content="Retrieve the most semantically relevant memory units for a user. Ranked by relevance and recency for AI prompt context." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/api-reference/recall`} />
+            </Helmet>
+
             <Head title="Recall | TraceMem API" />
 
             <ApiReferencePage

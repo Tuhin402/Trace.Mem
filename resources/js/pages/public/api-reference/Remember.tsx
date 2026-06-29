@@ -1,13 +1,35 @@
 import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import ApiReferencePage from '@/components/public/api-reference-page';
 import { apiRefGroups } from '@/components/public/api-ref-nav';
 import { useDomains } from '@/lib/domains';
 
 export default function Remember() {
-    const { apiUrl } = useDomains();
+    const { apiUrl, siteUrl } = useDomains();
 
     return (
         <>
+            <Helmet>
+                <title>Remember | TraceMem API</title>
+                <meta name="description" content="Store an atomic memory item with TraceMem. Semantic extraction, deduplication, and tenant isolation built in." />
+                <meta property="og:title" content="Remember | TraceMem API" />
+                <meta property="og:description" content="Store an atomic memory item scoped to the caller's tenant and user. TraceMem extracts semantic meaning, detects duplicates, and persists structured memory units." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${siteUrl}/api-reference/remember`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Remember | TraceMem API" />
+                <meta name="twitter:description" content="Store an atomic memory item scoped to the caller's tenant and user. Semantic extraction and deduplication built in." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/api-reference/remember`} />
+            </Helmet>
+
             <Head title="Remember | TraceMem API" />
 
             <ApiReferencePage

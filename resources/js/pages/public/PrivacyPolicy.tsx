@@ -41,9 +41,21 @@ export default function PrivacyPolicy() {
                 />
                 <meta name="robots" content="index, follow" />
                 <link rel="canonical" href={`${siteUrl}/privacy-policy`} />
-                <meta property="og:title" content="Privacy Policy" />
-                <meta property="og:description" content="Learn how Trace.Mem collects, stores and protects your data." />
+                <meta property="og:title" content="Privacy Policy | TraceMem" />
+                <meta property="og:description" content="Learn how TraceMem collects, stores and protects your data. Our privacy policy covers data collection, usage, retention, and your rights." />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/privacy-policy`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Privacy Policy | TraceMem" />
+                <meta name="twitter:description" content="Learn how TraceMem collects, stores and protects your data." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
             </Helmet>
 
             <LegalPageShell
@@ -206,7 +218,7 @@ export default function PrivacyPolicy() {
                     </ul>
                     <p className="legal-p">We do not use advertising cookies or cross-site tracking technologies.</p>
 
-                    <h3 className="legal-h3">API Data Processing — Memory Content</h3>
+                    <h3 className="legal-h3">API Data Processing - Memory Content</h3>
                     <p className="legal-p">
                         When Developers send data to Trace.Mem via our APIs, we process that data to
                         deliver our core memory services. This may include:
@@ -332,7 +344,7 @@ export default function PrivacyPolicy() {
                     <p className="legal-p">
                         We process certain data (such as security logs and aggregated analytics) based on
                         our legitimate interest in keeping the platform secure, improving our services,
-                        and preventing abuse — provided such interests are not overridden by your
+                        and preventing abuse - provided such interests are not overridden by your
                         fundamental rights.
                     </p>
 
@@ -389,26 +401,26 @@ export default function PrivacyPolicy() {
                     </p>
                     <ul className="legal-ul">
                         <li>
-                            <strong>Account Data</strong> — Retained for the duration of your account
+                            <strong>Account Data</strong> - Retained for the duration of your account
                             and for a period following account deletion, after which it is deleted or
                             anonymised.
                         </li>
                         <li>
-                            <strong>API Usage Logs</strong> — Retained for a defined period for
+                            <strong>API Usage Logs</strong> - Retained for a defined period for
                             security, debugging, and billing verification purposes, then deleted or
                             anonymised.
                         </li>
                         <li>
-                            <strong>Billing Records</strong> — Retained as required for tax and
+                            <strong>Billing Records</strong> - Retained as required for tax and
                             financial compliance under applicable law.
                         </li>
                         <li>
-                            <strong>Memory Content (API Data)</strong> — Retained until deleted by
+                            <strong>Memory Content (API Data)</strong> - Retained until deleted by
                             the Developer via API or dashboard, or until the Developer's account is
                             terminated.
                         </li>
                         <li>
-                            <strong>Support Communications</strong> — Retained for a reasonable period
+                            <strong>Support Communications</strong> - Retained for a reasonable period
                             from the date of the last interaction.
                         </li>
                     </ul>
@@ -458,28 +470,28 @@ export default function PrivacyPolicy() {
                     </p>
                     <ul className="legal-ul">
                         <li>
-                            <strong>Withdrawal of Consent</strong> — You may withdraw consent to
+                            <strong>Withdrawal of Consent</strong> - You may withdraw consent to
                             processing at any time where we rely on consent as the legal basis.
                             Withdrawal does not affect the lawfulness of processing before withdrawal.
                         </li>
                         <li>
-                            <strong>Access</strong> — You may request a copy of the personal data we
+                            <strong>Access</strong> - You may request a copy of the personal data we
                             hold about you.
                         </li>
                         <li>
-                            <strong>Correction</strong> — You may request correction of inaccurate or
+                            <strong>Correction</strong> - You may request correction of inaccurate or
                             incomplete personal data we hold about you.
                         </li>
                         <li>
-                            <strong>Deletion (Right to be Forgotten)</strong> — You may request
+                            <strong>Deletion (Right to be Forgotten)</strong> - You may request
                             deletion of your personal data, subject to legal retention obligations.
                         </li>
                         <li>
-                            <strong>Restriction</strong> — You may request that we restrict processing
+                            <strong>Restriction</strong> - You may request that we restrict processing
                             of your data in certain circumstances.
                         </li>
                         <li>
-                            <strong>Grievance Redressal</strong> — Under the DPDP Act, 2023, you may
+                            <strong>Grievance Redressal</strong> - Under the DPDP Act, 2023, you may
                             raise a grievance with our designated Grievance Officer (see Section 15).
                         </li>
                     </ul>
@@ -579,7 +591,7 @@ export default function PrivacyPolicy() {
 
                     <h3 className="legal-h3">Payment Processing</h3>
                     <p className="legal-p">
-                        Razorpay Software Private Limited — for billing and subscription management.{' '}
+                        Razorpay Software Private Limited - for billing and subscription management.{' '}
                         <a
                             href="https://razorpay.com/privacy/"
                             target="_blank"
@@ -631,7 +643,7 @@ export default function PrivacyPolicy() {
                     </p>
 
                     <div className="legal-contact-strip">
-                        <span className="legal-contact-label">Grievance Officer — DPDP Act, 2023</span>
+                        <span className="legal-contact-label">Grievance Officer - DPDP Act, 2023</span>
                         <h3 className="legal-contact-title">Submit a Grievance</h3>
                         <p className="legal-contact-desc">
                             For data protection grievances, privacy concerns, or rights requests,

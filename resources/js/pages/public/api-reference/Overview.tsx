@@ -12,10 +12,22 @@ export default function Overview() {
                 <title>API Reference Overview | TraceMem</title>
                 <meta name="description" content="Official TraceMem API reference. Explore endpoints and integrate persistent, semantic, and AI-assembled memory into your applications using our REST API." />
                 <meta name="keywords" content="TraceMem API, memory API, REST API, semantic memory, persistent memory, API docs, LLM memory API, TraceMem developer, AI memory integration" />
-                <meta property="og:title" content="TraceMem API Reference" />
+                <meta property="og:title" content="API Reference | TraceMem" />
                 <meta property="og:description" content="Full documentation for the TraceMem REST API. Learn how to store, recall, and contextually assemble memory for modern AI and LLM apps." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/api-reference`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="API Reference | TraceMem" />
+                <meta name="twitter:description" content="Full documentation for the TraceMem REST API. Learn how to store, recall, and contextually assemble memory for AI apps." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/api-reference`} />
             </Helmet>
 
             <Head title="API Reference Overview" />

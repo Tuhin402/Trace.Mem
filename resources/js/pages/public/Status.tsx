@@ -83,7 +83,7 @@ const services = [
 const incidents = [
     {
         title: 'Elevated API Latency',
-        timestamp: 'May 28, 2026 — 14:32 UTC',
+        timestamp: 'May 28, 2026 - 14:32 UTC',
         severity: 'minor' as const,
         summary:
             'Brief period of elevated response times on /recall endpoint due to a sudden spike in concurrent requests. Auto-scaling resolved the issue within 8 minutes. No data loss or errors.',
@@ -91,7 +91,7 @@ const incidents = [
     },
     {
         title: 'Scheduled Database Maintenance',
-        timestamp: 'May 15, 2026 — 03:00 UTC',
+        timestamp: 'May 15, 2026 - 03:00 UTC',
         severity: 'minor' as const,
         summary:
             'Planned PostgreSQL version upgrade and index optimization. Memory reads were temporarily routed to replica. Write operations were queued and replayed after maintenance. Total window: 12 minutes.',
@@ -99,7 +99,7 @@ const incidents = [
     },
     {
         title: 'OpenAI Upstream Degradation',
-        timestamp: 'Apr 22, 2026 — 09:15 UTC',
+        timestamp: 'Apr 22, 2026 - 09:15 UTC',
         severity: 'major' as const,
         summary:
             'OpenAI API experienced intermittent 503 errors affecting AI-first memory extraction. Semantic-only mode remained fully operational. Switched to fallback provider for 45 minutes until upstream recovered.',
@@ -130,15 +130,26 @@ export default function Status() {
             <Helmet>
                 <meta
                     name="description"
-                    content="TraceMem system status — real-time service health, uptime, and incident history for the TraceMem memory infrastructure."
+                    content="TraceMem system status - real-time service health, uptime, and incident history for the TraceMem memory infrastructure."
                 />
-                <meta property="og:title" content="TraceMem — System Status" />
+                <meta property="og:title" content="System Status | TraceMem" />
                 <meta
                     property="og:description"
                     content="Live status of TraceMem services including API, Memory Engine, Context Assembly, and more."
                 />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${siteUrl}/status`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="System Status | TraceMem" />
+                <meta name="twitter:description" content="Live status of TraceMem services including API, Memory Engine, Context Assembly, and more." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
                 <link rel="canonical" href={`${siteUrl}/status`} />
             </Helmet>
 
@@ -202,7 +213,7 @@ export default function Status() {
 
                         <div className="st-uptime-chart">
                             <div className="st-uptime-chart-label">
-                                Daily Availability — Last 90 Days
+                                Daily Availability - Last 90 Days
                             </div>
                             <div className="st-uptime-bars" aria-label="Uptime chart">
                                 {uptimeBars.map((bar, i) => (

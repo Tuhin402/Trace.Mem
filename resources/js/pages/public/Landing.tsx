@@ -316,14 +316,21 @@ export default function Landing() {
                     name="keywords"
                     content="AI memory, LLM memory, semantic memory, context memory, retrieval system, AI infrastructure, vector memory, long-term memory"
                 />
-                <meta property="og:title"       content="TraceMem" />
-                <meta property="og:description" content="Long-term memory infrastructure for AI applications." />
+                <meta property="og:title"       content="TraceMem | Long-Term Contextual Memory Infrastructure" />
+                <meta property="og:description" content="Persistent long-term memory infrastructure for AI and LLM applications - semantic recall, ranking, tenant isolation, and context assembly." />
                 <meta property="og:type"        content="website" />
                 <meta property="og:url"         content={siteUrl} />
                 <meta property="og:image"       content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
                 <meta name="twitter:card"        content="summary_large_image" />
-                <meta name="twitter:title"       content="TraceMem" />
-                <meta name="twitter:description" content="Long-term memory infrastructure for AI applications." />
+                <meta name="twitter:title"       content="TraceMem | Long-Term Contextual Memory Infrastructure" />
+                <meta name="twitter:description" content="Persistent long-term memory infrastructure for AI and LLM applications - semantic recall, ranking, tenant isolation, and context assembly." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
                 <link rel="canonical"            href={siteUrl} />
             </Helmet>
 

@@ -241,7 +241,7 @@ gunzip -c /var/backups/tracemem/backup_YYYY_MM_DD_HH_II_SS.sqlite.gz \
 ## 🔴 Razorpay & Billing
 
 - [ ] Switch from test mode to live mode in the Razorpay dashboard — use `rzp_live_` keys
-- [ ] Register the production webhook URL in Razorpay dashboard: `https://tracemem.one/razorpay/webhook`
+- [ ] Register the production webhook URL in Razorpay dashboard: `https://app.tracemem.one/razorpay/webhook`
 - [ ] Select all relevant events in the Razorpay webhook config:
   - `subscription.activated`
   - `subscription.charged`
@@ -272,7 +272,7 @@ gunzip -c /var/backups/tracemem/backup_YYYY_MM_DD_HH_II_SS.sqlite.gz \
 - [ ] Replace `RESEND_API_KEY` with your real `re_live_...` key
 - [ ] Set `RESEND_WEBHOOK_SECRET=whsec_...` from Resend Dashboard → Webhooks → Signing Secret
 - [ ] Set `MAIL_MAILER=resend` (was `log` in local dev)
-- [ ] Register the production inbound webhook URL in Resend dashboard: `https://tracemem.one/resend/webhook`
+- [ ] Register the production inbound webhook URL in Resend dashboard: `https://app.tracemem.one/resend/webhook`
 - [ ] Select Resend webhook events to subscribe:
   - `email.sent`, `email.delivered`, `email.delivery_delayed`
   - `email.bounced`, `email.complained`

@@ -29,6 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // All other web routes remain CSRF-protected automatically.
         $middleware->validateCsrfTokens(except: [
             '/stripe/webhook',
+            '/resend/webhook',
+            '/razorpay/webhook',
         ]);
 
         $middleware->web(append: [

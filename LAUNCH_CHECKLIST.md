@@ -268,7 +268,7 @@ gunzip -c /var/backups/tracemem/backup_YYYY_MM_DD_HH_II_SS.sqlite.gz \
 
 ## 🔴 Resend & Transactional Email
 
-- [ ] Verify `tracemem.one` domain in the Resend dashboard (add DNS records: SPF, DKIM, DMARC)
+- [ ] Verify `contact.tracemem.one` domain in the Resend dashboard (add DNS records: SPF, DKIM, DMARC)
 - [ ] Replace `RESEND_API_KEY` with your real `re_live_...` key
 - [ ] Set `RESEND_WEBHOOK_SECRET=whsec_...` from Resend Dashboard → Webhooks → Signing Secret
 - [ ] Set `MAIL_MAILER=resend` (was `log` in local dev)

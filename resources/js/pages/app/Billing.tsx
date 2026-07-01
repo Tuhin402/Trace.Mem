@@ -410,10 +410,10 @@ export default function Billing() {
             description:     orderData.description,
             // Branding: use favicon as logo fallback; Razorpay will use configured
             // Business Profile logo if set on the Razorpay dashboard.
-            image:           '/favicon.ico',
+            // image:           '/favicon.ico',
             currency:        orderData.currency,
             prefill:         orderData.prefill,
-            theme:           { color: '#6366f1' },    // matches var(--app-accent)
+            theme:           { color: '#741ab4ff' },    // matches var(--app-accent)
             modal: {
                 backdropclose: false,
                 escape:        true,

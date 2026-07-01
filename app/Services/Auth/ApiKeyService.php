@@ -39,15 +39,15 @@ class ApiKeyService
             $limit = $environment === 'test' ? $policy['test_api_key_limit'] : $policy['live_api_key_limit'];
 
             $activeCount = $user->apiKeys()
-            ->where('environment', $environment)
-            ->whereNull('revoked_at')
-            ->whereNull('cancelled_at')
-            ->when($replacing?->id, fn ($query) => $query->where('id', '!=', $replacing->id))
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
-            ->count();
+                ->where('environment', $environment)
+                ->whereNull('revoked_at')
+                ->whereNull('cancelled_at')
+                ->when($replacing?->id, fn ($query) => $query->where('id', '!=', $replacing->id))
+                ->where(function ($query) {
+                    $query->whereNull('expires_at')
+                        ->orWhere('expires_at', '>', now());
+                })
+                ->count();
 
             if ($activeCount >= $limit) {
                 abort(403, "You have reached the {$environment} API key limit for your current plan.");

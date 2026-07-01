@@ -35,7 +35,7 @@ export default function ContextAssemble() {
             <ApiReferencePage
                 title="Context Assemble"
                 description="Selects, ranks, and formats the most relevant memory units into a prompt-ready context window. Pass the current user query and an optional token budget, TraceMem returns a structured context block you can inject directly into your LLM prompt."
-                endpoint="/api/v1/context/assemble"
+                endpoint="/v1/context/assemble"
                 method="POST"
                 auth="Authorization: Bearer <api_key>"
                 body={[
@@ -69,7 +69,7 @@ export default function ContextAssemble() {
                     python: `import requests
 
 response = requests.post(
-    "${apiUrl}/api/v1/context/assemble",
+    "${apiUrl}/v1/context/assemble",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={
         "query":        "Help me answer this question about frameworks",
@@ -83,7 +83,7 @@ print(context)`,
                     javascript: `import axios from "axios";
 
 const { data } = await axios.post(
-  "${apiUrl}/api/v1/context/assemble",
+  "${apiUrl}/v1/context/assemble",
   {
     query:        "Help me answer this question about frameworks",
     token_budget: 1200,
@@ -94,14 +94,14 @@ const { data } = await axios.post(
 // Inject into your LLM prompt
 const systemPrompt = \`Context:\n\${data.context}\n\nUser: ...\`;`,
                     php: `$response = Http::withToken('cmlive_xxx')
-    ->post('${apiUrl}/api/v1/context/assemble', [
+    ->post('${apiUrl}/v1/context/assemble', [
         'query'        => 'Help me answer this question about frameworks',
         'token_budget' => 1200,
     ]);
 
 $context = $response->json('context');
 // Inject $context into your LLM system prompt`,
-                    curl: `curl -X POST "${apiUrl}/api/v1/context/assemble" \\
+                    curl: `curl -X POST "${apiUrl}/v1/context/assemble" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -115,7 +115,7 @@ $context = $response->json('context');
     }""";
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("${apiUrl}/api/v1/context/assemble"))
+    .uri(URI.create("${apiUrl}/v1/context/assemble"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -130,7 +130,7 @@ HttpResponse<String> response = HttpClient.newHttpClient()
 
 req, _ := http.NewRequest(
     "POST",
-    "${apiUrl}/api/v1/context/assemble",
+    "${apiUrl}/v1/context/assemble",
     strings.NewReader(payload),
 )
 req.Header.Set("Authorization", "Bearer cmlive_xxx")

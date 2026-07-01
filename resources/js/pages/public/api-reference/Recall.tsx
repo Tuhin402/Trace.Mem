@@ -35,7 +35,7 @@ export default function Recall() {
             <ApiReferencePage
                 title="Recall"
                 description="Retrieve the most semantically relevant memory units for the caller's tenant and user scope. Memories are ranked by relevance and recency. Use this before generating AI responses to provide grounded, personalized context."
-                endpoint="/api/v1/recall"
+                endpoint="/v1/recall"
                 method="POST"
                 auth="Authorization: Bearer <api_key>"
                 body={[
@@ -53,7 +53,7 @@ export default function Recall() {
                     python: `import requests
 
 response = requests.post(
-    "${apiUrl}/api/v1/recall",
+    "${apiUrl}/v1/recall",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={"limit": 5}
 )
@@ -64,14 +64,14 @@ for memory in memories:
                     javascript: `import axios from "axios";
 
 const { data } = await axios.post(
-  "${apiUrl}/api/v1/recall",
+  "${apiUrl}/v1/recall",
   { limit: 5 },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );
 
 data.memories.forEach((m) => console.log(m.content, m.score));`,
                     php: `$response = Http::withToken('cmlive_xxx')
-    ->post('${apiUrl}/api/v1/recall', [
+    ->post('${apiUrl}/v1/recall', [
         'limit' => 5,
     ]);
 
@@ -79,14 +79,14 @@ $memories = $response->json('memories');
 foreach ($memories as $memory) {
     echo $memory['content'] . PHP_EOL;
 }`,
-                    curl: `curl -X POST "${apiUrl}/api/v1/recall" \\
+                    curl: `curl -X POST "${apiUrl}/v1/recall" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{ "limit": 5 }'`,
                     java: `String body = "{\"limit\":5}";
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("${apiUrl}/api/v1/recall"))
+    .uri(URI.create("${apiUrl}/v1/recall"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -96,7 +96,7 @@ HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
                     go: `reqBody := strings.NewReader(\`{"limit":5}\`)
 
-req, _ := http.NewRequest("POST", "${apiUrl}/api/v1/recall", reqBody)
+req, _ := http.NewRequest("POST", "${apiUrl}/v1/recall", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
 req.Header.Set("Content-Type", "application/json")
 

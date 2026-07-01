@@ -35,7 +35,7 @@ export default function Overview() {
             <ApiReferencePage
                 title="TraceMem REST API"
                 description="A developer-first memory layer for AI applications. Store structured meaning, recall semantically relevant memories, and assemble prompt-ready context, all over a clean, authenticated REST interface."
-                endpoint="/api/v1"
+                endpoint="/v1"
                 method="OVERVIEW"
                 auth="Bearer API tokens are required for all protected endpoints. Test keys (cmtest_) use semantic-only mode with rate limits. Live keys (cmlive_) unlock AI-first mode and higher throughput."
                 body={[]}

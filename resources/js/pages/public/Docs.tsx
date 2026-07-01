@@ -645,10 +645,10 @@ export default function Docs() {
                                 <div className="docs-postman-info-card">
                                     <div className="docs-postman-info-label">Base URL</div>
                                     <div className="docs-postman-info-value">
-                                        tracemem.one/api/v1
+                                        api.tracemem.one/v1
                                     </div>
                                     <div className="docs-postman-info-sub">
-                                        All endpoints are versioned under /api/v1. The workspace
+                                        All endpoints are versioned under /v1. The workspace
                                         environment variable is pre-set.
                                     </div>
                                 </div>

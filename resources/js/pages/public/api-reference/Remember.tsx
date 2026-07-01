@@ -35,7 +35,7 @@ export default function Remember() {
             <ApiReferencePage
                 title="Remember"
                 description="Store an atomic memory item scoped to the caller's tenant and user. TraceMem extracts semantic meaning, detects duplicates, and persists structured memory units ready for recall and context assembly."
-                endpoint="/api/v1/remember"
+                endpoint="/v1/remember"
                 method="POST"
                 auth="Authorization: Bearer <api_key>"
                 body={[
@@ -54,7 +54,7 @@ export default function Remember() {
                     python: `import requests
 
 response = requests.post(
-    "${apiUrl}/api/v1/remember",
+    "${apiUrl}/v1/remember",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={"content": "User likes React"}
 )
@@ -63,25 +63,25 @@ print(response.json())
                     javascript: `import axios from "axios";
 
 const { data } = await axios.post(
-  "${apiUrl}/api/v1/remember",
+  "${apiUrl}/v1/remember",
   { content: "User likes React" },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );
 console.log(data.memory.id); // "mem_abc123"`,
                     php: `$response = Http::withToken('cmlive_xxx')
-    ->post('${apiUrl}/api/v1/remember', [
+    ->post('${apiUrl}/v1/remember', [
         'content' => 'User likes React',
     ]);
 
 $memory = $response->json('memory');`,
-                    curl: `curl -X POST "${apiUrl}/api/v1/remember" \\
+                    curl: `curl -X POST "${apiUrl}/v1/remember" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{ "content": "User likes React" }'`,
                     java: `String body = "{\"content\":\"User likes React\"}";
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("${apiUrl}/api/v1/remember"))
+    .uri(URI.create("${apiUrl}/v1/remember"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -91,7 +91,7 @@ HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
                     go: `reqBody := strings.NewReader(\`{"content":"User likes React"}\`)
 
-req, _ := http.NewRequest("POST", "${apiUrl}/api/v1/remember", reqBody)
+req, _ := http.NewRequest("POST", "${apiUrl}/v1/remember", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
 req.Header.Set("Content-Type", "application/json")
 

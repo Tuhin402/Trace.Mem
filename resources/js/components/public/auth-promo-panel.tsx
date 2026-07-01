@@ -20,7 +20,7 @@ export default function AuthPromoPanel() {
 
                 <div className="auth-promo-badge" aria-hidden="true">
                     <span className="auth-promo-badge-dot" />
-                    <span>tracemem.one/api/v1 - REST · Secure · Production-Ready</span>
+                    <span>api.tracemem.one/v1 - REST · Secure · Production-Ready</span>
                 </div>
             </div>
         </div>

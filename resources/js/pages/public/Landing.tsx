@@ -19,7 +19,7 @@ function buildSnippets(apiUrl: string) {
 
 # Initialise the TraceMem client
 TM_KEY = "cmlive_your_key_here"
-BASE   = "${apiUrl}/api/v1"
+BASE   = "${apiUrl}/v1"
 
 # ── Store a memory ──────────────────────────────────
 response = requests.post(
@@ -45,7 +45,7 @@ print(context.json())   # → [{"content": "User prefers concise ..."}]`,
 
 // Initialise the TraceMem client
 const TM_KEY = "cmlive_your_key_here";
-const BASE   = "${apiUrl}/api/v1";
+const BASE   = "${apiUrl}/v1";
 const auth   = { headers: { Authorization: \`Bearer \${TM_KEY}\` } };
 
 // ── Store a memory ──────────────────────────────────
@@ -67,7 +67,7 @@ console.log(data); // → [{ content: "User prefers concise ..." }]`,
 
 // Initialise the TraceMem client
 $key  = 'cmlive_your_key_here';
-$base = '${apiUrl}/api/v1';
+$base = '${apiUrl}/v1';
 
 // ── Store a memory ──────────────────────────────────
 Http::withToken($key)->post("{$base}/remember", [

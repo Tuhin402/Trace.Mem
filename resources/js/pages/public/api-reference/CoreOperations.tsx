@@ -55,21 +55,21 @@ headers = {"Authorization": "Bearer cmlive_xxx"}
 
 # 1. Store a memory
 requests.post(
-    "${apiUrl}/api/v1/remember",
+    "${apiUrl}/v1/remember",
     headers=headers,
     json={"content": "User likes React"}
 )
 
 # 2. Recall relevant memories
 requests.post(
-    "${apiUrl}/api/v1/recall",
+    "${apiUrl}/v1/recall",
     headers=headers,
     json={"limit": 5}
 )
 
 # 3. Assemble prompt context
 requests.post(
-    "${apiUrl}/api/v1/context/assemble",
+    "${apiUrl}/v1/context/assemble",
     headers=headers,
     json={"query": "Help me answer this", "token_budget": 1200}
 )`,
@@ -78,37 +78,37 @@ requests.post(
 const headers = { Authorization: "Bearer cmlive_xxx" };
 
 // 1. Store a memory
-await axios.post("/api/v1/remember", { content: "User likes React" }, { headers });
+await axios.post("/v1/remember", { content: "User likes React" }, { headers });
 
 // 2. Recall relevant memories
-await axios.post("/api/v1/recall", { limit: 5 }, { headers });
+await axios.post("/v1/recall", { limit: 5 }, { headers });
 
 // 3. Assemble prompt context
-await axios.post("/api/v1/context/assemble",
+await axios.post("/v1/context/assemble",
   { query: "Help me answer this", token_budget: 1200 },
   { headers }
 );`,
                     php: `$headers = ['Authorization' => 'Bearer cmlive_xxx'];
 
-Http::withHeaders($headers)->post('/api/v1/remember',       ['content' => 'User likes React']);
-Http::withHeaders($headers)->post('/api/v1/recall',         ['limit'   => 5]);
-Http::withHeaders($headers)->post('/api/v1/context/assemble',
+Http::withHeaders($headers)->post('/v1/remember',       ['content' => 'User likes React']);
+Http::withHeaders($headers)->post('/v1/recall',         ['limit'   => 5]);
+Http::withHeaders($headers)->post('/v1/context/assemble',
     ['query' => 'Help me answer this', 'token_budget' => 1200]
 );`,
                     curl: `# 1. Remember
-curl -X POST "${apiUrl}/api/v1/remember" \\
+curl -X POST "${apiUrl}/v1/remember" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{"content":"User likes React"}'
 
 # 2. Recall
-curl -X POST "${apiUrl}/api/v1/recall" \\
+curl -X POST "${apiUrl}/v1/recall" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{"limit": 5}'
 
 # 3. Assemble context
-curl -X POST "${apiUrl}/api/v1/context/assemble" \\
+curl -X POST "${apiUrl}/v1/context/assemble" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{"query":"Help me answer this","token_budget":1200}'`,
@@ -117,7 +117,7 @@ String auth  = "Bearer cmlive_xxx";
 
 // Remember
 client.send(HttpRequest.newBuilder()
-    .uri(URI.create("${apiUrl}/api/v1/remember"))
+    .uri(URI.create("${apiUrl}/v1/remember"))
     .header("Authorization", auth)
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString("{\"content\":\"User likes React\"}"))
@@ -130,7 +130,7 @@ headers := map[string]string{
 
 // Remember
 body := strings.NewReader(\`{"content":"User likes React"}\`)
-req, _ := http.NewRequest("POST", "${apiUrl}/api/v1/remember", body)
+req, _ := http.NewRequest("POST", "${apiUrl}/v1/remember", body)
 for k, v := range headers { req.Header.Set(k, v) }
 client.Do(req)`,
                 }}

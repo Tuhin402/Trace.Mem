@@ -368,7 +368,7 @@ export default function ApiKeys() {
                         <div className="app-divider" />
                         <div className="app-mono-label" style={{ marginBottom: '10px' }}>Quick integration</div>
                         <div className="app-code-block">
-                            <pre>{`curl -X POST /api/v1/remember \\
+                            <pre>{`curl -X POST /v1/remember \\
   -H "Authorization: Bearer <your-key>" \\
   -H "Content-Type: application/json" \\
   -d '{"content": "User prefers dark mode"}'`}</pre>

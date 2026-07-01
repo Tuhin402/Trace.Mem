@@ -93,10 +93,14 @@ class MemoryController extends Controller
 
     public function health(Request $request)
     {
-        $startedAt = cache()->get('app_started_at');
-        if (! $startedAt) {
-            cache()->forever('app_started_at', now()->toIso8601String());
+        try {
             $startedAt = cache()->get('app_started_at');
+            if (! $startedAt) {
+                cache()->forever('app_started_at', now()->toIsoString());
+                $startedAt = cache()->get('app_started_at');
+            }
+        } catch (\Throwable) {
+            $startedAt = null; // Redis unreachable — uptime unavailable but health can still report
         }
 
         $t0 = microtime(true);

@@ -140,13 +140,12 @@ class AuthController extends Controller
         $user = $request->user();
 
         if ($user && method_exists($user, 'hasVerifiedEmail') && ! $user->hasVerifiedEmail()) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            throw ValidationException::withMessages([
-                'email' => 'Please verify your email before logging in.',
-            ]);
+            // Do NOT log the user out — they must remain authenticated for the
+            // signed verification URL to pass Laravel's auth middleware check.
+            // The intended URL (the verification link) is preserved in session and
+            // Laravel will redirect there after login. The 'verified' middleware
+            // blocks all other protected routes until email_verified_at is set.
+            return redirect()->intended(route('verification.notice'));
         }
 
         if ($user) {

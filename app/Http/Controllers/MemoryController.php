@@ -22,7 +22,6 @@ class MemoryController extends Controller
         private readonly MemoryService $memoryService,
         private readonly MemoryContextAssemblyService $contextAssembler,
         private readonly MemorySemanticSegmentationService $semanticSegmenter,
-        private readonly MemoryExtractionService $extractor,
         private readonly MemoryConflictService $conflicts,
         private readonly MemoryScopeResolver $scopeResolver,
     ) {}
@@ -199,7 +198,7 @@ class MemoryController extends Controller
         ]);
     }
 
-    public function debugExtract(Request $request)
+    public function debugExtract(Request $request, MemoryExtractionService $extractor)
     {
         $this->assertDebugScope($request);
 
@@ -208,7 +207,7 @@ class MemoryController extends Controller
         ]);
 
         return response()->json([
-            'extracted' => $this->extractor->extract($data['input']),
+            'extracted' => $extractor->extract($data['input']),
         ]);
     }
 

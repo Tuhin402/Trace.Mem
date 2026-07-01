@@ -9,9 +9,8 @@ use App\Services\Memory\MemoryTemporalService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Iqbalatma\LaravelServiceRepo\BaseService;
 
-class MemoryExtractionService extends BaseService
+class MemoryExtractionService
 {
     public function __construct(
         private readonly MemorySemanticSegmentationService $semanticSegmenter,

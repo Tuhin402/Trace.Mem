@@ -1,5 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 import {
     Activity,
     Clock3,
@@ -157,10 +158,38 @@ function methodColor(method: string): string {
     }
 }
 
+/**
+ * Dynamically loads the Razorpay Checkout.js script once and caches the result.
+ * Returns a promise that resolves when the script is ready.
+ */
+function loadRazorpayScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (typeof window.Razorpay !== 'undefined') {
+            resolve();
+            return;
+        }
+        const existing = document.getElementById('razorpay-checkout-js');
+        if (existing) {
+            existing.addEventListener('load', () => resolve());
+            existing.addEventListener('error', () => reject(new Error('Razorpay script failed to load')));
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = 'razorpay-checkout-js';
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Razorpay script failed to load'));
+        document.head.appendChild(script);
+    });
+}
+
 /* ── Dashboard ───────────────────────────────────────────── */
 export default function Dashboard() {
     const { props } = usePage<PageProps>();
     const { toast, Toasts } = useToast();
+    const [checkingOut, setCheckingOut] = useState(false);
+    const razorpayOpenRef = useRef(false);
 
     const apiKeys      = props.apiKeys ?? [];
     const plan         = props.plan ?? null;
@@ -190,8 +219,101 @@ export default function Dashboard() {
         });
     }
 
-    const startCheckout = (planSlug: string, billingCycle: 'monthly' | 'quarterly' | 'yearly') => {
-        router.post('/billing/checkout', { plan_slug: planSlug, billing_cycle: billingCycle });
+    const startCheckout = async (planSlug: string, billingCycle: 'monthly' | 'quarterly' | 'yearly') => {
+        setCheckingOut(true);
+
+        try {
+            await loadRazorpayScript();
+        } catch {
+            toast('Payment provider failed to load. Please check your connection and try again.', 'error');
+            setCheckingOut(false);
+            return;
+        }
+
+        let orderData: {
+            subscription_id: string;
+            key_id: string;
+            amount: number;
+            currency: string;
+            name: string;
+            description: string;
+            prefill: { email: string; name: string };
+        };
+
+        try {
+            const response = await axios.post<typeof orderData>(
+                '/billing/checkout',
+                { plan_slug: planSlug, billing_cycle: billingCycle },
+                { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
+            );
+            orderData = response.data;
+        } catch (err: unknown) {
+            const message =
+                axios.isAxiosError(err) && err.response?.data?.error
+                    ? String(err.response.data.error)
+                    : 'Failed to initiate checkout. Please try again.';
+            toast(message, 'error');
+            setCheckingOut(false);
+            return;
+        }
+
+        razorpayOpenRef.current = true;
+
+        const rzp = new window.Razorpay({
+            key: orderData.key_id,
+            subscription_id: orderData.subscription_id,
+            name: orderData.name,
+            description: orderData.description,
+            currency: orderData.currency,
+            prefill: orderData.prefill,
+            theme: { color: '#741ab4ff' },
+            modal: {
+                backdropclose: false,
+                escape: true,
+                handleback: true,
+                confirm_close: false,
+                ondismiss: () => {
+                    razorpayOpenRef.current = false;
+                    setCheckingOut(false);
+                    toast(
+                        'Payment cancelled - your subscription has not been changed.',
+                        'info' as Parameters<typeof toast>[1],
+                    );
+                },
+            },
+            handler: async (response: {
+                razorpay_payment_id: string;
+                razorpay_subscription_id: string;
+                razorpay_signature: string;
+            }) => {
+                razorpayOpenRef.current = false;
+
+                try {
+                    await axios.post(
+                        '/billing/verify-payment',
+                        {
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_subscription_id: response.razorpay_subscription_id,
+                            razorpay_signature: response.razorpay_signature,
+                        },
+                        { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
+                    );
+
+                    toast('Subscription activated! Your plan is now active.', 'success');
+                    router.reload({ only: ['plan', 'subscription', 'flash'] });
+                } catch (verifyErr: unknown) {
+                    const message =
+                        axios.isAxiosError(verifyErr) && verifyErr.response?.data?.error
+                            ? String(verifyErr.response.data.error)
+                            : 'Payment was received but verification failed. Please contact support.';
+                    toast(message, 'error');
+                } finally {
+                    setCheckingOut(false);
+                }
+            },
+        });
+
+        rzp.open();
     };
 
     const activePeriod = filters.period ?? 'all_time';
@@ -494,6 +616,7 @@ export default function Dashboard() {
                                                     type="button"
                                                     className={`app-btn ${cycle === 'yearly' ? 'app-btn-primary' : 'app-btn-ghost'}`}
                                                     style={{ width: '100%', justifyContent: 'space-between' }}
+                                                    disabled={checkingOut}
                                                     onClick={() => startCheckout(p.slug, cycle)}
                                                 >
                                                     <span style={{ textTransform: 'capitalize' }}>{cycle}</span>

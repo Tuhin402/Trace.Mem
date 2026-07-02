@@ -210,10 +210,11 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
      */
     private function handleSubscriptionActivated(SubscriptionCacheService $subscriptionCache): void
     {
-        $eventType = 'subscription.activated';
-        $userId    = null;
+        $eventType  = 'subscription.activated';
+        $userId     = null;
+        $currentEnd = null;
 
-        DB::transaction(function () use ($eventType, &$userId) {
+        DB::transaction(function () use ($eventType, &$userId, &$currentEnd) {
             if (! $this->recordOrSkip($eventType)) {
                 return;
             }

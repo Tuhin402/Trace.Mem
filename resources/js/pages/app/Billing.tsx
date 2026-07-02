@@ -131,7 +131,7 @@ function loadRazorpayScript(): Promise<void> {
 
 /* ── Quota bar ───────────────────────────────────────────── */
 function QuotaBar({ label, used, limit }: { label: string; used: number; limit: number }) {
-    const pct   = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+    const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
     const color = pct >= 90 ? 'var(--app-error)' : pct >= 70 ? 'var(--app-warning)' : 'var(--app-accent)';
     return (
         <div className="bl-quota-bar">
@@ -176,14 +176,14 @@ function PlanCard({
 
             <div className="app-plan-meta">
                 {[
-                    ['Base mode',       formatMode(plan.base_mode)],
-                    ['Memory writes',   `${plan.memory_write_limit.toLocaleString()} / mo`],
-                    ['API requests',    `${plan.request_limit.toLocaleString()} / mo`],
-                    ['API keys',        String(plan.api_key_limit)],
+                    ['Base mode', formatMode(plan.base_mode)],
+                    ['Memory writes', `${plan.memory_write_limit.toLocaleString()} / mo`],
+                    ['API requests', `${plan.request_limit.toLocaleString()} / mo`],
+                    ['API keys', String(plan.api_key_limit)],
                     ['Live rate limit', `${plan.request_rate_limit_max_requests} req / ${plan.request_rate_limit_window_seconds}s`],
                     ['Test rate limit', `${plan.test_rate_limit_max_requests} req / ${plan.test_rate_limit_window_seconds}s`],
-                    ['Test keys',       plan.allow_test_keys ? 'Yes' : 'No'],
-                    ['Live keys',       plan.allow_live_keys ? 'Yes' : 'No'],
+                    ['Test keys', plan.allow_test_keys ? 'Yes' : 'No'],
+                    ['Live keys', plan.allow_live_keys ? 'Yes' : 'No'],
                 ].map(([k, v]) => (
                     <div className="app-plan-meta-row" key={k}>
                         <span className="app-plan-meta-key">{k}</span>
@@ -194,9 +194,9 @@ function PlanCard({
 
             <div className="bl-pricing-grid">
                 {(['monthly', 'quarterly', 'yearly'] as const).map((cycle) => {
-                    const price = cycle === 'monthly'   ? plan.price_monthly
-                                : cycle === 'quarterly' ? plan.price_quarterly
-                                :                        plan.price_yearly;
+                    const price = cycle === 'monthly' ? plan.price_monthly
+                        : cycle === 'quarterly' ? plan.price_quarterly
+                            : plan.price_yearly;
                     const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3 mo' : '/ yr';
                     const isPrimary = cycle === 'yearly' && !isCurrent;
                     return (
@@ -228,7 +228,7 @@ function CancelModal({
     subscription: UserSubscription;
     onClose: () => void;
 }) {
-    const [reason, setReason]         = useState('');
+    const [reason, setReason] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
     const handleSubmit = () => {
@@ -335,19 +335,19 @@ function CancelModal({
 
 /* ── Main page ───────────────────────────────────────────── */
 export default function Billing() {
-    const { props }         = usePage<PageProps>();
+    const { props } = usePage<PageProps>();
     const { toast, Toasts } = useToast();
 
-    const plan         = props.plan ?? null;
-    const plans        = props.plans ?? [];
+    const plan = props.plan ?? null;
+    const plans = props.plans ?? [];
     const subscription = props.subscription ?? null;
-    const usage        = props.usage ?? null;
-    const flashMsg     = props.flash?.message ?? null;
-    const flashErr     = props.flash?.error ?? null;
+    const usage = props.usage ?? null;
+    const flashMsg = props.flash?.message ?? null;
+    const flashErr = props.flash?.error ?? null;
 
-    const [cancelOpen,   setCancelOpen]   = useState(false);
-    const [showModal,    setShowModal]    = useState(false);
-    const [checkingOut,  setCheckingOut]  = useState(false);
+    const [cancelOpen, setCancelOpen] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [checkingOut, setCheckingOut] = useState(false);
 
     // Track whether a Razorpay modal is currently open so we can reset
     // loading state correctly when the user dismisses it.
@@ -356,7 +356,7 @@ export default function Billing() {
     useEffect(() => {
         if (flashMsg) toast(flashMsg, 'success');
         if (flashErr) toast(flashErr, 'error');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     /* ── Checkout — opens Razorpay modal inline ──────────── */
@@ -404,20 +404,20 @@ export default function Billing() {
         razorpayOpenRef.current = true;
 
         const rzp = new window.Razorpay({
-            key:             orderData.key_id,
+            key: orderData.key_id,
             subscription_id: orderData.subscription_id,
-            name:            orderData.name,
-            description:     orderData.description,
+            name: orderData.name,
+            description: orderData.description,
             // Branding: use favicon as logo fallback; Razorpay will use configured
             // Business Profile logo if set on the Razorpay dashboard.
             // image:           '/favicon.ico',
-            currency:        orderData.currency,
-            prefill:         orderData.prefill,
-            theme:           { color: '#741ab4ff' },    // matches var(--app-accent)
+            currency: orderData.currency,
+            prefill: orderData.prefill,
+            theme: { color: '#741ab4ff' },    // matches var(--app-accent)
             modal: {
                 backdropclose: false,
-                escape:        true,
-                handleback:    true,
+                escape: true,
+                handleback: true,
                 confirm_close: false,
 
                 /* ── ondismiss ───────────────────────────────────────────────
@@ -438,7 +438,7 @@ export default function Billing() {
                     razorpayOpenRef.current = false;
                     setCheckingOut(false);
                     toast(
-                        'Payment cancelled — your subscription has not been changed.',
+                        'Payment cancelled - your subscription has not been changed.',
                         'info' as Parameters<typeof toast>[1],
                     );
                 },
@@ -462,9 +462,9 @@ export default function Billing() {
                     await axios.post(
                         '/billing/verify-payment',
                         {
-                            razorpay_payment_id:      response.razorpay_payment_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_subscription_id: response.razorpay_subscription_id,
-                            razorpay_signature:       response.razorpay_signature,
+                            razorpay_signature: response.razorpay_signature,
                         },
                         { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
                     );

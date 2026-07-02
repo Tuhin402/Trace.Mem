@@ -312,10 +312,11 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
      */
     private function handleSubscriptionCharged(SubscriptionCacheService $subscriptionCache): void
     {
-        $eventType = 'subscription.charged';
-        $userId    = null;
+        $eventType  = 'subscription.charged';
+        $userId     = null;
+        $currentEnd = null;
 
-        DB::transaction(function () use ($eventType, &$userId) {
+        DB::transaction(function () use ($eventType, &$userId, &$currentEnd) {
             if (! $this->recordOrSkip($eventType)) {
                 return;
             }
@@ -745,8 +746,9 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
     {
         $eventType = 'payment.failed';
         $userId    = null;
+        $rzpSubId  = null;
 
-        DB::transaction(function () use ($eventType, &$userId) {
+        DB::transaction(function () use ($eventType, &$userId, &$rzpSubId) {
             if (! $this->recordOrSkip($eventType)) {
                 return;
             }

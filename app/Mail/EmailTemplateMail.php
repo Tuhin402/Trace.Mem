@@ -41,12 +41,12 @@ class EmailTemplateMail extends Mailable
         return new Content(
             view: $this->template->view(),
             with: array_merge($this->data, [
-                'theme'       => new EmailTheme(),
-                'subject'     => $this->template->subject(),
-                'appName'     => config('app.name', 'Trace.Mem'),
-                'appUrl'      => config('app.url', 'https://tracemem.one'),
-                'supportEmail' => 'support@tracemem.one',
-                'currentYear' => date('Y'),
+                'theme'         => new EmailTheme(),
+                'subject'       => $this->template->subject(),
+                'appName'       => config('app.name', 'Trace.Mem'),
+                'appUrl'        => config('app.url', 'https://tracemem.one'),
+                'support_email' => 'noreply@contact.tracemem.one',
+                'currentYear'   => date('Y'),
             ]),
         );
     }

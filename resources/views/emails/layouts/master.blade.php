@@ -154,7 +154,7 @@
                             <p style="margin: 0 0 8px; font-size: {{ $theme::fontSizeTiny() }}; color: {{ $theme::textSubtle() }}; font-family: {{ $theme::fontFamily() }};">
                                 <a href="{{ $appUrl }}" style="color: {{ $theme::textMuted() }}; text-decoration: none;">{{ $appUrl }}</a>
                                 &nbsp;&middot;&nbsp;
-                                <a href="mailto:{{ $supportEmail }}" style="color: {{ $theme::textMuted() }}; text-decoration: none;">{{ $supportEmail }}</a>
+                                <a href="mailto:{{ $support_email }}" style="color: {{ $theme::textMuted() }}; text-decoration: none;">{{ $support_email }}</a>
                             </p>
                             <p style="margin: 0; font-size: {{ $theme::fontSizeTiny() }}; color: {{ $theme::textSubtle() }}; font-family: {{ $theme::fontFamily() }};">
                                 &copy; {{ $currentYear }} Trace.Mem. All rights reserved.

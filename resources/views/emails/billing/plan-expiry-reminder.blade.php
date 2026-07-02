@@ -34,7 +34,7 @@
 @include('emails.components.button', ['url' => $billing_url, 'label' => 'Renew Subscription'])
 
 @include('emails.components.note', [
-    'text' => 'If your subscription is set to auto-renew, no action is needed. Questions? <a href="mailto:' . $supportEmail . '" style="color: ' . $theme::primary() . ';">' . $supportEmail . '</a>'
+    'text' => 'If your subscription is set to auto-renew, no action is needed. Questions? <a href="mailto:' . $support_email . '" style="color: ' . $theme::primary() . ';">' . $support_email . '</a>'
 ])
 
 @endsection

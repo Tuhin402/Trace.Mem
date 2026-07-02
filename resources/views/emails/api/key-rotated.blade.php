@@ -41,7 +41,7 @@
 
 @include('emails.components.alert', [
     'type'    => 'warning',
-    'message' => 'If you didn\'t rotate this key, contact support immediately at <a href="mailto:' . $supportEmail . '" style="color: ' . $theme::warning() . ';">' . $supportEmail . '</a>'
+    'message' => 'If you didn\'t rotate this key, contact support immediately at <a href="mailto:' . $support_email . '" style="color: ' . $theme::warning() . ';">' . $support_email . '</a>'
 ])
 
 @endsection

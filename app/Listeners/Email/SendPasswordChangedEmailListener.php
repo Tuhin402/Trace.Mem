@@ -32,7 +32,7 @@ class SendPasswordChangedEmailListener
                 'user_name'      => $user->name,
                 'changed_at'     => now()->format('M j, Y \a\t g:i A T'),
                 'security_url'   => url('/settings/security'),
-                'support_email'  => 'support@tracemem.one',
+                'support_email'  => 'noreply@contact.tracemem.one',
             ],
             recipientEmail: $user->email,
             userId:         $user->id,

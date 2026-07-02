@@ -29,9 +29,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'test_rate_limit_window_seconds' => 5,
                 'allow_test_keys' => true,
                 'allow_live_keys' => true,
-                'price_monthly' => 1.00,
-                'price_quarterly' => 1.00,
-                'price_yearly' => 1.00,
+                'price_monthly' => 199.00,
+                'price_quarterly' => 549.00,
+                'price_yearly' => 1999.00,
                 'is_active' => true,
             ]
         );
@@ -55,9 +55,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'test_rate_limit_window_seconds' => 2,
                 'allow_test_keys' => true,
                 'allow_live_keys' => true,
-                'price_monthly' => 1.00,
-                'price_quarterly' => 1.00,
-                'price_yearly' => 1.00,
+                'price_monthly' => 499.00,
+                'price_quarterly' => 1399.00,
+                'price_yearly' => 4999.00,
                 'is_active' => true,
             ]
         );

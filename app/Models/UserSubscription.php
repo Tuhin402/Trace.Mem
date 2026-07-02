@@ -12,6 +12,7 @@ class UserSubscription extends Model
         'subscription_plan_id',
         'billing_cycle',
         'status',
+        'is_active',
         'starts_at',
         'renews_at',
         'ends_at',
@@ -35,6 +36,7 @@ class UserSubscription extends Model
         'cancelled_at' => 'datetime',
 
         'auto_renew'       => 'boolean',
+        'is_active'        => 'boolean',
         'overage_enabled'  => 'boolean',
 
         'quotas_snapshot' => 'array',

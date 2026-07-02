@@ -113,6 +113,7 @@ class BillingController extends Controller
             'cancelled_at'        => now(),
             'cancellation_reason' => $data['reason'],
             'status'              => 'canceled',
+            'is_active'           => false,
             'auto_renew'          => false,
         ]);
 

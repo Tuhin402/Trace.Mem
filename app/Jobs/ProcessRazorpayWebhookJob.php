@@ -516,6 +516,7 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
             if ($userSub && ! $userSub->isCancelled()) {
                 $userSub->update([
                     'status'              => 'canceled',
+                    'is_active'           => false,
                     'auto_renew'          => false,
                     'cancelled_at'        => now(),
                     'cancellation_reason' => 'Subscription cancelled via Razorpay.',

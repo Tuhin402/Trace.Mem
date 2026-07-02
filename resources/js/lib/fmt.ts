@@ -30,11 +30,11 @@ export function fmtLatency(ms: number | null | undefined): string {
 }
 
 /**
- * Format a monetary value as USD.
+ * Format a monetary value as INR (Indian Rupee).
  */
 export function fmtMoney(value: string | number | null | undefined): string {
     const n = Number(value ?? 0);
-    return `$${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`;
+    return `₹${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`;
 }
 
 /**

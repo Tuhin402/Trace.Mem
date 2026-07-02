@@ -307,7 +307,7 @@ export default function Pricing() {
                                             </div>
                                             <div className="pricing-plan-name">{plan.name}</div>
                                             <div className="pricing-plan-price">
-                                                ${getPlanPrice(plan, cycle).toFixed(0)}
+                                                ₹{getPlanPrice(plan, cycle).toFixed(0)}
                                             </div>
                                             <div className="pricing-plan-price-period">
                                                 {periodLabel(cycle)}
@@ -380,7 +380,7 @@ export default function Pricing() {
                                         </div>
                                         <div className="pricing-mobile-plan-name">{plan.name}</div>
                                         <div className="pricing-mobile-plan-price">
-                                            ${getPlanPrice(plan, cycle).toFixed(0)}
+                                            ₹{getPlanPrice(plan, cycle).toFixed(0)}
                                         </div>
                                         <div className="pricing-mobile-plan-period">
                                             {periodLabel(cycle)}

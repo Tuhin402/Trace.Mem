@@ -240,19 +240,23 @@ const uspCards: UspCardData[] = [
 type YoutubeVideo = {
     id: string;
     title: string;
-    thumbnailUrl: string;
+    isShort?: boolean;
 };
+
+/* Thumbnail fallback: maxresdefault → hqdefault → mqdefault */
+function getThumbUrl(id: string, quality: 'maxresdefault' | 'hqdefault' | 'mqdefault' = 'maxresdefault') {
+    return `https://img.youtube.com/vi/${id}/${quality}.jpg`;
+}
 
 const youtubeVideos: YoutubeVideo[] = [
     {
         id: '1MpTXGKyybA',
         title: 'Meet Trace.Mem - Memory-as-a-Service for AI Applications',
-        thumbnailUrl: 'https://img.youtube.com/vi/1MpTXGKyybA/maxresdefault.jpg',
     },
     {
         id: 'dljdKLU4m14',
         title: 'AI Forgets. So I Built TraceMem',
-        thumbnailUrl: 'https://img.youtube.com/vi/dljdKLU4m14/maxresdefault.jpg',
+        isShort: true,
     },
 ];
 
@@ -688,7 +692,7 @@ export default function Landing() {
                                     {playingVideoId === video.id ? (
                                         <iframe
                                             className="yt-iframe"
-                                            src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
+                                            src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1`}
                                             title={video.title}
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                             allowFullScreen
@@ -701,10 +705,18 @@ export default function Landing() {
                                             aria-label={`Play: ${video.title}`}
                                         >
                                             <img
-                                                src={video.thumbnailUrl}
+                                                src={getThumbUrl(video.id, 'maxresdefault')}
                                                 alt={video.title}
                                                 className="yt-thumbnail"
                                                 loading="lazy"
+                                                onError={(e) => {
+                                                    const img = e.currentTarget;
+                                                    if (img.src.includes('maxresdefault')) {
+                                                        img.src = getThumbUrl(video.id, 'hqdefault');
+                                                    } else if (img.src.includes('hqdefault')) {
+                                                        img.src = getThumbUrl(video.id, 'mqdefault');
+                                                    }
+                                                }}
                                             />
                                             <div className="yt-play-icon" aria-hidden="true">
                                                 <svg viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg" className="yt-play-svg">

@@ -1,6 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { useDomains } from '@/lib/domains';
 import { Zap, Shield, Brain, Layers, Code2, Users, RefreshCw, MessageSquare, LayoutGrid, GitMerge, PackageCheck } from 'lucide-react';
 
@@ -236,6 +236,26 @@ const uspCards: UspCardData[] = [
     },
 ];
 
+/* ── YouTube Videos ──────────────────────────────────────── */
+type YoutubeVideo = {
+    id: string;
+    title: string;
+    thumbnailUrl: string;
+};
+
+const youtubeVideos: YoutubeVideo[] = [
+    {
+        id: '1MpTXGKyybA',
+        title: 'Meet Trace.Mem - Memory-as-a-Service for AI Applications',
+        thumbnailUrl: 'https://img.youtube.com/vi/1MpTXGKyybA/maxresdefault.jpg',
+    },
+    {
+        id: 'dljdKLU4m14',
+        title: 'AI Forgets. So I Built TraceMem',
+        thumbnailUrl: 'https://img.youtube.com/vi/dljdKLU4m14/maxresdefault.jpg',
+    },
+];
+
 /* ── FAQ items ────────────────────────────────────────────── */
 const faqItems = [
     {
@@ -303,6 +323,12 @@ export default function Landing() {
     /* Devs tab */
     const [activeDevsTab, setActiveDevsTab] = useState<DevsTab>('efficiency');
     const devsData = devsTabs.find((t) => t.key === activeDevsTab)!;
+
+    /* YouTube playing state */
+    const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+    const handlePlayVideo = useCallback((id: string) => {
+        setPlayingVideoId(id);
+    }, []);
 
     return (
         <>
@@ -642,8 +668,62 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* ══ 7. FAQ ═══════════════════════════════════════════ */}
-            <section className="lp-section faq-section" aria-label="Frequently asked questions">
+            {/* ══ 7. YOUTUBE VIDEOS ══════════════════════════════ */}
+            <section className="lp-section yt-section" aria-label="Videos">
+                <div className="lp-section-inner">
+                    <div className="yt-header">
+                        <span className="lp-section-tag">On YouTube</span>
+                        <h2 className="lp-section-title" style={{ textAlign: 'center' }}>
+                            See TraceMem in action.
+                        </h2>
+                        <p className="lp-section-lead center">
+                            Watch how TraceMem gives AI the memory it always needed.
+                        </p>
+                    </div>
+
+                    <div className="yt-grid">
+                        {youtubeVideos.map((video) => (
+                            <div className="yt-card" key={video.id}>
+                                <div className="yt-card-video">
+                                    {playingVideoId === video.id ? (
+                                        <iframe
+                                            className="yt-iframe"
+                                            src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
+                                            title={video.title}
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        />
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className="yt-thumbnail-btn"
+                                            onClick={() => handlePlayVideo(video.id)}
+                                            aria-label={`Play: ${video.title}`}
+                                        >
+                                            <img
+                                                src={video.thumbnailUrl}
+                                                alt={video.title}
+                                                className="yt-thumbnail"
+                                                loading="lazy"
+                                            />
+                                            <div className="yt-play-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg" className="yt-play-svg">
+                                                    <rect width="68" height="48" fill="#FF0000" />
+                                                    <path d="M27 15l20 9-20 9V15z" fill="#ffffff" />
+                                                </svg>
+                                            </div>
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="yt-card-title">{video.title}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ══ 8. FAQ ═══════════════════════════════════════════ */}
+            <section className="lp-section faq-section" aria-label="Frequently asked questions" id="faq">
                 <div className="lp-section-inner">
                     <div className="faq-header">
                         <span className="lp-section-tag">FAQ</span>

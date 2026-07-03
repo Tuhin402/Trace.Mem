@@ -254,7 +254,7 @@ const youtubeVideos: YoutubeVideo[] = [
         title: 'Meet Trace.Mem - Memory-as-a-Service for AI Applications',
     },
     {
-        id: 'dljdKLU4m14',
+        id: 'f6U9-FijJC0',
         title: 'AI Forgets. So I Built TraceMem',
         isShort: true,
     },

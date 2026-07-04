@@ -67,3 +67,20 @@ Schedule::command('email:plan-expiry-reminders')
     ->dailyAt('09:00')
     ->withoutOverlapping()
     ->name('plan-expiry-reminders');
+
+// ── Email: Free trial reminders (Founding Offer) ───────────────────────────────────
+// Sends reminder emails for trials ending in 7, 3, or 1 day(s).
+// Runs at 09:30 (after plan expiry reminders) with no overlap protection.
+// Includes dynamic usage stats; idempotency is handled inside the command.
+Schedule::command('email:free-trial-reminders')
+    ->dailyAt('09:30')
+    ->withoutOverlapping()
+    ->name('free-trial-reminders');
+
+// ── Cleanup: Stale trial pending states ────────────────────────────────────────────
+// Resets pending_activation states older than 15 min with no paid transaction.
+// Handles crashes / abandoned checkouts — keeps users eligible for retry.
+Schedule::command('trial:clean-stale-pending')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->name('trial-clean-stale-pending');

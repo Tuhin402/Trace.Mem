@@ -39,6 +39,7 @@ type Plan = {
 type PageProps = {
     auth?: { user?: unknown };
     plans: Plan[];
+    trial_eligible_plan?: string | null; // slug of the plan showing the Founding Offer
 };
 
 type BillingCycle = 'monthly' | 'quarterly' | 'yearly';
@@ -189,6 +190,7 @@ export default function Pricing() {
     const isLoggedIn = !!props.auth?.user;
     const getStartedHref = isLoggedIn ? '/dashboard' : '/register';
     const plans: Plan[] = props.plans ?? [];
+    const trialEligiblePlan = props.trial_eligible_plan ?? null;
 
     const [cycle, setCycle] = useState<BillingCycle>('monthly');
 
@@ -296,34 +298,62 @@ export default function Pricing() {
                                     <th className="pricing-th-empty" scope="col">
                                         <div className="pricing-th-empty-label">Features</div>
                                     </th>
-                                    {plans.map((plan) => (
+                                    {plans.map((plan) => {
+                                        const isFoundingOffer =
+                                            cycle === 'monthly' &&
+                                            plan.slug === 'semantic-starter' &&
+                                            trialEligiblePlan === 'semantic-starter';
+
+                                        return (
                                         <th
                                             key={plan.slug}
-                                            className={`pricing-plan-col${plan.slug === recommendedSlug ? ' highlight' : ''}`}
+                                            className={`pricing-plan-col${plan.slug === recommendedSlug ? ' highlight' : ''}${isFoundingOffer ? ' founding-offer-col' : ''}`}
                                             scope="col"
                                         >
+                                            {isFoundingOffer && (
+                                                <div className="pricing-founding-badge" aria-label="Founding Offer">
+                                                    Founding Offer
+                                                </div>
+                                            )}
                                             <div className="pricing-plan-mode">
                                                 {modeLabel(plan.base_mode)}
                                             </div>
                                             <div className="pricing-plan-name">{plan.name}</div>
                                             <div className="pricing-plan-price">
-                                                ₹{getPlanPrice(plan, cycle).toFixed(0)}
+                                                {isFoundingOffer ? (
+                                                    <>
+                                                        <span className="pricing-trial-price">₹0</span>
+                                                        <span className="pricing-trial-original">
+                                                            ₹{plan.price_monthly.toFixed(0)}
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    `₹${getPlanPrice(plan, cycle).toFixed(0)}`
+                                                )}
                                             </div>
                                             <div className="pricing-plan-price-period">
-                                                {periodLabel(cycle)}
+                                                {isFoundingOffer
+                                                    ? 'first month free'
+                                                    : periodLabel(cycle)}
                                             </div>
+                                            {isFoundingOffer && (
+                                                <div className="pricing-trial-note">
+                                                    ₹{plan.price_monthly.toFixed(0)}/month after first month
+                                                </div>
+                                            )}
                                             <div className="pricing-plan-desc">
                                                 {plan.description}
                                             </div>
                                             <div className="pricing-plan-cta">
                                                 <CtaButton
                                                     href={getStartedHref}
-                                                    label="Get Started"
-                                                    variant={plan.slug === recommendedSlug ? 'primary' : 'secondary'}
+                                                    label={isFoundingOffer ? 'Start Free Month' : 'Get Started'}
+                                                    variant={plan.slug === recommendedSlug || isFoundingOffer ? 'primary' : 'secondary'}
                                                 />
                                             </div>
                                         </th>
-                                    ))}
+                                        );
+                                    })}
                                 </tr>
                             </thead>
 
@@ -368,30 +398,55 @@ export default function Pricing() {
 
                         {/* ─── Mobile cards (≤900px) ─── */}
                         <div className="pricing-mobile-plans" aria-label="Plan cards">
-                            {plans.map((plan) => (
+                            {plans.map((plan) => {
+                                const isFoundingOffer =
+                                    cycle === 'monthly' &&
+                                    plan.slug === 'semantic-starter' &&
+                                    trialEligiblePlan === 'semantic-starter';
+
+                                return (
                                 <div
                                     key={plan.slug}
-                                    className={`pricing-mobile-plan-card${plan.slug === recommendedSlug ? ' highlight' : ''}`}
+                                    className={`pricing-mobile-plan-card${plan.slug === recommendedSlug ? ' highlight' : ''}${isFoundingOffer ? ' founding-offer-col' : ''}`}
                                 >
                                     {/* Header */}
                                     <div className="pricing-mobile-plan-header">
+                                        {isFoundingOffer && (
+                                            <div className="pricing-founding-badge">
+                                                Founding Offer
+                                            </div>
+                                        )}
                                         <div className="pricing-mobile-plan-mode">
                                             {modeLabel(plan.base_mode)}
                                         </div>
                                         <div className="pricing-mobile-plan-name">{plan.name}</div>
                                         <div className="pricing-mobile-plan-price">
-                                            ₹{getPlanPrice(plan, cycle).toFixed(0)}
+                                            {isFoundingOffer ? (
+                                                <>
+                                                    <span className="pricing-trial-price">₹0</span>
+                                                    <span className="pricing-trial-original">
+                                                        ₹{plan.price_monthly.toFixed(0)}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                `₹${getPlanPrice(plan, cycle).toFixed(0)}`
+                                            )}
                                         </div>
                                         <div className="pricing-mobile-plan-period">
-                                            {periodLabel(cycle)}
+                                            {isFoundingOffer ? 'first month free' : periodLabel(cycle)}
                                         </div>
+                                        {isFoundingOffer && (
+                                            <div className="pricing-trial-note">
+                                                ₹{plan.price_monthly.toFixed(0)}/month after first month
+                                            </div>
+                                        )}
                                         <p className="pricing-mobile-plan-desc">
                                             {plan.description}
                                         </p>
                                         <CtaButton
                                             href={getStartedHref}
-                                            label="Get Started"
-                                            variant={plan.slug === recommendedSlug ? 'primary' : 'secondary'}
+                                            label={isFoundingOffer ? 'Start Free Month' : 'Get Started'}
+                                            variant={plan.slug === recommendedSlug || isFoundingOffer ? 'primary' : 'secondary'}
                                         />
                                     </div>
 
@@ -444,12 +499,13 @@ export default function Pricing() {
                                     <div className="pricing-mobile-row-cta">
                                         <CtaButton
                                             href={getStartedHref}
-                                            label="Get Started"
-                                            variant={plan.slug === recommendedSlug ? 'primary' : 'secondary'}
+                                            label={isFoundingOffer ? 'Start Free Month' : 'Get Started'}
+                                            variant={plan.slug === recommendedSlug || isFoundingOffer ? 'primary' : 'secondary'}
                                         />
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </section>

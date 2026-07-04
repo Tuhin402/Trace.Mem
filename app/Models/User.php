@@ -21,14 +21,19 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $fillable = [
         'tenant_scope_id',
-        'stripe_customer_id',    // kept for historical Stripe billing records
-        'razorpay_customer_id',  // Razorpay customer ID (set on first subscription)
+        'stripe_customer_id',       // kept for historical Stripe billing records
+        'razorpay_customer_id',     // Razorpay customer ID (set on first subscription)
         'name',
         'email',
         'password',
         'account_type',
         'company_name',
         'last_login_at',
+        // ── Free trial (Founding Offer) ──────────────────────────────────────
+        'free_trial_status',        // null | pending_activation | activated | completed | cancelled | upgraded
+        'free_trial_activated_at',
+        'free_trial_ends_at',
+        'free_trial_plan_id',
     ];
 
     protected $hidden = [
@@ -37,9 +42,13 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime',
-        'password' => 'hashed',
+        'email_verified_at'      => 'datetime',
+        'last_login_at'          => 'datetime',
+        'password'               => 'hashed',
+        // ── Free trial casts ────────────────────────────────────────────────
+        'free_trial_activated_at' => 'datetime',
+        'free_trial_ends_at'      => 'datetime',
+        'free_trial_plan_id'      => 'integer',
     ];
 
     protected static function booted(): void
@@ -65,6 +74,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function subscriptions(): HasMany
     {
         return $this->hasMany(UserSubscription::class);
+    }
+
+    public function freeTrialEvents(): HasMany
+    {
+        return $this->hasMany(FreeTrialEvent::class);
     }
 
     public function currentSubscription(): HasOne

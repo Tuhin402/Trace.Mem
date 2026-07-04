@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Providers\EmailServiceProvider;
 use App\Services\Auth\SubscriptionCacheService;
 use App\Services\Auth\SubscriptionEntitlementService;
+use App\Services\Billing\FreeTrialAnalyticsService;
+use App\Services\Billing\FreeTrialEligibilityService;
 use App\Services\Cache\TraceMemCache;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -53,6 +55,12 @@ class AppServiceProvider extends ServiceProvider
         // Email system — provider-agnostic binding + event wiring + observer registration.
         // To switch email provider: change the binding inside EmailServiceProvider only.
         $this->app->register(EmailServiceProvider::class);
+
+        // FreeTrialEligibilityService — stateless; can be singleton.
+        $this->app->singleton(FreeTrialEligibilityService::class);
+
+        // FreeTrialAnalyticsService — fire-and-forget event tracker; singleton.
+        $this->app->singleton(FreeTrialAnalyticsService::class);
     }
 
     /**

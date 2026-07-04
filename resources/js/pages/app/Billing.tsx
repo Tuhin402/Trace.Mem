@@ -72,6 +72,16 @@ type PageProps = {
         message?: string;
         error?: string;
     };
+    trial_info?: {
+        is_eligible: boolean;
+        is_in_trial: boolean;
+        is_consumed: boolean;
+        trial_status: string | null;
+        days_remaining: number;
+        trial_ends_at: string | null;
+        autopay_begins_at: string | null;
+        next_billing_amount: string; // e.g. "\u20b9199" — always from DB
+    } | null;
 };
 
 /* ── Razorpay global type ────────────────────────────────── */
@@ -154,19 +164,28 @@ function PlanCard({
     currentPlanSlug,
     onSelect,
     checkingOut,
+    trialInfo,
 }: {
     plan: SubscriptionPlan;
     currentPlanSlug?: string | null;
     onSelect: (slug: string, cycle: 'monthly' | 'quarterly' | 'yearly') => void;
     checkingOut: boolean;
+    trialInfo?: PageProps['trial_info'];
 }) {
     const isCurrent = plan.slug === currentPlanSlug;
+    // Show Founding Offer pricing for Semantic Starter monthly when eligible
+    const isFoundingOffer = trialInfo?.is_eligible && plan.slug === 'semantic-starter';
 
     return (
-        <div className={`app-plan-card bl-plan-card${isCurrent ? ' app-plan-card-active' : ''}`}>
+        <div className={`app-plan-card bl-plan-card${isCurrent ? ' app-plan-card-active' : ''}${isFoundingOffer ? ' bl-plan-card-founding' : ''}`}>
             <div className="bl-plan-card-header">
                 <div>
-                    <div className="app-plan-name">{plan.name}</div>
+                    <div className="app-plan-name">
+                        {plan.name}
+                        {isFoundingOffer && (
+                            <span className="bl-founding-inline-badge">Founding Offer</span>
+                        )}
+                    </div>
                     {plan.description && (
                         <div className="app-plan-desc" style={{ marginTop: '6px' }}>{plan.description}</div>
                     )}
@@ -198,7 +217,11 @@ function PlanCard({
                         : cycle === 'quarterly' ? plan.price_quarterly
                             : plan.price_yearly;
                     const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3 mo' : '/ yr';
-                    const isPrimary = cycle === 'yearly' && !isCurrent;
+                    const isPrimary = (cycle === 'yearly' && !isCurrent) || (cycle === 'monthly' && isFoundingOffer && !isCurrent);
+                    // Show ₹0 for monthly on Founding Offer eligible plans — price from prop
+                    const displayPrice = isFoundingOffer && cycle === 'monthly'
+                        ? '₹0'
+                        : money(price);
                     return (
                         <button
                             key={cycle}
@@ -210,7 +233,14 @@ function PlanCard({
                         >
                             <span style={{ textTransform: 'capitalize' }}>{cycle}</span>
                             <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
-                                {money(price)}<span style={{ opacity: 0.5, fontSize: '10px' }}> {suffix}</span>
+                                {displayPrice}
+                                <span style={{ opacity: 0.5, fontSize: '10px' }}> {suffix}</span>
+                                {isFoundingOffer && cycle === 'monthly' && (
+                                    <span style={{ opacity: 0.65, fontSize: '9px', display: 'block' }}>
+                                        {/* next_billing_amount is always from DB */}
+                                        {trialInfo?.next_billing_amount}/mo after
+                                    </span>
+                                )}
                             </span>
                         </button>
                     );
@@ -338,16 +368,19 @@ export default function Billing() {
     const { props } = usePage<PageProps>();
     const { toast, Toasts } = useToast();
 
-    const plan = props.plan ?? null;
-    const plans = props.plans ?? [];
+    const plan         = props.plan ?? null;
+    const plans        = props.plans ?? [];
     const subscription = props.subscription ?? null;
-    const usage = props.usage ?? null;
-    const flashMsg = props.flash?.message ?? null;
-    const flashErr = props.flash?.error ?? null;
+    const usage        = props.usage ?? null;
+    const flashMsg     = props.flash?.message ?? null;
+    const flashErr     = props.flash?.error ?? null;
+    const trialInfo    = props.trial_info ?? null;
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [checkingOut, setCheckingOut] = useState(false);
+
+    const isInTrial = trialInfo?.is_in_trial ?? false;
 
     // Track whether a Razorpay modal is currently open so we can reset
     // loading state correctly when the user dismisses it.
@@ -490,6 +523,21 @@ export default function Billing() {
 
     const isCancelled = subscription?.is_cancelled ?? false;
 
+    /* ── Trial-aware subscription status label ── */
+    const subscriptionStatusBadge = isInTrial
+        ? (
+            <span className="app-badge bl-badge-founding-member">
+                <CheckCircle2 size={10} />
+                Founding Member
+            </span>
+          )
+        : (
+            <span className="app-badge app-badge-active">
+                <CheckCircle2 size={10} />
+                Active
+            </span>
+          );
+
     return (
         <>
             <Head title="Billing" />
@@ -563,10 +611,7 @@ export default function Billing() {
                                 <h2>Active Subscription</h2>
                                 <p>Your current plan and quota usage</p>
                             </div>
-                            <span className="app-badge app-badge-active">
-                                <CheckCircle2 size={10} />
-                                Active
-                            </span>
+                            {subscriptionStatusBadge}
                         </div>
 
                         {/* Plan name + meta */}
@@ -574,41 +619,74 @@ export default function Billing() {
                             <div className="bl-current-plan-name">
                                 <CreditCard size={18} style={{ color: 'var(--app-accent)' }} />
                                 <span>{plan.name}</span>
+                                {isInTrial && (
+                                    <span className="bl-trial-countdown-pill">
+                                        Free Trial
+                                        {trialInfo && trialInfo.days_remaining > 0
+                                            ? ` — ${trialInfo.days_remaining} day${trialInfo.days_remaining === 1 ? '' : 's'} remaining`
+                                            : ''}
+                                    </span>
+                                )}
                             </div>
 
                             {subscription && (
                                 <div className="bl-sub-meta">
-                                    <div className="bl-sub-meta-item">
-                                        <Clock3 size={13} />
-                                        <span>
-                                            {subscription.billing_cycle
-                                                ? `Billed ${subscription.billing_cycle}`
-                                                : 'Active'}
-                                        </span>
-                                    </div>
-                                    {subscription.starts_at && (
-                                        <div className="bl-sub-meta-item">
-                                            <CheckCircle2 size={13} />
-                                            <span>Started {subscription.starts_at}</span>
-                                        </div>
-                                    )}
-                                    {subscription.renews_at && (
-                                        <div className="bl-sub-meta-item">
-                                            <ShieldCheck size={13} />
-                                            <span>Renews {subscription.renews_at}</span>
-                                        </div>
-                                    )}
-                                    {subscription.ends_at && !subscription.renews_at && (
-                                        <div className="bl-sub-meta-item" style={{ color: 'var(--app-warning)' }}>
-                                            <Clock3 size={13} />
-                                            <span>Expires {subscription.ends_at}</span>
-                                        </div>
-                                    )}
-                                    {subscription.auto_renew === false && (
-                                        <div className="bl-sub-meta-item" style={{ color: 'var(--app-warning)' }}>
-                                            <AlertTriangle size={13} />
-                                            <span>Auto-renew off</span>
-                                        </div>
+                                    {/* ── Trial-specific rows ── */}
+                                    {isInTrial ? (
+                                        <>
+                                            <div className="bl-sub-meta-item">
+                                                <Clock3 size={13} />
+                                                <span>Free Trial — {trialInfo?.days_remaining} day{trialInfo?.days_remaining === 1 ? '' : 's'} remaining</span>
+                                            </div>
+                                            {trialInfo?.autopay_begins_at && (
+                                                <div className="bl-sub-meta-item">
+                                                    <ShieldCheck size={13} style={{ color: 'var(--app-accent)' }} />
+                                                    <span>AutoPay begins: <strong>{trialInfo.autopay_begins_at}</strong></span>
+                                                </div>
+                                            )}
+                                            {trialInfo?.next_billing_amount && (
+                                                <div className="bl-sub-meta-item">
+                                                    <CreditCard size={13} />
+                                                    {/* Amount always from DB via trial_info prop */}
+                                                    <span>Monthly renewal: <strong>{trialInfo.next_billing_amount}</strong></span>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="bl-sub-meta-item">
+                                                <Clock3 size={13} />
+                                                <span>
+                                                    {subscription.billing_cycle
+                                                        ? `Billed ${subscription.billing_cycle}`
+                                                        : 'Active'}
+                                                </span>
+                                            </div>
+                                            {subscription.starts_at && (
+                                                <div className="bl-sub-meta-item">
+                                                    <CheckCircle2 size={13} />
+                                                    <span>Started {subscription.starts_at}</span>
+                                                </div>
+                                            )}
+                                            {subscription.renews_at && (
+                                                <div className="bl-sub-meta-item">
+                                                    <ShieldCheck size={13} />
+                                                    <span>Renews {subscription.renews_at}</span>
+                                                </div>
+                                            )}
+                                            {subscription.ends_at && !subscription.renews_at && (
+                                                <div className="bl-sub-meta-item" style={{ color: 'var(--app-warning)' }}>
+                                                    <Clock3 size={13} />
+                                                    <span>Expires {subscription.ends_at}</span>
+                                                </div>
+                                            )}
+                                            {subscription.auto_renew === false && (
+                                                <div className="bl-sub-meta-item" style={{ color: 'var(--app-warning)' }}>
+                                                    <AlertTriangle size={13} />
+                                                    <span>Auto-renew off</span>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -664,8 +742,19 @@ export default function Billing() {
 
                             {cancelOpen && (
                                 <div className="bl-cancel-body">
+                                    {/* Trial-specific warning — only shown when user is in active free trial */}
+                                    {isInTrial && (
+                                        <div className="bl-trial-cancel-warning">
+                                            <AlertTriangle size={14} style={{ color: 'var(--app-warning)', flexShrink: 0 }} />
+                                            <span>
+                                                <strong>Founding Offer warning:</strong> Cancelling during your free trial will
+                                                permanently consume this offer. You will not be eligible for the free first
+                                                month again, even if you resubscribe later.
+                                            </span>
+                                        </div>
+                                    )}
                                     <p className="bl-cancel-desc">
-                                        Cancelling will <strong>immediately revoke</strong> all paid features -
+                                        Cancelling will <strong>immediately revoke</strong> all paid features —
                                         live keys, memory write quota, and higher rate limits.
                                         You will drop to the free tier right away.
                                     </p>
@@ -721,6 +810,7 @@ export default function Billing() {
                                     currentPlanSlug={isCancelled ? null : plan?.slug}
                                     onSelect={startCheckout}
                                     checkingOut={checkingOut}
+                                    trialInfo={trialInfo}
                                 />
                             ))}
                         </div>

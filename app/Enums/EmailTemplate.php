@@ -18,6 +18,9 @@ enum EmailTemplate: string
     case ApiKeyRotated         = 'api_key_rotated';
     case ApiKeyExpiryReminder  = 'api_key_expiry_reminder';
     case PlanExpiryReminder    = 'plan_expiry_reminder';
+    // ── Free Trial (Founding Offer) ───────────────────────────────────
+    case FreeTrialStarted      = 'free_trial_started';
+    case FreeTrialReminder     = 'free_trial_reminder';  // shared for 7/3/1-day reminders
 
     // ── Subject lines ─────────────────────────────────────────────────────────
 
@@ -38,6 +41,8 @@ enum EmailTemplate: string
             self::ApiKeyRotated         => 'Your API key has been rotated',
             self::ApiKeyExpiryReminder  => 'Your API key expires in 7 days',
             self::PlanExpiryReminder    => 'Your Trace.Mem plan expires in 7 days',
+            self::FreeTrialStarted      => 'Your Founding Offer is active — first month of TraceMem is free',
+            self::FreeTrialReminder     => 'Your Founding Offer ends soon — TraceMem',
         };
     }
 
@@ -75,6 +80,8 @@ enum EmailTemplate: string
             self::ApiKeyRotated         => 'ApiKeyRotatedEmail',
             self::ApiKeyExpiryReminder  => 'ApiKeyExpiryReminderEmail',
             self::PlanExpiryReminder    => 'PlanExpiryReminderEmail',
+            self::FreeTrialStarted      => 'FreeTrialStartedEmail',
+            self::FreeTrialReminder     => 'FreeTrialReminderEmail',
         };
     }
 
@@ -96,6 +103,8 @@ enum EmailTemplate: string
             self::ApiKeyRotated         => 'emails.api.key-rotated',
             self::ApiKeyExpiryReminder  => 'emails.api.key-expiry-reminder',
             self::PlanExpiryReminder    => 'emails.billing.plan-expiry-reminder',
+            self::FreeTrialStarted      => 'emails.billing.free-trial-started',
+            self::FreeTrialReminder     => 'emails.billing.free-trial-reminder',
         };
     }
 }

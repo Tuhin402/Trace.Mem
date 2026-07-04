@@ -303,8 +303,6 @@
 }
 
 /* ── Feature rows ─────────────────────────────────────── */
-.pricing-tbody {}
-
 .pricing-feature-group-row td {
     padding: 10px 28px 6px;
     background: var(--tm-surface-2);
@@ -612,8 +610,6 @@
     background: linear-gradient(to right, var(--tm-primary-vivid), var(--tm-secondary), transparent);
 }
 
-.pricing-custom-left {}
-
 .pricing-custom-tag {
     font-family: var(--font-mono);
     font-size: 10px;
@@ -733,3 +729,66 @@
         font-size: 10px;
     }
 }
+
+/* ============================================================
+   Founding Offer — Public Pricing Page Styles
+   ============================================================ */
+
+/* \u2500\u2500 Column / card accent border for the Founding Offer plan \u2500\u2500\u2500\u2500\u2500\u2500 */
+.pricing-plan-col.founding-offer-col,
+.pricing-mobile-plan-card.founding-offer-col {
+    border-top: 2px solid rgba(225, 78, 246, 0.55);
+    background: linear-gradient(
+        160deg,
+        rgba(225, 78, 246, 0.04) 0%,
+        transparent 60%
+    );
+}
+
+/* \u2500\u2500 "Founding Offer" label badge at the top of the column \u2500\u2500\u2500\u2500\u2500\u2500 */
+.pricing-founding-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    background: rgba(225, 78, 246, 0.12);
+    color: #e14ef6;
+    border: 1px solid rgba(225, 78, 246, 0.35);
+    margin-bottom: 10px;
+}
+
+/* \u2500\u2500 \u20b90 price display (large, prominent) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.pricing-trial-price {
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--tm-primary, #e14ef6);
+    letter-spacing: -0.04em;
+}
+
+/* \u2500\u2500 Crossed-out original price shown alongside \u20b90 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.pricing-trial-original {
+    font-size: 0.75em;
+    font-weight: 500;
+    color: var(--tm-text-muted);
+    text-decoration: line-through;
+    margin-left: 6px;
+    opacity: 0.6;
+}
+
+/* \u2500\u2500 "Then \u20b9XXX/month" note below the price \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.pricing-trial-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--tm-text-muted);
+    letter-spacing: 0.03em;
+    margin-top: 4px;
+    margin-bottom: 6px;
+    opacity: 0.7;
+}
+

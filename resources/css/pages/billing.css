@@ -509,3 +509,84 @@
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================
+   Founding Offer (Free Trial) UI Styles
+   ============================================================ */
+
+/* ── Founding Member badge (replaces Active badge in header) ──────────── */
+.bl-badge-founding-member {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: rgba(225, 78, 246, 0.12);
+    color: #e14ef6;
+    border: 1px solid rgba(225, 78, 246, 0.3);
+}
+
+/* ── Trial countdown pill (inline next to plan name) ─────────────── */
+.bl-trial-countdown-pill {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: rgba(225, 78, 246, 0.08);
+    color: #c084fc;
+    border: 1px solid rgba(225, 78, 246, 0.2);
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+/* ── Founding Offer inline badge on PlanCard header ───────────── */
+.bl-founding-inline-badge {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(225, 78, 246, 0.15), rgba(192, 132, 252, 0.1));
+    color: #e14ef6;
+    border: 1px solid rgba(225, 78, 246, 0.3);
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── PlanCard highlighted border for Founding Offer ────────────── */
+.bl-plan-card.bl-plan-card-founding {
+    border-color: rgba(225, 78, 246, 0.35);
+    box-shadow: 0 0 0 1px rgba(225, 78, 246, 0.15), 0 0 24px rgba(225, 78, 246, 0.06);
+}
+
+/* ── Trial cancel warning box ────────────────────────────── */
+.bl-trial-cancel-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(var(--app-warning-rgb, 255, 165, 0), 0.06);
+    border: 1px solid rgba(var(--app-warning-rgb, 255, 165, 0), 0.2);
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--app-text-muted);
+    margin-bottom: 12px;
+}
+
+.bl-trial-cancel-warning strong {
+    color: var(--app-text);
+}
+

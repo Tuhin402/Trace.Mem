@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\SubscriptionPlan;
+use App\Services\Billing\FreeTrialEligibilityService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PricingController extends Controller
 {
-    public function index()
+    public function __construct(
+        private readonly FreeTrialEligibilityService $trialService,
+    ) {}
+    public function index(Request $request)
     {
         $plans = SubscriptionPlan::query()
             ->where('is_active', true)
@@ -48,8 +53,19 @@ class PricingController extends Controller
             ->values()
             ->all();
 
+        // ── Founding Offer eligibility for public pricing display ──────────────────
+        //
+        // Guest users always see the ₹0 marketing price — the backend validates
+        // eligibility server-side at checkout time. Logged-in users only see the
+        // offer price if they are genuinely eligible (no prior subscriptions).
+        $user             = $request->user();
+        $trialEligiblePlan = $user
+            ? ($this->trialService->isEligible($user) ? FreeTrialEligibilityService::TRIAL_PLAN_SLUG : null)
+            : FreeTrialEligibilityService::TRIAL_PLAN_SLUG;   // guests: always show offer
+
         return Inertia::render('public/Pricing', [
-            'plans' => $plans,
+            'plans'              => $plans,
+            'trial_eligible_plan'=> $trialEligiblePlan,
         ]);
     }
 }

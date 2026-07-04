@@ -5,9 +5,11 @@ namespace App\Jobs;
 use App\Enums\EmailTemplate;
 use App\Jobs\SendEmailJob;
 use App\Models\BillingTransaction;
+use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\Services\Auth\SubscriptionCacheService;
+use App\Services\Billing\FreeTrialAnalyticsService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -275,28 +277,74 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
 
-            // Dispatch subscription purchased notification email
-            $sub = $this->subscriptionEntity();
+            $sub    = $this->subscriptionEntity();
             $planId = (int) data_get($sub, 'notes.plan_id');
             $cycle  = (string) data_get($sub, 'notes.billing_cycle', 'monthly');
-            $plan   = \App\Models\SubscriptionPlan::find($planId);
+            $plan   = SubscriptionPlan::find($planId);
 
-            SendEmailJob::dispatch(
-                template:       EmailTemplate::SubscriptionPurchased,
-                data:           [
-                    'user_name'     => $user->name,
-                    'plan_name'     => $plan?->name ?? 'Trace.Mem Plan',
-                    'billing_cycle' => $cycle,
-                    'amount'        => 'See billing page',
-                    'starts_at'     => now()->format('M j, Y'),
-                    'renews_at'     => $currentEnd ? Carbon::createFromTimestamp($currentEnd)->format('M j, Y') : null,
-                    'dashboard_url' => url('/dashboard'),
-                    'billing_url'   => url('/billing'),
-                ],
-                recipientEmail: $user->email,
-                userId:         $user->id,
-                requestId:      Str::uuid()->toString(),
-            )->onQueue('emails');
+            // ── Determine if this was a free trial activation ───────────────
+            // Check both Razorpay notes and user free_trial_status for robustness.
+            $isTrial = data_get($sub, 'notes.is_trial') === '1'
+                || $user->free_trial_status === 'activated'
+                || $user->free_trial_status === 'pending_activation';
+
+            if ($isTrial) {
+                // Idempotently promote pending_activation → activated (webhook backup path)
+                if ($user->free_trial_status === 'pending_activation') {
+                    $trialEndsUnix = data_get($sub, 'notes.trial_ends_at');
+                    $user->forceFill([
+                        'free_trial_status'       => 'activated',
+                        'free_trial_activated_at' => now(),
+                        'free_trial_ends_at'      => $trialEndsUnix
+                            ? Carbon::createFromTimestamp((int) $trialEndsUnix)
+                            : now()->addMonth(),
+                        'free_trial_plan_id'      => $planId ?: null,
+                    ])->save();
+                }
+
+                // Send "Founding Offer started" email — price from DB, never hardcoded
+                $trialEndsAt = $user->fresh()->free_trial_ends_at;
+                SendEmailJob::dispatch(
+                    template:       EmailTemplate::FreeTrialStarted,
+                    data:           [
+                        'user_name'           => $user->name,
+                        'plan_name'           => $plan?->name ?? 'Semantic Starter',
+                        'trial_end_date'      => $trialEndsAt?->format('M j, Y') ?? 'One month from today',
+                        'next_billing_date'   => $trialEndsAt?->format('M j, Y') ?? 'One month from today',
+                        'next_billing_amount' => '\u20b9' . number_format((float) ($plan?->price_monthly ?? 0), 0),
+                        'dashboard_url'       => url('/dashboard'),
+                        'billing_url'         => url('/billing'),
+                    ],
+                    recipientEmail: $user->email,
+                    userId:         $user->id,
+                    requestId:      Str::uuid()->toString(),
+                )->onQueue('emails');
+
+                // Track analytics
+                app(FreeTrialAnalyticsService::class)->track($user, 'trial_activated', [
+                    'plan_id' => $planId,
+                    'cycle'   => $cycle,
+                    'source'  => 'webhook',
+                ]);
+            } else {
+                // Normal (non-trial) subscription purchase email
+                SendEmailJob::dispatch(
+                    template:       EmailTemplate::SubscriptionPurchased,
+                    data:           [
+                        'user_name'     => $user->name,
+                        'plan_name'     => $plan?->name ?? 'Trace.Mem Plan',
+                        'billing_cycle' => $cycle,
+                        'amount'        => 'See billing page',
+                        'starts_at'     => now()->format('M j, Y'),
+                        'renews_at'     => $currentEnd ? Carbon::createFromTimestamp($currentEnd)->format('M j, Y') : null,
+                        'dashboard_url' => url('/dashboard'),
+                        'billing_url'   => url('/billing'),
+                    ],
+                    recipientEmail: $user->email,
+                    userId:         $user->id,
+                    requestId:      Str::uuid()->toString(),
+                )->onQueue('emails');
+            }
         }
     }
 
@@ -385,13 +433,23 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
 
+            // ── If user was on a free trial, mark it as completed (converted) ───
+            $freshUser = $user->fresh();
+            if ($freshUser && $freshUser->free_trial_status === 'activated') {
+                $freshUser->forceFill(['free_trial_status' => 'completed'])->save();
+                app(FreeTrialAnalyticsService::class)->track($freshUser, 'trial_converted', [
+                    'plan_id'    => (int) data_get($this->subscriptionEntity(), 'notes.plan_id'),
+                    'payment_id' => data_get($this->paymentEntity(), 'id'),
+                ]);
+            }
+
             // Dispatch subscription renewed + payment received notification emails
             $sub      = $this->subscriptionEntity();
             $planId   = (int) data_get($sub, 'notes.plan_id');
-            $plan     = \App\Models\SubscriptionPlan::find($planId);
+            $plan     = SubscriptionPlan::find($planId);
             $payment  = $this->paymentEntity();
             $paidAt   = now()->format('M j, Y \a\t g:i A T');
-            $amountFmt = '₹' . number_format(((int) data_get($payment, 'amount', 0)) / 100, 2);
+            $amountFmt = '\u20b9' . number_format(((int) data_get($payment, 'amount', 0)) / 100, 2);
 
             SendEmailJob::dispatch(
                 template:       EmailTemplate::SubscriptionRenewed,
@@ -532,10 +590,19 @@ class ProcessRazorpayWebhookJob implements ShouldQueue
         if ($userId && ($user = User::find($userId))) {
             $this->invalidateCaches($user, $subscriptionCache);
 
+            // ── If user cancelled during a free trial, mark offer consumed ────
+            $freshUser = $user->fresh();
+            if ($freshUser && $freshUser->free_trial_status === 'activated') {
+                $freshUser->forceFill(['free_trial_status' => 'cancelled'])->save();
+                app(FreeTrialAnalyticsService::class)->track($freshUser, 'trial_cancelled', [
+                    'source' => 'razorpay_webhook',
+                ]);
+            }
+
             // Dispatch subscription cancelled notification email
             $sub    = $this->subscriptionEntity();
             $planId = (int) data_get($sub, 'notes.plan_id');
-            $plan   = \App\Models\SubscriptionPlan::find($planId);
+            $plan   = SubscriptionPlan::find($planId);
 
             SendEmailJob::dispatch(
                 template:       EmailTemplate::SubscriptionCancelled,

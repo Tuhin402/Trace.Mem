@@ -34,61 +34,95 @@ export default function QuickStart() {
 
             <ApiReferencePage
                 title="Quick Start"
-                description="Make your first TraceMem request in under two minutes. Store a memory, recall it, and assemble prompt-ready context, all with a single Bearer token."
-                endpoint="/v1/remember"
+                description="Make your first TraceMem request in under two minutes. The fastest path is POST /chat - one call handles memory storage, context assembly, and AI reply generation automatically. For fine-grained control over each step, see Core Operations which documents POST /remember, POST /recall, and POST /context/assemble individually."
+                endpoint="/v1/chat"
                 method="POST"
                 auth="Authorization: Bearer <api_key>  -  Test keys (cmtest_) use semantic-only mode."
                 body={[
                     {
-                        key:         'content',
+                        key:         'message',
                         type:        'string',
                         required:    true,
-                        description: 'The raw user message, note, or statement you want to persist as a memory unit.',
+                        description: 'The user message. TraceMem classifies it, optionally stores it as memory, assembles personalised context, and returns an AI reply in a single call.',
+                    },
+                    {
+                        key:         'memory_mode',
+                        type:        'string',
+                        description: 'Optional. "auto" (default), "force", or "off". Controls whether the message is stored as memory.',
                     },
                 ]}
                 responses={{
-                    ok:         '{ "message": "Memory saved", "memory": { "id": "mem_xxx", "content": "User prefers short answers", "score": 0.94 } }',
-                    badRequest: '{ "message": "Missing API key." }',
+                    ok: `{
+  "request_id": "tm_chat_01K1E6G9XY",
+  "reply": "Got it! I'll remember that you prefer short answers.",
+  "memory": { "saved": true, "type": "preference", "via": "heuristic" },
+  "context": { "used": true, "memories": 3, "tokens": 198 },
+  "provider": "nvidia",
+  "model": "openai/gpt-oss-20b",
+  "latency_ms": { "classifier": 0, "llm": 541, "total": 612 }
+}`,
+                    badRequest: '{ "message": "The message field is required." }',
                 }}
                 snippets={{
                     python: `import requests
 
-requests.post(
-    "${apiUrl}/v1/remember",
+response = requests.post(
+    "${apiUrl}/v1/chat",
     headers={"Authorization": "Bearer cmlive_xxx"},
-    json={"content": "User prefers short answers"}
-)`,
+    json={"message": "I prefer short answers"}
+)
+
+data = response.json()
+print(data["reply"])          # AI reply
+print(data["memory"]["saved"]) # True if stored`,
                     javascript: `import axios from "axios";
 
-await axios.post(
-  "${apiUrl}/v1/remember",
-  { content: "User prefers short answers" },
+const { data } = await axios.post(
+  "${apiUrl}/v1/chat",
+  { message: "I prefer short answers" },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
-);`,
-                    php: `Http::withToken('cmlive_xxx')
-    ->post('${apiUrl}/v1/remember', [
-        'content' => 'User prefers short answers',
-    ]);`,
-                    curl: `curl -X POST "${apiUrl}/v1/remember" \\
+);
+
+console.log(data.reply);           // AI reply
+console.log(data.memory.saved);    // true if stored
+console.log(data.request_id);      // tm_chat_...`,
+                    php: `$response = Http::withToken('cmlive_xxx')
+    ->post('${apiUrl}/v1/chat', [
+        'message' => 'I prefer short answers',
+    ]);
+
+$data     = $response->json();
+$reply    = $data['reply'];
+$saved    = $data['memory']['saved'];`,
+                    curl: `curl -X POST "${apiUrl}/v1/chat" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
-  -d '{ "content": "User prefers short answers" }'`,
-                    java: `HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("${apiUrl}/v1/remember"))
+  -d '{ "message": "I prefer short answers" }'`,
+                    java: `String body = "{\"message\":\"I prefer short answers\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${apiUrl}/v1/chat"))
     .header("Authorization", "Bearer cmlive_xxx")
     .header("Content-Type", "application/json")
-    .POST(HttpRequest.BodyPublishers.ofString(
-        "{\"content\":\"User prefers short answers\"}"
-    ))
-    .build();`,
-                    go: `reqBody := strings.NewReader(\`{"content":"User prefers short answers"}\`)
-req, _ := http.NewRequest("POST", "${apiUrl}/v1/remember", reqBody)
+    .POST(HttpRequest.BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> resp = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+// resp.headers().firstValue("X-Request-ID") → "tm_chat_..."`,
+                    go: `reqBody := strings.NewReader(`+"`"+`{"message":"I prefer short answers"}`+"`"+`)
+
+req, _ := http.NewRequest("POST", "${apiUrl}/v1/chat", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
-req.Header.Set("Content-Type", "application/json")`,
+req.Header.Set("Content-Type", "application/json")
+
+resp, _ := (&http.Client{}).Do(req)
+defer resp.Body.Close()
+// resp.Header.Get("X-Request-ID") → "tm_chat_..."`,
                 }}
                 groups={apiRefGroups}
-                prev={{ href: '/api-reference',              label: 'Overview'         }}
-                next={{ href: '/api-reference/core-operations', label: 'Core operations' }}
+                prev={{ href: '/api-reference',                 label: 'Overview'         }}
+                next={{ href: '/api-reference/core-operations', label: 'Core operations'  }}
             />
         </>
     );

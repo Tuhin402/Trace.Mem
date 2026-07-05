@@ -141,6 +141,7 @@ defer resp.Body.Close()`,
                 }}
                 groups={apiRefGroups}
                 prev={{ href: '/api-reference/recall', label: 'Recall' }}
+                next={{ href: '/api-reference/chat', label: 'Chat' }}
             />
         </>
     );

@@ -17,7 +17,7 @@ export const apiRefGroups: SidebarGroup[] = [
     {
         title: 'Getting started',
         items: [
-            { label: 'Overview',            href: '/api-reference',                   subtitle: 'TraceMem REST API'          },
+            { label: 'Overview',             href: '/api-reference',                   subtitle: 'TraceMem REST API'          },
             { label: 'Quick start',          href: '/api-reference/quick-start',       subtitle: 'First working request'      },
             { label: 'Core operations',      href: '/api-reference/core-operations',   subtitle: 'Remember and recall'        },
             { label: 'Auth & authorization', href: '/api-reference/authentication',    subtitle: 'Bearer keys and scopes'     },
@@ -26,10 +26,11 @@ export const apiRefGroups: SidebarGroup[] = [
     {
         title: 'Endpoints',
         items: [
-            { label: 'Health',           href: '/api-reference/health',           subtitle: 'Service uptime check'   },
-            { label: 'Remember',         href: '/api-reference/remember',         subtitle: 'Store memory units'     },
-            { label: 'Recall',           href: '/api-reference/recall',           subtitle: 'Fetch relevant memory'  },
-            { label: 'Context assemble', href: '/api-reference/context-assemble', subtitle: 'Prompt-ready context'   },
+            { label: 'Chat (Beta)',      href: '/api-reference/chat',             subtitle: 'One-call AI orchestration' },
+            { label: 'Health',           href: '/api-reference/health',           subtitle: 'Service uptime check'      },
+            { label: 'Remember',         href: '/api-reference/remember',         subtitle: 'Store memory units'        },
+            { label: 'Recall',           href: '/api-reference/recall',           subtitle: 'Fetch relevant memory'     },
+            { label: 'Context assemble', href: '/api-reference/context-assemble', subtitle: 'Prompt-ready context'      },
         ],
     },
 ];

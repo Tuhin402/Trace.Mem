@@ -27,6 +27,8 @@ Route::inertia('/api-reference/health', 'public/api-reference/Health')->name('ap
 Route::inertia('/api-reference/remember', 'public/api-reference/Remember')->name('api.reference.remember');
 Route::inertia('/api-reference/recall', 'public/api-reference/Recall')->name('api.reference.recall');
 Route::inertia('/api-reference/context-assemble', 'public/api-reference/ContextAssemble')->name('api.reference.context-assemble');
+Route::inertia('/api-reference/chat', 'public/api-reference/Chat')->name('api.reference.chat');
+
 
 Route::middleware('guest')->group(function () {
     Route::inertia('/login', 'auth/Login')->name('login');

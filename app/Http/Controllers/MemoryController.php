@@ -9,11 +9,9 @@ use App\Services\Memory\MemorySemanticSegmentationService;
 use App\Services\Memory\MemoryConflictService;
 use App\Services\Memory\MemoryScopeResolver;
 use App\Services\MemoryExtractionService;
+use App\Services\HealthService;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Http;
 
 class MemoryController extends Controller
 {
@@ -24,6 +22,7 @@ class MemoryController extends Controller
         private readonly MemorySemanticSegmentationService $semanticSegmenter,
         private readonly MemoryConflictService $conflicts,
         private readonly MemoryScopeResolver $scopeResolver,
+        private readonly HealthService $healthService,
     ) {}
 
     public function remember(Request $request)
@@ -92,89 +91,7 @@ class MemoryController extends Controller
 
     public function health(Request $request)
     {
-        try {
-            $startedAt = cache()->get('app_started_at');
-            if (! $startedAt) {
-                cache()->forever('app_started_at', now()->toIsoString());
-                $startedAt = cache()->get('app_started_at');
-            }
-        } catch (\Throwable) {
-            $startedAt = null; // Redis unreachable — uptime unavailable but health can still report
-        }
-
-        $t0 = microtime(true);
-
-        $checks = [];
-
-        // DB
-        try {
-            DB::connection()->getPdo();
-            $checks['db'] = ['ok' => true];
-        } catch (\Throwable $e) {
-            $checks['db'] = ['ok' => false, 'error' => $e->getMessage()];
-        }
-
-        // Redis
-        try {
-            Redis::connection()->command('ping', []);
-            $checks['redis'] = ['ok' => true];
-        } catch (\Throwable $e) {
-            $checks['redis'] = ['ok' => false, 'error' => $e->getMessage()];
-        }
-
-        // Queue backend + worker heartbeat
-        try {
-            $driver = config('queue.default');
-
-            if ($driver === 'redis') {
-                Redis::connection()->command('ping', []);
-                $heartbeat = Redis::connection()->get('queue:heartbeat');
-                $checks['queue'] = [
-                    'ok' => (bool) $heartbeat,
-                    'driver' => 'redis',
-                    'heartbeat_present' => (bool) $heartbeat,
-                ];
-            } elseif ($driver === 'database') {
-                DB::table('jobs')->limit(1)->first();
-                $checks['queue'] = ['ok' => true, 'driver' => 'database'];
-            } else {
-                $checks['queue'] = ['ok' => true, 'driver' => $driver, 'note' => 'backend not actively checked'];
-            }
-        } catch (\Throwable $e) {
-            $checks['queue'] = ['ok' => false, 'error' => $e->getMessage()];
-        }
-
-        // OpenAI
-        try {
-            $response = Http::withToken(config('services.openai.api_key'))
-                ->timeout(5)
-                ->get('https://api.openai.com/v1/models');
-
-            $checks['openai'] = [
-                'ok' => $response->successful(),
-                'status' => $response->status(),
-            ];
-        } catch (\Throwable $e) {
-            $checks['openai'] = ['ok' => false, 'error' => $e->getMessage()];
-        }
-
-        $latencyMs = (int) round((microtime(true) - $t0) * 1000);
-
-        // $ok = collect($checks)->every(fn ($check) => ($check['ok'] ?? false) === true);
-        $criticalChecks = ['db'];
-        $ok = collect($criticalChecks)
-            ->every(fn ($name) => ($checks[$name]['ok'] ?? false) === true);
-
-        return response()->json([
-            'ok' => $ok,
-            'service' => 'memory-layer',
-            'version' => config('app.version'),
-            'environment' => app()->environment(),
-            'uptime_seconds' => $startedAt ? now()->diffInSeconds($startedAt) : null,
-            'latency_ms' => $latencyMs,
-            'timestamp' => now()->toIso8601String(),
-            'checks' => $checks,
-        ], $ok ? 200 : 503);
+        return $this->healthService->check();
     }
 
     // guard for debugs  

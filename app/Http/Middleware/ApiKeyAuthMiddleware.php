@@ -3,9 +3,12 @@
 namespace App\Http\Middleware;
 
 use App\Models\ApiUsageLog;
+use App\Models\User;
 use App\Services\Auth\ApiKeyService;
+use App\Services\Auth\SubscriptionEntitlementService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +17,8 @@ use Throwable;
 class ApiKeyAuthMiddleware
 {
     public function __construct(
-        private readonly ApiKeyService $apiKeys
+        private readonly ApiKeyService                  $apiKeys,
+        private readonly SubscriptionEntitlementService $entitlements,
     ) {}
 
     public function handle(Request $request, Closure $next): Response
@@ -33,6 +37,20 @@ class ApiKeyAuthMiddleware
 
         if ($apiKey->isRevoked() || $apiKey->isExpired()) {
             return response()->json(['message' => 'API key is revoked or expired.'], 401);
+        }
+
+        // ── Subscription gate ─────────────────────────────────────────────────
+        // Sandbox (test) keys are restricted to localhost/Postman already;
+        // skip the billing check so local dev never breaks on a lapsed sub.
+        // Live keys must belong to a user with an active, non-cancelled subscription.
+        //
+        // Failure mode: fail-OPEN on any exception (cache blip, DB timeout) so a
+        // transient infrastructure hiccup never locks a paying user out of production.
+        if ($apiKey->isLive()) {
+            $subscriptionDenied = $this->checkSubscription($apiKey->user_id, $request);
+            if ($subscriptionDenied !== null) {
+                return $subscriptionDenied;
+            }
         }
 
         if (! $this->requestMatchesPolicy($request, $apiKey)) {
@@ -203,4 +221,66 @@ class ApiKeyAuthMiddleware
             'metadata' => $metadata,
         ]);
     }
-}
+
+    /**
+     * Check that the key owner has an active, non-cancelled subscription.
+     *
+     * Returns a JsonResponse (HTTP 402) if the subscription is inactive,
+     * or null if the request should proceed.
+     *
+     * Fail-open contract: any Throwable is caught, logged as a warning,
+     * and null is returned so a cache/DB blip never denies a paying user.
+     *
+     * This method is only called for live-environment keys. Sandbox keys
+     * are already restricted to localhost/Postman and do not require a
+     * subscription check — keeping local development frictionless.
+     */
+    private function checkSubscription(int $userId, Request $request): ?\Illuminate\Http\JsonResponse
+    {
+        try {
+            $user = User::find($userId);
+
+            // Guard: key has no user row (data integrity issue — fail closed).
+            if ($user === null) {
+                Log::error('ApiKeyAuthMiddleware: live key has no associated user', [
+                    'user_id' => $userId,
+                    'ip'      => $request->ip(),
+                    'path'    => $request->path(),
+                ]);
+
+                return response()->json([
+                    'error'   => 'account_not_found',
+                    'message' => 'The account associated with this API key could not be found.',
+                ], 401);
+            }
+
+            $entitlements = $this->entitlements->resolveForUser($user);
+
+            if (! $entitlements['has_active_subscription']) {
+                Log::info('ApiKeyAuthMiddleware: live key blocked — inactive subscription', [
+                    'user_id' => $userId,
+                    'ip'      => $request->ip(),
+                    'path'    => $request->path(),
+                ]);
+
+                return response()->json([
+                    'error'   => 'subscription_inactive',
+                    'message' => 'Your subscription is inactive or has been cancelled. '
+                               . 'Please renew your plan to continue using the API.',
+                ], 402);
+            }
+
+            return null; // subscription is active — proceed
+
+        } catch (Throwable $e) {
+            // Fail-open: a transient cache or DB error must not lock paying users out.
+            Log::warning('ApiKeyAuthMiddleware: subscription check failed — failing open', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+                'path'    => $request->path(),
+            ]);
+
+            return null;
+        }
+    }
+}

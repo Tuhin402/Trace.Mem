@@ -187,8 +187,8 @@ PROMPT;
                 ->retry(1, 500, throw: false)
                 ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
                     'model'       => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
-                    'temperature' => 0,     // deterministic — classification must not be creative
-                    'top_p'       => 1,
+                   // 'temperature' => 0,     // deterministic — classification must not be creative
+                    // 'top_p'       => 1,
                     'max_tokens'  => 100,
                     'stream'      => false,
                     'messages'    => [

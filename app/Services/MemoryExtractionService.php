@@ -91,37 +91,37 @@ class MemoryExtractionService
                     'top_p' => 1,
                     'max_tokens' => 4096,
                     'stream' => false,
-                    'reasoning_effort' => 'medium',
+                    // 'reasoning_effort' => 'medium',
                     
-                    'response_format' => [
-                        'type' => 'json_schema',
-                        'json_schema' => [
-                            'name' => 'memory_extraction',
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'memories' => [
-                                        'type' => 'array',
-                                        'items' => [
-                                            'type' => 'object',
-                                            'properties' => [
-                                                'type' => [
-                                                    'type' => 'string'
-                                                ],
-                                                'content' => [
-                                                    'type' => 'string'
-                                                ]
-                                            ],
-                                            'required' => ['type', 'content'],
-                                            'additionalProperties' => false
-                                        ]
-                                    ]
-                                ],
-                                'required' => ['memories'],
-                                'additionalProperties' => false
-                            ]
-                        ]
-                    ],
+                    // 'response_format' => [
+                    //     'type' => 'json_schema',
+                    //     'json_schema' => [
+                    //         'name' => 'memory_extraction',
+                    //         'schema' => [
+                    //             'type' => 'object',
+                    //             'properties' => [
+                    //                 'memories' => [
+                    //                     'type' => 'array',
+                    //                     'items' => [
+                    //                         'type' => 'object',
+                    //                         'properties' => [
+                    //                             'type' => [
+                    //                                 'type' => 'string'
+                    //                             ],
+                    //                             'content' => [
+                    //                                 'type' => 'string'
+                    //                             ]
+                    //                         ],
+                    //                         'required' => ['type', 'content'],
+                    //                         'additionalProperties' => false
+                    //                     ]
+                    //                 ]
+                    //             ],
+                    //             'required' => ['memories'],
+                    //             'additionalProperties' => false
+                    //         ]
+                    //     ]
+                    // ],
                 ]);
 
             if (! $response->successful()) {

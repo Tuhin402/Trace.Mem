@@ -6,9 +6,9 @@ use App\Services\Memory\MemorySemanticSegmentationService;
 use App\Services\Memory\CodeDetectionService;
 use App\Services\Memory\MemoryTemporalService;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+
 
 class MemoryExtractionService
 {
@@ -16,7 +16,9 @@ class MemoryExtractionService
         private readonly MemorySemanticSegmentationService $semanticSegmenter,
         private readonly CodeDetectionService $codeDetector,
         private readonly MemoryTemporalService $temporalService,
+        private readonly NimClient $nim,
     ) {}
+
 
     public function extract(string $input): array
     {
@@ -27,107 +29,71 @@ class MemoryExtractionService
             //     ->post(config('services.openai.base_url') . '/chat/completions', [
             //         'model' => 'gpt-4o-mini',
 
-            $response = Http::timeout(10)
-                ->retry(2, 300)
-                ->withToken(config('services.nvidia_nim_openai.api_key'))
-                ->acceptJson()
-                ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
-                    'model' => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
-                    'messages' => [
-                        [
-                            'role' => 'system',
-                            'content' => '
-                                You are a memory extraction engine.
+            $response = $this->nim->completions([
+                'model'       => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
+                'messages'    => [
+                    [
+                        'role'    => 'system',
+                        'content' => '
+                            You are a memory extraction engine.
 
-                                Your task:
-                                - Extract atomic user memories from the input.
-                                - Split compound sentences into separate memories.
-                                - Each memory must contain ONLY ONE idea.
-                                - Return ONLY valid JSON array.
-                                - Do not explain anything.
+                            Your task:
+                            - Extract atomic user memories from the input.
+                            - Split compound sentences into separate memories.
+                            - Each memory must contain ONLY ONE idea.
+                            - Return ONLY valid JSON array.
+                            - Do not explain anything.
 
-                                Allowed types:
-                                - preference
-                                - fact
-                                - rule
-                                - skill
+                            Allowed types:
+                            - preference
+                            - fact
+                            - rule
+                            - skill
 
-                                Examples:
+                            Examples:
 
-                                Input: "I like React, I can build Laravel APIs, and I hate overly verbose responses"
-                                Output:
-                                [
-                                    {
-                                        "type": "preference",
-                                        "content": "User likes React"
-                                    },
-                                    {
-                                        "type": "skill",
-                                        "content": "User can build Laravel APIs"
-                                    },
-                                    {
-                                        "type": "preference",
-                                        "content": "User hates overly verbose responses"
-                                    }
-                                ]
+                            Input: "I like React, I can build Laravel APIs, and I hate overly verbose responses"
+                            Output:
+                            [
+                                {
+                                    "type": "preference",
+                                    "content": "User likes React"
+                                },
+                                {
+                                    "type": "skill",
+                                    "content": "User can build Laravel APIs"
+                                },
+                                {
+                                    "type": "preference",
+                                    "content": "User hates overly verbose responses"
+                                }
+                            ]
 
-                                Input: "I can build Laravel APIs"
-                                Output:
-                                [
-                                    {
-                                        "type": "skill",
-                                        "content": "User can build Laravel APIs"
-                                    }
-                                ]
-                            ',
-                        ],
-                        [
-                            'role' => 'user',
-                            'content' => $input,
-                        ],
+                            Input: "I can build Laravel APIs"
+                            Output:
+                            [
+                                {
+                                    "type": "skill",
+                                    "content": "User can build Laravel APIs"
+                                }
+                            ]
+                        ',
                     ],
-                    'temperature' => 0.2,
-
-                    'top_p' => 1,
-                    'max_tokens' => 4096,
-                    'stream' => false,
-                    // 'reasoning_effort' => 'medium',
-                    
-                    // 'response_format' => [
-                    //     'type' => 'json_schema',
-                    //     'json_schema' => [
-                    //         'name' => 'memory_extraction',
-                    //         'schema' => [
-                    //             'type' => 'object',
-                    //             'properties' => [
-                    //                 'memories' => [
-                    //                     'type' => 'array',
-                    //                     'items' => [
-                    //                         'type' => 'object',
-                    //                         'properties' => [
-                    //                             'type' => [
-                    //                                 'type' => 'string'
-                    //                             ],
-                    //                             'content' => [
-                    //                                 'type' => 'string'
-                    //                             ]
-                    //                         ],
-                    //                         'required' => ['type', 'content'],
-                    //                         'additionalProperties' => false
-                    //                     ]
-                    //                 ]
-                    //             ],
-                    //             'required' => ['memories'],
-                    //             'additionalProperties' => false
-                    //         ]
-                    //     ]
-                    // ],
-                ]);
+                    [
+                        'role'    => 'user',
+                        'content' => $input,
+                    ],
+                ],
+                'temperature' => 0.2,
+                'top_p'       => 1,
+                'max_tokens'  => 4096,
+                'stream'      => false,
+            ], timeout: 30);
 
             if (! $response->successful()) {
-                Log::warning('OpenAI extraction failed', [
+                Log::warning('NVIDIA extraction failed', [
                     'status' => $response->status(),
-                    'body' => $response->body(),
+                    'body'   => $response->body(),
                 ]);
 
                 return $this->fallbackExtract($input);
@@ -136,7 +102,7 @@ class MemoryExtractionService
             $content = $response->json('choices.0.message.content');
 
             $decoded = json_decode($content, true);
-            Log::info('OpenAI raw response', [
+            Log::info('NVIDIA raw response', [
                 'response' => $response->json(),
             ]);
 
@@ -153,7 +119,7 @@ class MemoryExtractionService
                 $input
             );
         } catch (Throwable $e) {
-            Log::error('OpenAI extraction exception', [
+            Log::error('NVIDIA extraction exception', [
                 'message' => $e->getMessage(),
             ]);
 

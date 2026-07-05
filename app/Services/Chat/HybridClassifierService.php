@@ -2,9 +2,10 @@
 
 namespace App\Services\Chat;
 
-use Illuminate\Support\Facades\Http;
+use App\Services\NimClient;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+
 
 /**
  * Hybrid memory classifier.
@@ -107,6 +108,7 @@ PROMPT;
 
     public function __construct(
         private readonly CircuitBreaker $circuitBreaker,
+        private readonly NimClient      $nim,
     ) {}
 
     /**
@@ -181,21 +183,17 @@ PROMPT;
     private function llmClassify(string $message): array
     {
         try {
-            $response = Http::withToken(config('services.nvidia_nim_openai.api_key'))
-                ->acceptJson()
-                ->timeout(3)
-                ->retry(1, 500, throw: false)
-                ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
-                    'model'       => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
-                   // 'temperature' => 0,     // deterministic — classification must not be creative
-                    // 'top_p'       => 1,
-                    'max_tokens'  => 100,
-                    'stream'      => false,
-                    'messages'    => [
-                        ['role' => 'system', 'content' => self::CLASSIFIER_SYSTEM_PROMPT],
-                        ['role' => 'user',   'content' => $message],
-                    ],
-                ]);
+            $response = $this->nim->completions([
+                'model'       => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
+                'temperature' => 0,    // deterministic — classification must not be creative
+                'top_p'       => 1,
+                'max_tokens'  => 100,
+                'stream'      => false,
+                'messages'    => [
+                    ['role' => 'system', 'content' => self::CLASSIFIER_SYSTEM_PROMPT],
+                    ['role' => 'user',   'content' => $message],
+                ],
+            ], timeout: 15);
 
             if (! $response->successful()) {
                 $this->circuitBreaker->recordFailure();

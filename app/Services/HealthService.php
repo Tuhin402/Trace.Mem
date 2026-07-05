@@ -4,9 +4,9 @@ namespace App\Services;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use Throwable;
+
 
 /**
  * Extracted health check logic — previously inlined in MemoryController::health().
@@ -20,6 +20,10 @@ use Throwable;
  */
 class HealthService
 {
+    public function __construct(
+        private readonly NimClient $nim,
+    ) {}
+
     public function check(): JsonResponse
     {
         try {
@@ -77,16 +81,14 @@ class HealthService
         // Sends an actual chat/completions request (max_tokens=1) to prove
         // the application can generate — not just that /models is reachable.
         // Response key stays "openai" to preserve the existing monitoring contract.
+        // Timeout: 15 s — enough for a 1-token response on a warm NIM instance.
         try {
-            $response = Http::withToken(config('services.nvidia_nim_openai.api_key'))
-                ->acceptJson()
-                ->timeout(5)
-                ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
-                    'model'      => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
-                    'messages'   => [['role' => 'user', 'content' => 'ping']],
-                    'max_tokens' => 1,
-                    'stream'     => false,
-                ]);
+            $response = $this->nim->completions([
+                'model'      => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
+                'messages'   => [['role' => 'user', 'content' => 'ping']],
+                'max_tokens' => 1,
+                'stream'     => false,
+            ], timeout: 15);
 
             $checks['openai'] = [
                 'ok'     => $response->successful(),

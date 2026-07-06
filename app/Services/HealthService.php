@@ -82,6 +82,8 @@ class HealthService
         // the application can generate — not just that /models is reachable.
         // Response key stays "openai" to preserve the existing monitoring contract.
         // Timeout: 15 s — enough for a 1-token response on a warm NIM instance.
+        // TEMPORARILY DISABLED as per request
+        /*
         try {
             $response = $this->nim->completions([
                 'model'      => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
@@ -97,6 +99,7 @@ class HealthService
         } catch (Throwable $e) {
             $checks['openai'] = ['ok' => false, 'error' => $e->getMessage()];
         }
+        */
 
         $latencyMs = (int) round((microtime(true) - $t0) * 1000);
 
@@ -107,7 +110,7 @@ class HealthService
 
         return response()->json([
             'ok'             => $ok,
-            'service'        => 'memory-layer',
+            'service'        => 'context-memory-layer',
             'version'        => config('app.version'),
             'environment'    => app()->environment(),
             'uptime_seconds' => $startedAt ? now()->diffInSeconds($startedAt) : null,

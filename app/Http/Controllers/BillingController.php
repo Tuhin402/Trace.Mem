@@ -92,6 +92,7 @@ class BillingController extends Controller
                 'total_requests' => $totalRequests,
             ],
             'trial_info'   => $trialInfo,
+            'founding_offer'=> $this->trialService->getFoundingOfferPresentation($user),
             'flash'        => [
                 'message' => session('message'),
                 'error'   => session('error'),
@@ -197,46 +198,13 @@ class BillingController extends Controller
         if ($this->trialService->canActivate($user, $plan->slug, $cycle)) {
             $isTrial     = true;
             $trialEndsAt = now()->addMonth();
-
-            // ── Race-condition guard: lockForUpdate inside transaction ─────
-            try {
-                DB::transaction(function () use ($user, $plan, $cycle) {
-                    $freshUser = User::lockForUpdate()->find($user->id);
-
-                    // Re-check eligibility under lock (prevents double activation)
-                    if (! $this->trialService->canActivate($freshUser, $plan->slug, $cycle)) {
-                        throw new \RuntimeException('trial_not_eligible');
-                    }
-
-                    // Set transient pending state to block concurrent requests
-                    $freshUser->forceFill(['free_trial_status' => 'pending_activation'])->save();
-                });
-            } catch (\RuntimeException $e) {
-                if ($e->getMessage() === 'trial_not_eligible') {
-                    Log::info('BillingController::checkout — trial already consumed (race condition guard)', [
-                        'user_id' => $user->id,
-                        'plan'    => $plan->slug,
-                    ]);
-                    // Not eligible — proceed as a normal (non-trial) checkout
-                    $isTrial = false;
-                } else {
-                    throw $e;
-                }
-            }
         } elseif (
             $user->free_trial_status === 'activated'
             && $plan->slug !== FreeTrialEligibilityService::TRIAL_PLAN_SLUG
         ) {
             // ── Upgrade during trial: user is on trial and switching to a different plan ──
             $isUpgradeFromTrial = true;
-
-            DB::transaction(function () use ($user) {
-                User::lockForUpdate()->find($user->id)
-                    ->forceFill(['free_trial_status' => 'pending_activation'])->save();
-            });
-
-            // Try to cancel the existing Razorpay trial subscription
-            $this->cancelExistingTrialRazorpaySubscription($user, $keyId, $keySecret);
+            // The Razorpay subscription will be cancelled ONLY after successful payment verification.
         }
 
         // ── Step 1: Resolve or lazily create a Razorpay Plan ──────────────
@@ -269,8 +237,6 @@ class BillingController extends Controller
                     'status'  => $planResponse->status(),
                     'body'    => $planResponse->json(),
                 ]);
-
-                $this->rollbackTrialPendingState($user, $isTrial, $isUpgradeFromTrial);
 
                 return response()->json([
                     'error' => 'Payment provider is unavailable. Please try again shortly.',
@@ -324,9 +290,6 @@ class BillingController extends Controller
                 'status'      => $subscriptionResponse->status(),
                 'body'        => $subscriptionResponse->json(),
             ]);
-
-            // ── Razorpay failed: do NOT permanently consume the trial ──────
-            $this->rollbackTrialPendingState($user, $isTrial, $isUpgradeFromTrial);
 
             return response()->json([
                 'error' => 'Payment provider is unavailable. Please try again shortly.',
@@ -440,7 +403,7 @@ class BillingController extends Controller
         $trialEndsUnix = null;
         $isUpgrade = false;
 
-        DB::transaction(function () use ($user, $data, &$planId, &$subPlanId, &$cycle, &$isTrial, &$trialEndsUnix, &$isUpgrade) {
+        DB::transaction(function () use ($user, $data, $keySecret, &$planId, &$subPlanId, &$cycle, &$isTrial, &$trialEndsUnix, &$isUpgrade) {
             // Locate the pending BillingTransaction created at checkout
             $tx = BillingTransaction::where('provider_subscription_id', $data['razorpay_subscription_id'])
                 ->where('user_id', $user->id)
@@ -490,6 +453,9 @@ class BillingController extends Controller
                         'ends_at'    => now(),
                         'auto_renew' => false,
                     ]);
+                    
+                // Cancel the existing Razorpay trial subscription securely inside the webhook/verification flow
+                $this->cancelExistingTrialRazorpaySubscription($user, config('services.razorpay.key_id'), config('services.razorpay.key_secret'));
             }
 
             // Activate the UserSubscription (idempotent via updateOrCreate)
@@ -516,7 +482,7 @@ class BillingController extends Controller
 
             // ── Activate trial on user if this was a trial checkout ───────
             $freshUser = User::lockForUpdate()->find($user->id);
-            if ($freshUser && $isTrial && $freshUser->free_trial_status === 'pending_activation') {
+            if ($freshUser && $isTrial && $freshUser->free_trial_status === null) {
                 $freshUser->forceFill([
                     'free_trial_status'      => 'activated',
                     'free_trial_activated_at'=> now(),
@@ -526,7 +492,7 @@ class BillingController extends Controller
             }
 
             // ── Mark trial as upgraded if this was an upgrade checkout ────
-            if ($freshUser && $isUpgrade && $freshUser->free_trial_status === 'pending_activation') {
+            if ($freshUser && $isUpgrade && $freshUser->free_trial_status === 'activated') {
                 $freshUser->forceFill(['free_trial_status' => 'upgraded'])->save();
             }
         });
@@ -608,31 +574,6 @@ class BillingController extends Controller
     /* ════════════════════════════════════════════════════════════
      *  PRIVATE HELPERS
      * ════════════════════════════════════════════════════════════ */
-
-    /**
-     * If Razorpay fails, reset free_trial_status back to null so the
-     * user remains eligible for the trial. Never permanently consume
-     * the trial due to a payment provider error.
-     */
-    private function rollbackTrialPendingState(User $user, bool $isTrial, bool $isUpgradeFromTrial): void
-    {
-        if ($isTrial || $isUpgradeFromTrial) {
-            $freshUser = $user->fresh();
-            if ($freshUser && $freshUser->free_trial_status === 'pending_activation') {
-                // For trial: reset to null (eligible again)
-                // For upgrade: restore to 'activated' (trial was live before upgrade attempt)
-                $freshUser->forceFill([
-                    'free_trial_status' => $isUpgradeFromTrial ? 'activated' : null,
-                ])->save();
-
-                Log::info('BillingController: rolled back trial pending state after Razorpay failure', [
-                    'user_id'    => $user->id,
-                    'is_trial'   => $isTrial,
-                    'is_upgrade' => $isUpgradeFromTrial,
-                ]);
-            }
-        }
-    }
 
     /**
      * Attempt to cancel the existing trial Razorpay subscription when a user upgrades.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Memory;
 use App\Services\Billing\ApiUsageAnalyticsService;
 use App\Services\Billing\BillingCatalogService;
+use App\Services\Billing\FreeTrialEligibilityService;
 use App\Services\Cache\TraceMemCache;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,6 +16,7 @@ class DashboardController extends Controller
         private readonly BillingCatalogService $catalog,
         private readonly ApiUsageAnalyticsService $analytics,
         private readonly TraceMemCache $cache,
+        private readonly FreeTrialEligibilityService $trialService,
     ) {}
 
     public function index(Request $request)
@@ -79,6 +81,7 @@ class DashboardController extends Controller
                     'is_cancelled'  => $subscription->isCancelled(),
                 ]
                 : null,
+            'founding_offer'  => $this->trialService->getFoundingOfferPresentation($user),
             'flash'           => [
                 'message'   => session('message'),
                 'plain_key' => session('plain_key'),

@@ -53,19 +53,13 @@ class PricingController extends Controller
             ->values()
             ->all();
 
-        // ── Founding Offer eligibility for public pricing display ──────────────────
-        //
-        // Guest users always see the ₹0 marketing price — the backend validates
-        // eligibility server-side at checkout time. Logged-in users only see the
-        // offer price if they are genuinely eligible (no prior subscriptions).
-        $user             = $request->user();
-        $trialEligiblePlan = $user
-            ? ($this->trialService->isEligible($user) ? FreeTrialEligibilityService::TRIAL_PLAN_SLUG : null)
-            : FreeTrialEligibilityService::TRIAL_PLAN_SLUG;   // guests: always show offer
+        // ── Founding Offer unified presentation logic ──────────────────────────
+        // Guests and eligible users will receive the presentation object.
+        $user = $request->user();
 
         return Inertia::render('public/Pricing', [
-            'plans'              => $plans,
-            'trial_eligible_plan'=> $trialEligiblePlan,
+            'plans'          => $plans,
+            'founding_offer' => $this->trialService->getFoundingOfferPresentation($user),
         ]);
     }
 }

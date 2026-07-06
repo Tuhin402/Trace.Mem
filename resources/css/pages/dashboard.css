@@ -143,6 +143,29 @@
     gap: 8px;
 }
 
+/* ── Founding Offer inline badge on PlanCard header ───────────── */
+.bl-founding-inline-badge {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(216, 180, 254, 0.15);
+    color: #a855f7;
+    border: 1px solid rgba(216, 180, 254, 0.3);
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── PlanCard highlighted border for Founding Offer ────────────── */
+.bl-plan-card.bl-plan-card-founding {
+    border-color: rgba(216, 180, 254, 0.6);
+    background: rgba(216, 180, 254, 0.03);
+}
+
 /* ── Recent activity list (new, shared with ApiKeys) ─────── */
 .db-activity-list {
     display: flex;

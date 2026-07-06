@@ -39,7 +39,16 @@ type Plan = {
 type PageProps = {
     auth?: { user?: unknown };
     plans: Plan[];
-    trial_eligible_plan?: string | null; // slug of the plan showing the Founding Offer
+    founding_offer?: {
+        eligible: boolean;
+        campaign_active: boolean;
+        show_founding_offer: boolean;
+        plan_slug: string;
+        display_price: number;
+        original_price: number;
+        next_price: number;
+        badge_text: string;
+    } | null;
 };
 
 type BillingCycle = 'monthly' | 'quarterly' | 'yearly';
@@ -190,7 +199,7 @@ export default function Pricing() {
     const isLoggedIn = !!props.auth?.user;
     const getStartedHref = isLoggedIn ? '/dashboard' : '/register';
     const plans: Plan[] = props.plans ?? [];
-    const trialEligiblePlan = props.trial_eligible_plan ?? null;
+    const foundingOffer = props.founding_offer ?? null;
 
     const [cycle, setCycle] = useState<BillingCycle>('monthly');
 
@@ -301,8 +310,8 @@ export default function Pricing() {
                                     {plans.map((plan) => {
                                         const isFoundingOffer =
                                             cycle === 'monthly' &&
-                                            plan.slug === 'semantic-starter' &&
-                                            trialEligiblePlan === 'semantic-starter';
+                                            foundingOffer?.show_founding_offer &&
+                                            plan.slug === foundingOffer.plan_slug;
 
                                         return (
                                         <th
@@ -311,8 +320,8 @@ export default function Pricing() {
                                             scope="col"
                                         >
                                             {isFoundingOffer && (
-                                                <div className="pricing-founding-badge" aria-label="Founding Offer">
-                                                    Founding Offer
+                                                <div className="pricing-founding-badge" aria-label={foundingOffer.badge_text}>
+                                                    {foundingOffer.badge_text}
                                                 </div>
                                             )}
                                             <div className="pricing-plan-mode">
@@ -322,9 +331,9 @@ export default function Pricing() {
                                             <div className="pricing-plan-price">
                                                 {isFoundingOffer ? (
                                                     <>
-                                                        <span className="pricing-trial-price">₹0</span>
+                                                        <span className="pricing-trial-price">₹{foundingOffer.display_price} today</span>
                                                         <span className="pricing-trial-original">
-                                                            ₹{plan.price_monthly.toFixed(0)}
+                                                            ₹{foundingOffer.original_price}
                                                         </span>
                                                     </>
                                                 ) : (
@@ -338,7 +347,7 @@ export default function Pricing() {
                                             </div>
                                             {isFoundingOffer && (
                                                 <div className="pricing-trial-note">
-                                                    ₹{plan.price_monthly.toFixed(0)}/month after first month
+                                                    Then ₹{foundingOffer.next_price}/month
                                                 </div>
                                             )}
                                             <div className="pricing-plan-desc">
@@ -401,8 +410,8 @@ export default function Pricing() {
                             {plans.map((plan) => {
                                 const isFoundingOffer =
                                     cycle === 'monthly' &&
-                                    plan.slug === 'semantic-starter' &&
-                                    trialEligiblePlan === 'semantic-starter';
+                                    foundingOffer?.show_founding_offer &&
+                                    plan.slug === foundingOffer.plan_slug;
 
                                 return (
                                 <div
@@ -413,7 +422,7 @@ export default function Pricing() {
                                     <div className="pricing-mobile-plan-header">
                                         {isFoundingOffer && (
                                             <div className="pricing-founding-badge">
-                                                Founding Offer
+                                                {foundingOffer.badge_text}
                                             </div>
                                         )}
                                         <div className="pricing-mobile-plan-mode">
@@ -423,9 +432,9 @@ export default function Pricing() {
                                         <div className="pricing-mobile-plan-price">
                                             {isFoundingOffer ? (
                                                 <>
-                                                    <span className="pricing-trial-price">₹0</span>
+                                                    <span className="pricing-trial-price">₹{foundingOffer.display_price} today</span>
                                                     <span className="pricing-trial-original">
-                                                        ₹{plan.price_monthly.toFixed(0)}
+                                                        ₹{foundingOffer.original_price}
                                                     </span>
                                                 </>
                                             ) : (
@@ -437,7 +446,7 @@ export default function Pricing() {
                                         </div>
                                         {isFoundingOffer && (
                                             <div className="pricing-trial-note">
-                                                ₹{plan.price_monthly.toFixed(0)}/month after first month
+                                                Then ₹{foundingOffer.next_price}/month
                                             </div>
                                         )}
                                         <p className="pricing-mobile-plan-desc">

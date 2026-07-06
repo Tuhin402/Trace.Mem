@@ -553,22 +553,22 @@
     display: inline-flex;
     font-family: var(--font-mono);
     font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 3px;
-    background: linear-gradient(135deg, rgba(225, 78, 246, 0.15), rgba(192, 132, 252, 0.1));
-    color: #e14ef6;
-    border: 1px solid rgba(225, 78, 246, 0.3);
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(216, 180, 254, 0.15);
+    color: #a855f7;
+    border: 1px solid rgba(216, 180, 254, 0.3);
     margin-left: 8px;
     vertical-align: middle;
 }
 
 /* ── PlanCard highlighted border for Founding Offer ────────────── */
 .bl-plan-card.bl-plan-card-founding {
-    border-color: rgba(225, 78, 246, 0.35);
-    box-shadow: 0 0 0 1px rgba(225, 78, 246, 0.15), 0 0 24px rgba(225, 78, 246, 0.06);
+    border-color: rgba(216, 180, 254, 0.6);
+    background: rgba(216, 180, 254, 0.03);
 }
 
 /* ── Trial cancel warning box ────────────────────────────── */

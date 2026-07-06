@@ -24,7 +24,7 @@ class FreeTrialEligibilityService
     public const TRIAL_CYCLE     = 'monthly';
 
     /** Terminal states — offer permanently consumed. */
-    private const CONSUMED_STATES = ['activated', 'completed', 'cancelled', 'upgraded', 'pending_activation'];
+    private const CONSUMED_STATES = ['activated', 'completed', 'cancelled', 'upgraded'];
 
     /* ═══════════════════════════════════════════════════════════════
      *  ELIGIBILITY CHECKS
@@ -142,6 +142,40 @@ class FreeTrialEligibilityService
             'trial_ends_at'       => $user->free_trial_ends_at?->format('M j, Y'),
             'autopay_begins_at'   => $user->free_trial_ends_at?->format('M j, Y'),
             'next_billing_amount' => $this->getMonthlyPrice($user),
+        ];
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     *  PRESENTATION
+     * ═══════════════════════════════════════════════════════════════ */
+
+    /**
+     * Unified presentation logic for the Founding Offer to prevent UI drift.
+     */
+    public function getFoundingOfferPresentation(?User $user): ?array
+    {
+        $eligible = $user ? $this->isEligible($user) : true;
+        
+        $plan = SubscriptionPlan::where('slug', self::TRIAL_PLAN_SLUG)->first();
+        
+        if (! $plan) {
+            return null;
+        }
+
+        // Toggle this to false when marketing wants to end the promotion,
+        // without affecting users who already consumed or activated it.
+        $campaignActive = true;
+        $showFoundingOffer = $campaignActive && $eligible;
+
+        return [
+            'eligible'            => $eligible,
+            'campaign_active'     => $campaignActive,
+            'show_founding_offer' => $showFoundingOffer,
+            'plan_slug'           => self::TRIAL_PLAN_SLUG,
+            'display_price'       => 0,
+            'original_price'      => (float) $plan->price_monthly,
+            'next_price'          => (float) $plan->price_monthly,
+            'badge_text'          => 'Founding Offer',
         ];
     }
 }

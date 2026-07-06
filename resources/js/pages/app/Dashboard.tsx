@@ -131,6 +131,16 @@ type PageProps = {
     } | null;
     selectedFilters?: { period?: string; month?: string };
     availableMonths?: string[];
+    founding_offer?: {
+        eligible: boolean;
+        campaign_active: boolean;
+        show_founding_offer: boolean;
+        plan_slug: string;
+        display_price: number;
+        original_price: number;
+        next_price: number;
+        badge_text: string;
+    } | null;
     flash?: {
         plain_key?: string;
         message?: string;
@@ -199,6 +209,7 @@ export default function Dashboard() {
     const todayInsights = props.todayInsights;
     const memories     = props.memories ?? [];
     const subscription = props.subscription ?? null;
+    const foundingOffer = props.founding_offer ?? null;
     const filters      = props.selectedFilters ?? {};
     const flashKey     = props.flash?.plain_key ?? null;
     const flashMsg     = props.flash?.message ?? null;
@@ -581,11 +592,19 @@ export default function Dashboard() {
                         </div>
 
                         <div className="db-billing-grid">
-                            {plans.map((p) => (
-                                <div className="app-plan-card" key={p.id}>
+                            {plans.map((p) => {
+                                const isFoundingOffer = foundingOffer?.show_founding_offer && p.slug === foundingOffer.plan_slug;
+
+                                return (
+                                <div className={`app-plan-card${isFoundingOffer ? ' bl-plan-card-founding' : ''}`} key={p.id}>
                                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
                                         <div>
-                                            <div className="app-plan-name">{p.name}</div>
+                                            <div className="app-plan-name">
+                                                {p.name}
+                                                {isFoundingOffer && (
+                                                    <span className="bl-founding-inline-badge">{foundingOffer.badge_text}</span>
+                                                )}
+                                            </div>
                                             {p.description && (
                                                 <div className="app-plan-desc" style={{ marginTop: '6px' }}>{p.description}</div>
                                             )}
@@ -610,25 +629,40 @@ export default function Dashboard() {
                                         {(['monthly', 'quarterly', 'yearly'] as const).map((cycle) => {
                                             const price = cycle === 'monthly' ? p.price_monthly : cycle === 'quarterly' ? p.price_quarterly : p.price_yearly;
                                             const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3mo' : '/ yr';
+                                            const isPrimary = cycle === 'yearly' || (cycle === 'monthly' && isFoundingOffer);
+
                                             return (
                                                 <button
                                                     key={cycle}
                                                     type="button"
-                                                    className={`app-btn ${cycle === 'yearly' ? 'app-btn-primary' : 'app-btn-ghost'}`}
+                                                    className={`app-btn ${isPrimary ? 'app-btn-primary' : 'app-btn-ghost'}`}
                                                     style={{ width: '100%', justifyContent: 'space-between' }}
                                                     disabled={checkingOut}
                                                     onClick={() => startCheckout(p.slug, cycle)}
                                                 >
                                                     <span style={{ textTransform: 'capitalize' }}>{cycle}</span>
-                                                    <span style={{ color: cycle === 'yearly' ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
-                                                        {fmtMoney(price)}<span style={{ opacity: 0.5, fontSize: '9px' }}> {suffix}</span>
-                                                    </span>
+                                                    {isFoundingOffer && cycle === 'monthly' ? (
+                                                        <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>
+                                                            ₹{foundingOffer.display_price} today
+                                                            <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '10px', marginLeft: '6px' }}>
+                                                                ₹{foundingOffer.original_price}
+                                                            </span>
+                                                            <span style={{ opacity: 0.65, fontSize: '9px', display: 'block', marginTop: '2px' }}>
+                                                                Then ₹{foundingOffer.next_price}/month
+                                                            </span>
+                                                        </span>
+                                                    ) : (
+                                                        <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
+                                                            {fmtMoney(price)}<span style={{ opacity: 0.5, fontSize: '9px' }}> {suffix}</span>
+                                                        </span>
+                                                    )}
                                                 </button>
                                             );
                                         })}
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}

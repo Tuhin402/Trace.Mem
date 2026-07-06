@@ -82,6 +82,16 @@ type PageProps = {
         autopay_begins_at: string | null;
         next_billing_amount: string; // e.g. "\u20b9199" — always from DB
     } | null;
+    founding_offer?: {
+        eligible: boolean;
+        campaign_active: boolean;
+        show_founding_offer: boolean;
+        plan_slug: string;
+        display_price: number;
+        original_price: number;
+        next_price: number;
+        badge_text: string;
+    } | null;
 };
 
 /* ── Razorpay global type ────────────────────────────────── */
@@ -165,16 +175,17 @@ function PlanCard({
     onSelect,
     checkingOut,
     trialInfo,
+    foundingOffer,
 }: {
     plan: SubscriptionPlan;
     currentPlanSlug?: string | null;
     onSelect: (slug: string, cycle: 'monthly' | 'quarterly' | 'yearly') => void;
     checkingOut: boolean;
     trialInfo?: PageProps['trial_info'];
+    foundingOffer?: PageProps['founding_offer'];
 }) {
     const isCurrent = plan.slug === currentPlanSlug;
-    // Show Founding Offer pricing for Semantic Starter monthly when eligible
-    const isFoundingOffer = trialInfo?.is_eligible && plan.slug === 'semantic-starter';
+    const isFoundingOffer = foundingOffer?.show_founding_offer && plan.slug === foundingOffer.plan_slug;
 
     return (
         <div className={`app-plan-card bl-plan-card${isCurrent ? ' app-plan-card-active' : ''}${isFoundingOffer ? ' bl-plan-card-founding' : ''}`}>
@@ -183,7 +194,7 @@ function PlanCard({
                     <div className="app-plan-name">
                         {plan.name}
                         {isFoundingOffer && (
-                            <span className="bl-founding-inline-badge">Founding Offer</span>
+                            <span className="bl-founding-inline-badge">{foundingOffer.badge_text}</span>
                         )}
                     </div>
                     {plan.description && (
@@ -218,10 +229,7 @@ function PlanCard({
                             : plan.price_yearly;
                     const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3 mo' : '/ yr';
                     const isPrimary = (cycle === 'yearly' && !isCurrent) || (cycle === 'monthly' && isFoundingOffer && !isCurrent);
-                    // Show ₹0 for monthly on Founding Offer eligible plans — price from prop
-                    const displayPrice = isFoundingOffer && cycle === 'monthly'
-                        ? '₹0'
-                        : money(price);
+                    
                     return (
                         <button
                             key={cycle}
@@ -232,16 +240,22 @@ function PlanCard({
                             disabled={checkingOut}
                         >
                             <span style={{ textTransform: 'capitalize' }}>{cycle}</span>
-                            <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
-                                {displayPrice}
-                                <span style={{ opacity: 0.5, fontSize: '10px' }}> {suffix}</span>
-                                {isFoundingOffer && cycle === 'monthly' && (
-                                    <span style={{ opacity: 0.65, fontSize: '9px', display: 'block' }}>
-                                        {/* next_billing_amount is always from DB */}
-                                        {trialInfo?.next_billing_amount}/mo after
+                            {isFoundingOffer && cycle === 'monthly' ? (
+                                <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>
+                                    ₹{foundingOffer.display_price} today
+                                    <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '10px', marginLeft: '6px' }}>
+                                        ₹{foundingOffer.original_price}
                                     </span>
-                                )}
-                            </span>
+                                    <span style={{ opacity: 0.65, fontSize: '9px', display: 'block', marginTop: '2px' }}>
+                                        Then ₹{foundingOffer.next_price}/month
+                                    </span>
+                                </span>
+                            ) : (
+                                <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
+                                    {money(price)}
+                                    <span style={{ opacity: 0.5, fontSize: '10px' }}> {suffix}</span>
+                                </span>
+                            )}
                         </button>
                     );
                 })}
@@ -375,6 +389,7 @@ export default function Billing() {
     const flashMsg     = props.flash?.message ?? null;
     const flashErr     = props.flash?.error ?? null;
     const trialInfo    = props.trial_info ?? null;
+    const foundingOffer = props.founding_offer ?? null;
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [showModal, setShowModal] = useState(false);

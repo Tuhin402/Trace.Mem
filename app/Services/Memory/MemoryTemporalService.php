@@ -118,12 +118,12 @@ class MemoryTemporalService
             return $this->finalize($normalized, $ordinal, $reference);
         }
 
-        if ($range = $this->detectRelativeRange($normalized, $reference, $scheduleLike)) {
-            return $this->finalize($normalized, $range, $reference);
-        }
-
         if ($informal = $this->detectInformalRelative($normalized, $reference, $scheduleLike)) {
             return $this->finalize($normalized, $informal, $reference);
+        }
+
+        if ($range = $this->detectRelativeRange($normalized, $reference, $scheduleLike)) {
+            return $this->finalize($normalized, $range, $reference);
         }
 
         if ($weekday = $this->detectRelativeWeekday($normalized, $reference, $scheduleLike)) {

@@ -243,14 +243,22 @@ class ChatOrchestrationService
             ],
             'context'    => [
                 'used'            => $contextUsed,
-                'memories'        => $contextMemories,
-                'tokens'          => $contextTokens,
                 'candidate_count' => $candidateCount,
                 'returned_count'  => $contextMemories,
+                'token_budget'    => (int) config('chat.context_token_budget', 800),
+                'tokens_used'     => $contextTokens,
                 'assembled_from'  => $assembledFrom,
             ],
-            'provider'   => 'nvidia',
-            'model'      => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
+            'memory_engine' => [
+                'provider'       => 'tracemem',
+                'engine'         => 'rule_engine',
+                'engine_version' => $decision->engineVersion,
+                'rule_version'   => $decision->ruleVersion,
+            ],
+            'chat_engine' => [
+                'provider'       => 'nvidia',
+                'model'          => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
+            ],
             'latency_ms' => [
                 'decision' => $decisionMs,
                 'memory'   => $memoryMs,

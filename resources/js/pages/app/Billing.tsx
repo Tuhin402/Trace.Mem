@@ -229,7 +229,7 @@ function PlanCard({
                             : plan.price_yearly;
                     const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3 mo' : '/ yr';
                     const isPrimary = (cycle === 'yearly' && !isCurrent) || (cycle === 'monthly' && isFoundingOffer && !isCurrent);
-                    
+
                     return (
                         <button
                             key={cycle}
@@ -382,13 +382,13 @@ export default function Billing() {
     const { props } = usePage<PageProps>();
     const { toast, Toasts } = useToast();
 
-    const plan         = props.plan ?? null;
-    const plans        = props.plans ?? [];
+    const plan = props.plan ?? null;
+    const plans = props.plans ?? [];
     const subscription = props.subscription ?? null;
-    const usage        = props.usage ?? null;
-    const flashMsg     = props.flash?.message ?? null;
-    const flashErr     = props.flash?.error ?? null;
-    const trialInfo    = props.trial_info ?? null;
+    const usage = props.usage ?? null;
+    const flashMsg = props.flash?.message ?? null;
+    const flashErr = props.flash?.error ?? null;
+    const trialInfo = props.trial_info ?? null;
     const foundingOffer = props.founding_offer ?? null;
 
     const [cancelOpen, setCancelOpen] = useState(false);
@@ -545,13 +545,13 @@ export default function Billing() {
                 <CheckCircle2 size={10} />
                 Founding Member
             </span>
-          )
+        )
         : (
             <span className="app-badge app-badge-active">
                 <CheckCircle2 size={10} />
                 Active
             </span>
-          );
+        );
 
     return (
         <>
@@ -826,6 +826,7 @@ export default function Billing() {
                                     onSelect={startCheckout}
                                     checkingOut={checkingOut}
                                     trialInfo={trialInfo}
+                                    foundingOffer={foundingOffer}
                                 />
                             ))}
                         </div>

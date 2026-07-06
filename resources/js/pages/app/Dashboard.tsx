@@ -149,9 +149,9 @@ type PageProps = {
 };
 
 const PERIODS = [
-    { key: 'all_time',    label: 'All Time' },
-    { key: 'this_month',  label: 'This Month' },
-    { key: 'last_month',  label: 'Last Month' },
+    { key: 'all_time', label: 'All Time' },
+    { key: 'this_month', label: 'This Month' },
+    { key: 'last_month', label: 'Last Month' },
     { key: 'year_to_date', label: 'Year to Date' },
 ] as const;
 
@@ -161,10 +161,10 @@ function formatMode(mode: string) {
 
 function methodColor(method: string): string {
     switch (method.toUpperCase()) {
-        case 'GET':    return 'var(--app-info)';
-        case 'POST':   return 'var(--app-success)';
+        case 'GET': return 'var(--app-info)';
+        case 'POST': return 'var(--app-success)';
         case 'DELETE': return 'var(--app-error)';
-        default:       return 'var(--app-text-dim)';
+        default: return 'var(--app-text-dim)';
     }
 }
 
@@ -201,19 +201,19 @@ export default function Dashboard() {
     const [checkingOut, setCheckingOut] = useState(false);
     const razorpayOpenRef = useRef(false);
 
-    const apiKeys      = props.apiKeys ?? [];
-    const plan         = props.plan ?? null;
-    const plans        = props.plans ?? [];
-    const usageStats   = props.usageStats;
-    const recentUsage  = props.usageLogs ?? [];
+    const apiKeys = props.apiKeys ?? [];
+    const plan = props.plan ?? null;
+    const plans = props.plans ?? [];
+    const usageStats = props.usageStats;
+    const recentUsage = props.usageLogs ?? [];
     const todayInsights = props.todayInsights;
-    const memories     = props.memories ?? [];
+    const memories = props.memories ?? [];
     const subscription = props.subscription ?? null;
     const foundingOffer = props.founding_offer ?? null;
-    const filters      = props.selectedFilters ?? {};
-    const flashKey     = props.flash?.plain_key ?? null;
-    const flashMsg     = props.flash?.message ?? null;
-    const flashErr     = props.flash?.error ?? null;
+    const filters = props.selectedFilters ?? {};
+    const flashKey = props.flash?.plain_key ?? null;
+    const flashMsg = props.flash?.message ?? null;
+    const flashErr = props.flash?.error ?? null;
 
     const activeKeys = apiKeys.filter((k) => !k.revoked_at);
 
@@ -328,7 +328,7 @@ export default function Dashboard() {
     };
 
     const activePeriod = filters.period ?? 'all_time';
-    const successRate  = fmtRate(usageStats?.successful_requests ?? 0, usageStats?.total_requests ?? 0);
+    const successRate = fmtRate(usageStats?.successful_requests ?? 0, usageStats?.total_requests ?? 0);
 
     return (
         <>
@@ -568,7 +568,7 @@ export default function Dashboard() {
                     <div className="app-panel-head db-promo-head" style={{ borderBottom: 'none', paddingBottom: 0 }}>
                         <div style={{ position: 'relative', zIndex: 1 }}>
                             <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <ShieldCheck size={18} style={{ color: 'var(--app-accent)' }} /> 
+                                <ShieldCheck size={18} style={{ color: 'var(--app-accent)' }} />
                                 Memory Portability & Migration
                             </h2>
                             <p style={{ maxWidth: '600px', marginTop: '4px' }}>
@@ -596,71 +596,71 @@ export default function Dashboard() {
                                 const isFoundingOffer = foundingOffer?.show_founding_offer && p.slug === foundingOffer.plan_slug;
 
                                 return (
-                                <div className={`app-plan-card${isFoundingOffer ? ' bl-plan-card-founding' : ''}`} key={p.id}>
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                                        <div>
-                                            <div className="app-plan-name">
-                                                {p.name}
-                                                {isFoundingOffer && (
-                                                    <span className="bl-founding-inline-badge">{foundingOffer.badge_text}</span>
+                                    <div className={`app-plan-card${isFoundingOffer ? ' bl-plan-card-founding' : ''}`} key={p.id}>
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                                            <div>
+                                                <div className="app-plan-name">
+                                                    {p.name}
+                                                    {isFoundingOffer && (
+                                                        <span className="bl-founding-inline-badge">{foundingOffer.badge_text}</span>
+                                                    )}
+                                                </div>
+                                                {p.description && (
+                                                    <div className="app-plan-desc" style={{ marginTop: '6px' }}>{p.description}</div>
                                                 )}
                                             </div>
-                                            {p.description && (
-                                                <div className="app-plan-desc" style={{ marginTop: '6px' }}>{p.description}</div>
-                                            )}
+                                        </div>
+
+                                        <div className="app-plan-meta">
+                                            {[
+                                                ['Mode', formatMode(p.base_mode)],
+                                                ['Memory writes', `${fmtNum(p.memory_write_limit)} / mo`],
+                                                ['Requests', `${fmtNum(p.request_limit)} / mo`],
+                                                ['API keys', String(p.api_key_limit)],
+                                            ].map(([k, v]) => (
+                                                <div className="app-plan-meta-row" key={k}>
+                                                    <span className="app-plan-meta-key">{k}</span>
+                                                    <span className="app-plan-meta-val">{v}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="db-price-grid">
+                                            {(['monthly', 'quarterly', 'yearly'] as const).map((cycle) => {
+                                                const price = cycle === 'monthly' ? p.price_monthly : cycle === 'quarterly' ? p.price_quarterly : p.price_yearly;
+                                                const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3mo' : '/ yr';
+                                                const isPrimary = cycle === 'yearly' || (cycle === 'monthly' && isFoundingOffer);
+
+                                                return (
+                                                    <button
+                                                        key={cycle}
+                                                        type="button"
+                                                        className={`app-btn ${isPrimary ? 'app-btn-primary' : 'app-btn-ghost'}`}
+                                                        style={{ width: '100%', justifyContent: 'space-between' }}
+                                                        disabled={checkingOut}
+                                                        onClick={() => startCheckout(p.slug, cycle)}
+                                                    >
+                                                        <span style={{ textTransform: 'capitalize' }}>{cycle}</span>
+                                                        {isFoundingOffer && cycle === 'monthly' ? (
+                                                            <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>
+                                                                ₹{foundingOffer.display_price} today
+                                                                <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '10px', marginLeft: '6px' }}>
+                                                                    ₹{foundingOffer.original_price}
+                                                                </span>
+                                                                <span style={{ opacity: 0.65, fontSize: '9px', display: 'block', marginTop: '2px' }}>
+                                                                    Then ₹{foundingOffer.next_price}/month
+                                                                </span>
+                                                            </span>
+                                                        ) : (
+                                                            <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
+                                                                {fmtMoney(price)}<span style={{ opacity: 0.5, fontSize: '9px' }}> {suffix}</span>
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
-
-                                    <div className="app-plan-meta">
-                                        {[
-                                            ['Mode',          formatMode(p.base_mode)],
-                                            ['Memory writes', `${fmtNum(p.memory_write_limit)} / mo`],
-                                            ['Requests',      `${fmtNum(p.request_limit)} / mo`],
-                                            ['API keys',      String(p.api_key_limit)],
-                                        ].map(([k, v]) => (
-                                            <div className="app-plan-meta-row" key={k}>
-                                                <span className="app-plan-meta-key">{k}</span>
-                                                <span className="app-plan-meta-val">{v}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="db-price-grid">
-                                        {(['monthly', 'quarterly', 'yearly'] as const).map((cycle) => {
-                                            const price = cycle === 'monthly' ? p.price_monthly : cycle === 'quarterly' ? p.price_quarterly : p.price_yearly;
-                                            const suffix = cycle === 'monthly' ? '/ mo' : cycle === 'quarterly' ? '/ 3mo' : '/ yr';
-                                            const isPrimary = cycle === 'yearly' || (cycle === 'monthly' && isFoundingOffer);
-
-                                            return (
-                                                <button
-                                                    key={cycle}
-                                                    type="button"
-                                                    className={`app-btn ${isPrimary ? 'app-btn-primary' : 'app-btn-ghost'}`}
-                                                    style={{ width: '100%', justifyContent: 'space-between' }}
-                                                    disabled={checkingOut}
-                                                    onClick={() => startCheckout(p.slug, cycle)}
-                                                >
-                                                    <span style={{ textTransform: 'capitalize' }}>{cycle}</span>
-                                                    {isFoundingOffer && cycle === 'monthly' ? (
-                                                        <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>
-                                                            ₹{foundingOffer.display_price} today
-                                                            <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '10px', marginLeft: '6px' }}>
-                                                                ₹{foundingOffer.original_price}
-                                                            </span>
-                                                            <span style={{ opacity: 0.65, fontSize: '9px', display: 'block', marginTop: '2px' }}>
-                                                                Then ₹{foundingOffer.next_price}/month
-                                                            </span>
-                                                        </span>
-                                                    ) : (
-                                                        <span style={{ color: isPrimary ? 'inherit' : 'var(--app-accent)', fontFamily: 'var(--font-mono)' }}>
-                                                            {fmtMoney(price)}<span style={{ opacity: 0.5, fontSize: '9px' }}> {suffix}</span>
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
                                 );
                             })}
                         </div>
@@ -683,13 +683,13 @@ export default function Dashboard() {
                             </div>
                             <div className="obs-empty-title">Start sending data to unlock insights</div>
                             <div className="obs-empty-desc">
-                                Once your API keys are active, this section will populate with a premium Memory Inspector 
+                                Once your API keys are active, this section will populate with a premium Memory Inspector
                                 and detailed usage analytics for the current day.
                             </div>
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '16px' }}>
-                            
+
                             {/* Today's Insights */}
                             {todayInsights && (
                                 <div style={{ paddingBottom: '24px', borderBottom: '1px solid var(--tm-border)' }}>
@@ -715,7 +715,7 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
                                         <span className="obs-subtitle">Top Endpoints (Today)</span>
                                         <Link href="/logs?tab=insights" className="app-panel-link">
@@ -747,7 +747,7 @@ export default function Dashboard() {
                                         View all <ArrowRight size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
                                     </Link>
                                 </div>
-                                
+
                                 {memories.length === 0 ? (
                                     <div className="app-empty-state" style={{ marginTop: '16px' }}>
                                         <div className="app-empty-state-title">No memories stored yet</div>
@@ -816,8 +816,8 @@ export default function Dashboard() {
                                                 background: row.status_code >= 500
                                                     ? 'var(--app-error)'
                                                     : row.status_code >= 400
-                                                    ? 'var(--app-warning)'
-                                                    : 'var(--app-success)',
+                                                        ? 'var(--app-warning)'
+                                                        : 'var(--app-success)',
                                             }}
                                         />
                                         <div className="db-activity-body">

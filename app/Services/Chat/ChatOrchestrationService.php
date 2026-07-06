@@ -2,6 +2,9 @@
 
 namespace App\Services\Chat;
 
+use App\Services\Memory\Decision\DecisionContext;
+use App\Services\Memory\Decision\DecisionResult;
+use App\Services\Memory\Decision\MemoryDecisionEngine;
 use App\Services\Memory\MemoryContextAssemblyService;
 use App\Services\Memory\MemoryIngestionOrchestrator;
 use Illuminate\Support\Facades\Http;
@@ -14,7 +17,7 @@ use Throwable;
  *
  * Execution order (non-dry-run):
  *   1. Idempotency check  → return cached response immediately if hit
- *   2. Classify message   → HybridClassifierService (heuristic or NIM)
+ *   2. Decision           → MemoryDecisionEngine (deterministic, no AI, no HTTP)
  *   3. Memory ingestion   → MemoryIngestionOrchestrator (existing, unchanged)
  *   4. Context assembly   → MemoryContextAssemblyService (existing, unchanged)
  *   5. Prompt build       → PromptAssemblyService
@@ -28,15 +31,18 @@ use Throwable;
  *   continues the pipeline (with degraded output) rather than aborting.
  *   Only step 6 (LLM) can produce a non-200 response (502).
  *
+ * Memory infrastructure guarantee:
+ *   Steps 1–4 are fully operational even when NVIDIA/OpenAI are unreachable.
+ *   The MemoryDecisionEngine performs ZERO external calls.
+ *
  * One LLM call guaranteed:
- *   The hybrid classifier adds zero NIM calls for heuristic-matched messages.
- *   Even for NIM-classified messages, the classifier call is separate and cheap
- *   (max_tokens=100, temperature=0). The main chat NIM call is always exactly one.
+ *   The decision engine adds zero LLM calls. The chat NIM call is always
+ *   exactly one.
  */
 class ChatOrchestrationService
 {
     public function __construct(
-        private readonly HybridClassifierService      $classifier,
+        private readonly MemoryDecisionEngine         $decisionEngine,
         private readonly IdempotencyStore             $idempotencyStore,
         private readonly MemoryIngestionOrchestrator  $orchestrator,
         private readonly MemoryContextAssemblyService $contextAssembler,
@@ -79,57 +85,68 @@ class ChatOrchestrationService
             }
         }
 
-        // ── 2. Dry-run: classifier only, zero side effects ───────────────────
-        if ($dryRun) {
-            $classifierStart = hrtime(true);
-            $decision        = $this->safeClassify($message, $memoryMode);
-            $classifierMs    = $this->elapsedMs($classifierStart);
+        // ── 2. Decision (deterministic, no AI) ───────────────────────────────
+        $decisionContext = new DecisionContext(
+            endpoint:   DecisionContext::ENDPOINT_CHAT,
+            memoryMode: $memoryMode,
+            isDryRun:   $dryRun,
+        );
 
+        $decisionStart   = hrtime(true);
+        $decision        = $this->safeDecide($message, $decisionContext);
+        $decisionMs      = $this->elapsedMs($decisionStart);
+        $decisionWarning = $decision->via === 'decision_error' ? ($decision->reason) : null;
+
+        // ── 2a. Dry-run: decision only, zero side effects ────────────────────
+        if ($dryRun) {
             Log::info('chat.latency', [
-                'request_id'     => $requestId,
+                'request_id'   => $requestId,
                 'prompt_version' => config('chat.prompt_version', 'v1'),
-                'dry_run'        => true,
-                'classifier_via' => $decision['via'],
-                'classifier_ms'  => $classifierMs,
-                'total_ms'       => $classifierMs,
-                'http_status'    => 200,
+                'dry_run'      => true,
+                'decision_via' => $decision->via,
+                'decision_ms'  => $decisionMs,
+                'total_ms'     => $decisionMs,
+                'http_status'  => 200,
             ]);
 
             return [
                 'request_id'     => $requestId,
                 'dry_run'        => true,
-                'would_remember' => $decision['remember'],
-                'type'           => $decision['type'],
-                'reason'         => $decision['reason'],
-                'via'            => $decision['via'],
+                'would_remember' => $decision->remember,
+                'type'           => $decision->type,
+                'reason'         => $decision->reason,
+                'reason_code'    => $decision->reasonCode,
+                'via'            => $decision->via,
+                'confidence'     => $decision->confidence,
+                'matched_rules'  => $decision->matchedRules,
             ];
         }
 
-        // ── 3. Classifier ─────────────────────────────────────────────────────
-        $classifierStart   = hrtime(true);
-        $decision          = $this->safeClassify($message, $memoryMode);
-        $classifierMs      = $this->elapsedMs($classifierStart);
-        $classifierWarning = $decision['_warning'] ?? null;
-
-        // ── 4. Memory ingestion ───────────────────────────────────────────────
+        // ── 3. Memory ingestion ───────────────────────────────────────────────
         $memorySaved   = false;
         $memoryType    = null;
         $memoryWarning = null;
         $memoryMs      = 0;
 
-        if ($decision['remember'] && $memoryMode !== 'off') {
+        if ($decision->remember && $memoryMode !== 'off') {
             $memoryStart = hrtime(true);
             try {
-                $this->orchestrator->ingest($tenantId, $userId, $message, 'ai_first');
+                $this->orchestrator->ingest(
+                    $tenantId,
+                    $userId,
+                    $message,
+                    'ai_first',
+                    $decision->toMemoryMetadata()
+                );
                 $memorySaved = true;
-                $memoryType  = $decision['type'];
+                $memoryType  = $decision->type;
             } catch (Throwable $e) {
                 $memoryWarning = 'Memory storage failed; chat continues.';
             }
             $memoryMs = $this->elapsedMs($memoryStart);
         }
 
-        // ── 5. Context assembly ───────────────────────────────────────────────
+        // ── 4. Context assembly ───────────────────────────────────────────────
         $contextText     = '';
         $contextUsed     = false;
         $contextMemories = 0;
@@ -163,11 +180,11 @@ class ChatOrchestrationService
             $contextMs = $this->elapsedMs($contextStart);
         }
 
-        // ── 6. Prompt assembly ────────────────────────────────────────────────
+        // ── 5. Prompt assembly ────────────────────────────────────────────────
         $systemPrompt = $this->promptAssembler->buildSystemPrompt($contextText, $contextUsed);
         $messages     = $this->promptAssembler->buildMessages($systemPrompt, $message);
 
-        // ── 7. NIM chat call (ONE call, 30 s timeout, no retry) ──────────────
+        // ── 6. NIM chat call (ONE call, 30 s timeout, no retry) ──────────────
         $llmStart = hrtime(true);
 
         try {
@@ -189,7 +206,7 @@ class ChatOrchestrationService
             if (! $nimResponse->successful()) {
                 return $this->fail502(
                     $requestId, $decision, $memorySaved, $memoryType,
-                    $classifierMs, $decision['via'], $memoryMs,
+                    $decisionMs, $memoryMs,
                     $contextUsed, $contextMemories, $contextMs,
                     $llmMs, $totalMs,
                     $apiKeyId, $idempotencyKey
@@ -204,7 +221,7 @@ class ChatOrchestrationService
 
             return $this->fail502(
                 $requestId, $decision, $memorySaved, $memoryType,
-                $classifierMs, $decision['via'], $memoryMs,
+                $decisionMs, $memoryMs,
                 $contextUsed, $contextMemories, $contextMs,
                 $llmMs, $totalMs,
                 $apiKeyId, $idempotencyKey
@@ -213,15 +230,16 @@ class ChatOrchestrationService
 
         $totalMs = $this->elapsedMs($totalStart);
 
-        // ── 8. Build success response ─────────────────────────────────────────
+        // ── 7. Build success response ─────────────────────────────────────────
         $response = [
             'request_id' => $requestId,
             'reply'      => $reply,
             'memory'     => [
-                'saved'  => $memorySaved,
-                'type'   => $memoryType,
-                'reason' => $decision['reason'],
-                'via'    => $decision['via'],
+                'saved'       => $memorySaved,
+                'type'        => $memoryType,
+                'reason'      => $decision->reason,
+                'reason_code' => $decision->reasonCode,
+                'via'         => $decision->via,
             ],
             'context'    => [
                 'used'            => $contextUsed,
@@ -234,53 +252,55 @@ class ChatOrchestrationService
             'provider'   => 'nvidia',
             'model'      => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
             'latency_ms' => [
-                'classifier' => $classifierMs,
-                'memory'     => $memoryMs,
-                'context'    => $contextMs,
-                'llm'        => $llmMs,
-                'total'      => $totalMs,
+                'decision' => $decisionMs,
+                'memory'   => $memoryMs,
+                'context'  => $contextMs,
+                'llm'      => $llmMs,
+                'total'    => $totalMs,
             ],
         ];
 
         // debug block — only when explicitly requested
         if ($debug) {
             $warnings = array_values(array_filter([
-                $classifierWarning,
+                $decisionWarning,
                 $memoryWarning,
                 $contextWarning,
             ]));
 
             $response['debug'] = [
-                'prompt_version'        => config('chat.prompt_version', 'v1'),
-                'classifier_confidence' => $decision['confidence'],
-                'classifier_via'        => $decision['via'],
-                'context_segments'      => $contextText !== '' ? array_filter(explode("\n", trim($contextText))) : [],
-                'circuit_breaker'       => $this->classifier->getCircuitState(),
-                'warnings'              => $warnings,
+                'prompt_version'      => config('chat.prompt_version', 'v1'),
+                'decision_confidence' => $decision->confidence,
+                'decision_via'        => $decision->via,
+                'matched_rules'       => $decision->matchedRules,
+                'reason_code'         => $decision->reasonCode,
+                'engine_version'      => $decision->engineVersion,
+                'rule_version'        => $decision->ruleVersion,
+                'context_segments'    => $contextText !== '' ? array_filter(explode("\n", trim($contextText))) : [],
+                'warnings'            => $warnings,
             ];
         }
 
-        // ── 9. Idempotency + latency log ──────────────────────────────────────
+        // ── 8. Idempotency + latency log ──────────────────────────────────────
         if ($idempotencyKey !== null) {
             $this->idempotencyStore->put($apiKeyId, $idempotencyKey, $response);
         }
 
         Log::info('chat.latency', [
-            'request_id'        => $requestId,
-            'prompt_version'    => config('chat.prompt_version', 'v1'),
-            'dry_run'           => false,
-            'classifier_via'    => $decision['via'],
-            'classifier_ms'     => $classifierMs,
-            'memory_saved'      => $memorySaved,
-            'memory_ms'         => $memoryMs,
-            'context_used'      => $contextUsed,
-            'context_memories'  => $contextMemories,
-            'context_ms'        => $contextMs,
-            'circuit_state'     => $this->classifier->getCircuitState(),
-            'llm_ms'            => $llmMs,
-            'total_ms'          => $totalMs,
-            'http_status'       => 200,
-            'idempotency_hit'   => false,
+            'request_id'       => $requestId,
+            'prompt_version'   => config('chat.prompt_version', 'v1'),
+            'dry_run'          => false,
+            'decision_via'     => $decision->via,
+            'decision_ms'      => $decisionMs,
+            'memory_saved'     => $memorySaved,
+            'memory_ms'        => $memoryMs,
+            'context_used'     => $contextUsed,
+            'context_memories' => $contextMemories,
+            'context_ms'       => $contextMs,
+            'llm_ms'           => $llmMs,
+            'total_ms'         => $totalMs,
+            'http_status'      => 200,
+            'idempotency_hit'  => false,
         ]);
 
         return $response;
@@ -289,35 +309,40 @@ class ChatOrchestrationService
     // ── Private helpers ───────────────────────────────────────────────────────
 
     /**
-     * Wraps classifier in a try/catch so a thrown exception never fails the request.
+     * Wraps engine in try/catch so a thrown exception never fails the request.
      */
-    private function safeClassify(string $message, string $mode): array
+    private function safeDecide(string $message, DecisionContext $context): DecisionResult
     {
         try {
-            return $this->classifier->classify($message, $mode);
+            return $this->decisionEngine->decide($message, $context);
         } catch (Throwable $e) {
-            return [
-                'remember'   => false,
-                'type'       => null,
-                'reason'     => 'Classifier exception; defaulting to no-remember.',
-                'confidence' => 0.0,
-                'via'        => 'classifier_error',
-                '_warning'   => 'Classifier threw: ' . $e->getMessage(),
-            ];
+            // Return a safe default — never remember on engine error
+            return new DecisionResult(
+                remember:       false,
+                type:           null,
+                confidence:     0.0,
+                matchedRules:   [],
+                weights:        [],
+                reason:         'Decision engine exception; defaulting to no-remember.',
+                reasonCode:     'DECISION_ENGINE_ERROR',
+                via:            'decision_error',
+                ruleVersion:    (int) config('memory_rules.rule_version', 1),
+                engineVersion:  (int) config('memory_rules.engine_version', 1),
+                volatility:     'volatile',
+            );
         }
     }
 
     /**
      * Build a 502 failure payload, cache it in idempotency store, and return it.
-     * Includes memory state at time of failure so developers can see what did succeed.
+     * Memory state at time of failure is included so developers can see what succeeded.
      */
     private function fail502(
         string  $requestId,
-        array   $decision,
+        DecisionResult $decision,
         bool    $memorySaved,
         ?string $memoryType,
-        int     $classifierMs,
-        string  $classifierVia,
+        int     $decisionMs,
         int     $memoryMs,
         bool    $contextUsed,
         int     $contextMemories,
@@ -331,14 +356,13 @@ class ChatOrchestrationService
             'request_id'       => $requestId,
             'prompt_version'   => config('chat.prompt_version', 'v1'),
             'dry_run'          => false,
-            'classifier_via'   => $classifierVia,
-            'classifier_ms'    => $classifierMs,
+            'decision_via'     => $decision->via,
+            'decision_ms'      => $decisionMs,
             'memory_saved'     => $memorySaved,
             'memory_ms'        => $memoryMs,
             'context_used'     => $contextUsed,
             'context_memories' => $contextMemories,
             'context_ms'       => $contextMs,
-            'circuit_state'    => $this->classifier->getCircuitState(),
             'llm_ms'           => $llmMs,
             'total_ms'         => $totalMs,
             'http_status'      => 502,
@@ -350,10 +374,11 @@ class ChatOrchestrationService
             'error'         => 'upstream_llm_unavailable',
             'message'       => 'The AI model is temporarily unavailable. Memory operations completed successfully.',
             'memory'        => [
-                'saved'  => $memorySaved,
-                'type'   => $memoryType,
-                'reason' => $decision['reason'],
-                'via'    => $decision['via'],
+                'saved'       => $memorySaved,
+                'type'        => $memoryType,
+                'reason'      => $decision->reason,
+                'reason_code' => $decision->reasonCode,
+                'via'         => $decision->via,
             ],
             '__http_status' => 502,
         ];

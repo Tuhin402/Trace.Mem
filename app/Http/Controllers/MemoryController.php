@@ -8,6 +8,8 @@ use App\Services\Memory\MemoryService;
 use App\Services\Memory\MemorySemanticSegmentationService;
 use App\Services\Memory\MemoryConflictService;
 use App\Services\Memory\MemoryScopeResolver;
+use App\Services\Memory\Decision\DecisionContext;
+use App\Services\Memory\Decision\MemoryDecisionEngine;
 use App\Services\MemoryExtractionService;
 use App\Services\HealthService;
 
@@ -146,4 +148,49 @@ class MemoryController extends Controller
             ),
         ]);
     }
-} 
+
+    /**
+     * POST /api/v1/debug/memory-decision
+     *
+     * Internal explainability endpoint — gated by memory:debug API key scope.
+     * Returns the full decision report including every rule evaluated, weights,
+     * matched rules, confidence, reason code, and elapsed microseconds.
+     *
+     * No memory is stored. No side effects. Pure decision preview.
+     *
+     * Example response:
+     * {
+     *   "remember": true,
+     *   "type": "fact",
+     *   "confidence": 1.0,
+     *   "reason_code": "IDENTITY_NAME_MATCH",
+     *   "matched_rules": ["identity.name"],
+     *   "weights": [100],
+     *   "evaluated_rules": [
+     *     {"id": "negative.roleplay", "matched": false, ...},
+     *     {"id": "identity.name", "matched": true, "weight": 100, "terminal": true}
+     *   ],
+     *   "elapsed_us": 312
+     * }
+     */
+    public function debugMemoryDecision(Request $request, MemoryDecisionEngine $engine)
+    {
+        $this->assertDebugScope($request);
+
+        $data = $request->validate([
+            'message'      => ['required', 'string', 'max:10000'],
+            'memory_mode'  => ['sometimes', 'string', 'in:auto,force,off'],
+        ]);
+
+        $context = new DecisionContext(
+            endpoint:   DecisionContext::ENDPOINT_CHAT,
+            memoryMode: $data['memory_mode'] ?? 'auto',
+            isDryRun:   true,
+        );
+
+        // trace=true forces full per-rule evaluation log
+        $result = $engine->decide($data['message'], $context, trace: true);
+
+        return response()->json($result->toDebugArray());
+    } 
+}

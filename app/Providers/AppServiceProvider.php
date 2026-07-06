@@ -8,6 +8,9 @@ use App\Services\Auth\SubscriptionEntitlementService;
 use App\Services\Billing\FreeTrialAnalyticsService;
 use App\Services\Billing\FreeTrialEligibilityService;
 use App\Services\Cache\TraceMemCache;
+use App\Services\Memory\Decision\DecisionTelemetry;
+use App\Services\Memory\Decision\MemoryDecisionEngine;
+use App\Services\Memory\Decision\MemoryRuleRegistry;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +64,19 @@ class AppServiceProvider extends ServiceProvider
 
         // FreeTrialAnalyticsService — fire-and-forget event tracker; singleton.
         $this->app->singleton(FreeTrialAnalyticsService::class);
+
+        // ── MemoryDecisionEngine infrastructure ───────────────────────────────
+        // MemoryRuleRegistry — singleton so config/memory_rules.php is parsed
+        // exactly once per request (or once per CLI invocation). Zero DB, zero HTTP.
+        $this->app->singleton(MemoryRuleRegistry::class);
+
+        // DecisionTelemetry — singleton (reads enabled flag once, reuses across calls).
+        $this->app->singleton(DecisionTelemetry::class);
+
+        // MemoryDecisionEngine — auto-resolved by container; depends on:
+        //   MemoryNormalizationService, CodeDetectionService (both stateless),
+        //   MemoryRuleRegistry (singleton), DecisionTelemetry (singleton).
+        $this->app->singleton(MemoryDecisionEngine::class);
     }
 
     /**

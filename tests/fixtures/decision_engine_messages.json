@@ -1,0 +1,156 @@
+[
+  {"message": "My name is Alex", "expected_remember": true, "expected_reason_code": "IDENTITY_NAME_MATCH"},
+  {"message": "Call me Sarah", "expected_remember": true, "expected_reason_code": "IDENTITY_NAME_MATCH"},
+  {"message": "Everyone calls me Dev", "expected_remember": true, "expected_reason_code": "IDENTITY_NAME_MATCH"},
+  {"message": "My first name is Mohammed", "expected_remember": true, "expected_reason_code": "IDENTITY_NAME_MATCH"},
+  {"message": "My username is tuhin402", "expected_remember": true, "expected_reason_code": "IDENTITY_NAME_MATCH"},
+
+  {"message": "My pronouns are they/them", "expected_remember": true, "expected_reason_code": "IDENTITY_PRONOUN_MATCH"},
+  {"message": "I use she/her pronouns", "expected_remember": true, "expected_reason_code": "IDENTITY_PRONOUN_MATCH"},
+  {"message": "Please use he/him when referring to me", "expected_remember": true, "expected_reason_code": "IDENTITY_PRONOUN_MATCH"},
+
+  {"message": "My birthday is March 15", "expected_remember": true, "expected_reason_code": "IDENTITY_BIRTHDAY_MATCH"},
+  {"message": "I'm 28 years old", "expected_remember": true, "expected_reason_code": "IDENTITY_BIRTHDAY_MATCH"},
+  {"message": "I was born on January 4th", "expected_remember": true, "expected_reason_code": "IDENTITY_BIRTHDAY_MATCH"},
+
+  {"message": "I live in Dhaka", "expected_remember": true, "expected_reason_code": "FACT_LOCATION_MATCH"},
+  {"message": "I'm based in London", "expected_remember": true, "expected_reason_code": "FACT_LOCATION_MATCH"},
+  {"message": "My timezone is IST", "expected_remember": true, "expected_reason_code": "FACT_LOCATION_MATCH"},
+  {"message": "I moved to Berlin last year", "expected_remember": true, "expected_reason_code": "FACT_LOCATION_MATCH"},
+  {"message": "I'm from Kolkata", "expected_remember": true, "expected_reason_code": "FACT_LOCATION_MATCH"},
+
+  {"message": "I work at Google", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+  {"message": "My job is software architect", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+  {"message": "I'm employed at a startup", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+  {"message": "My employer is Microsoft", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+
+  {"message": "I'm a software engineer", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+  {"message": "I'm a senior developer", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+  {"message": "I work as a data scientist", "expected_remember": true, "expected_reason_code": "FACT_JOB_MATCH"},
+
+  {"message": "I'm vegetarian", "expected_remember": true, "expected_reason_code": "FACT_DIETARY_MATCH"},
+  {"message": "I'm vegan", "expected_remember": true, "expected_reason_code": "FACT_DIETARY_MATCH"},
+  {"message": "I'm allergic to peanuts", "expected_remember": true, "expected_reason_code": "FACT_DIETARY_MATCH"},
+  {"message": "I'm lactose intolerant", "expected_remember": true, "expected_reason_code": "FACT_DIETARY_MATCH"},
+  {"message": "I don't eat meat", "expected_remember": true, "expected_reason_code": "FACT_DIETARY_MATCH"},
+  {"message": "I have a nut allergy", "expected_remember": true, "expected_reason_code": "FACT_DIETARY_MATCH"},
+
+  {"message": "I like React", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+  {"message": "I love TypeScript", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+  {"message": "I prefer PostgreSQL", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+  {"message": "I enjoy working with Laravel", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+  {"message": "My go-to is VSCode", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+  {"message": "My favourite editor is Neovim", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+  {"message": "My preferred framework is Django", "expected_remember": true, "expected_reason_code": "PREFERENCE_MATCH"},
+
+  {"message": "I hate PHP", "expected_remember": true, "expected_reason_code": "PREFERENCE_NEGATIVE_MATCH"},
+  {"message": "I avoid using Windows", "expected_remember": true, "expected_reason_code": "PREFERENCE_NEGATIVE_MATCH"},
+  {"message": "I can't stand Angular", "expected_remember": true, "expected_reason_code": "PREFERENCE_NEGATIVE_MATCH"},
+  {"message": "I never use jQuery", "expected_remember": true, "expected_reason_code": "PREFERENCE_NEGATIVE_MATCH"},
+  {"message": "I don't like MongoDB", "expected_remember": true, "expected_reason_code": "PREFERENCE_NEGATIVE_MATCH"},
+
+  {"message": "Always use bullet points in your responses", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+  {"message": "Never include code unless I ask", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+  {"message": "Use tabs for indentation", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+  {"message": "Respond briefly", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+  {"message": "Don't explain things I already know", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+  {"message": "Keep your answers concise", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+  {"message": "I don't want long answers", "expected_remember": true, "expected_reason_code": "CONSTRAINT_MATCH"},
+
+  {"message": "I know how to build APIs in Go", "expected_remember": true, "expected_reason_code": "SKILL_MATCH"},
+  {"message": "I can write Rust", "expected_remember": true, "expected_reason_code": "SKILL_MATCH"},
+  {"message": "I've built microservices with Docker", "expected_remember": true, "expected_reason_code": "SKILL_MATCH"},
+  {"message": "I created a SaaS platform", "expected_remember": true, "expected_reason_code": "SKILL_MATCH"},
+  {"message": "I maintain an open source library", "expected_remember": true, "expected_reason_code": "SKILL_MATCH"},
+  {"message": "I'm proficient in Python", "expected_remember": true, "expected_reason_code": "SKILL_MATCH"},
+
+  {"message": "I usually start my day with coffee and code review", "expected_remember": true, "expected_reason_code": "HABIT_MATCH"},
+  {"message": "I often use TDD in my projects", "expected_remember": true, "expected_reason_code": "HABIT_MATCH"},
+  {"message": "I rarely use IDEs, I prefer terminal editors", "expected_remember": true, "expected_reason_code": "HABIT_MATCH"},
+  {"message": "I typically write tests first", "expected_remember": true, "expected_reason_code": "HABIT_MATCH"},
+
+  {"message": "My goal is to learn Rust this year", "expected_remember": true, "expected_reason_code": "GOAL_MATCH"},
+  {"message": "I want to build a SaaS product", "expected_remember": true, "expected_reason_code": "GOAL_MATCH"},
+  {"message": "I'm planning to switch to Go", "expected_remember": true, "expected_reason_code": "GOAL_MATCH"},
+  {"message": "My objective is to get promoted to staff engineer", "expected_remember": true, "expected_reason_code": "GOAL_MATCH"},
+
+  {"message": "I use Laravel for backend development", "expected_remember": true, "expected_reason_code": "TOOL_FRAMEWORK_MATCH"},
+  {"message": "I build with React", "expected_remember": true, "expected_reason_code": "TOOL_FRAMEWORK_MATCH"},
+  {"message": "I've switched to Next.js", "expected_remember": true, "expected_reason_code": "TOOL_FRAMEWORK_MATCH"},
+
+  {"message": "I use VSCode as my editor", "expected_remember": true, "expected_reason_code": "TOOL_EDITOR_MATCH"},
+  {"message": "I prefer PHPStorm", "expected_remember": true, "expected_reason_code": "TOOL_EDITOR_MATCH"},
+  {"message": "I've switched to Neovim", "expected_remember": true, "expected_reason_code": "TOOL_EDITOR_MATCH"},
+
+  {"message": "I use PostgreSQL for all my projects", "expected_remember": true, "expected_reason_code": "TOOL_DB_MATCH"},
+  {"message": "I prefer MongoDB", "expected_remember": true, "expected_reason_code": "TOOL_DB_MATCH"},
+
+  {"message": "I code primarily in PHP", "expected_remember": true, "expected_reason_code": "TOOL_LANG_MATCH"},
+  {"message": "I write Python for data work", "expected_remember": true, "expected_reason_code": "TOOL_LANG_MATCH"},
+  {"message": "I've switched to TypeScript", "expected_remember": true, "expected_reason_code": "TOOL_LANG_MATCH"},
+
+  {"message": "I use pnpm as my package manager", "expected_remember": true, "expected_reason_code": "TOOL_PKG_MATCH"},
+  {"message": "I prefer yarn over npm", "expected_remember": true, "expected_reason_code": "TOOL_PKG_MATCH"},
+
+  {"message": "I use macOS for development", "expected_remember": true, "expected_reason_code": "TOOL_OS_MATCH"},
+  {"message": "I run Ubuntu on my laptop", "expected_remember": true, "expected_reason_code": "TOOL_OS_MATCH"},
+
+  {"message": "Always use markdown in your responses", "expected_remember": true, "expected_reason_code": "COMMUNICATION_MATCH"},
+  {"message": "Respond in bullet points", "expected_remember": true, "expected_reason_code": "COMMUNICATION_MATCH"},
+  {"message": "I prefer detailed answers", "expected_remember": true, "expected_reason_code": "COMMUNICATION_MATCH"},
+  {"message": "Don't over-explain things", "expected_remember": true, "expected_reason_code": "COMMUNICATION_MATCH"},
+  {"message": "Get to the point", "expected_remember": true, "expected_reason_code": "COMMUNICATION_MATCH"},
+  {"message": "No fluff, just the answer", "expected_remember": true, "expected_reason_code": "COMMUNICATION_MATCH"},
+
+  {"message": "Remember that my favourite IDE is PHPStorm", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+  {"message": "Don't forget I prefer PostgreSQL", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+  {"message": "Always remember I use Laravel", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+  {"message": "Please remember my name is Tuhin", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+  {"message": "Keep in mind that I work on Linux", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+  {"message": "Note that I am vegetarian", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+  {"message": "Make a note that I prefer TypeScript", "expected_remember": true, "expected_reason_code": "IMPERATIVE_REMEMBER"},
+
+  {"message": "Pretend my name is Alex", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Imagine I live in Paris", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Suppose I worked at Google", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Let's say my name is Bob", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Hypothetically, if I were a doctor", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "This is an example: my name is John", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Translate: My name is Alex", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "For example, my name would be Sarah", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "As a joke, my name is Napoleon", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Don't store this: I live in Dhaka", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Do not remember this preference", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Just kidding, I hate React", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "Theoretically, I prefer vim", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+  {"message": "What if my name was Alex", "expected_remember": false, "expected_reason_code": "NEGATIVE_RULE_MATCH"},
+
+  {"message": "Hi", "expected_remember": false, "expected_reason_code": "SKIP_GREETING"},
+  {"message": "Hello", "expected_remember": false, "expected_reason_code": "SKIP_GREETING"},
+  {"message": "Hey there", "expected_remember": false, "expected_reason_code": "SKIP_GREETING"},
+  {"message": "Good morning", "expected_remember": false, "expected_reason_code": "SKIP_GREETING"},
+  {"message": "How are you?", "expected_remember": false, "expected_reason_code": "SKIP_GREETING"},
+
+  {"message": "What is the capital of France?", "expected_remember": false, "expected_reason_code": "SKIP_QUESTION"},
+  {"message": "Who invented PHP?", "expected_remember": false, "expected_reason_code": "SKIP_QUESTION"},
+  {"message": "How does garbage collection work?", "expected_remember": false, "expected_reason_code": "SKIP_QUESTION"},
+  {"message": "Why does React re-render?", "expected_remember": false, "expected_reason_code": "SKIP_QUESTION"},
+  {"message": "What are the best practices for REST APIs?", "expected_remember": false, "expected_reason_code": "SKIP_QUESTION"},
+  {"message": "Can you explain dependency injection?", "expected_remember": false, "expected_reason_code": "SKIP_QUESTION"},
+
+  {"message": "Write a function to sort an array", "expected_remember": false, "expected_reason_code": "SKIP_TASK"},
+  {"message": "Create a Laravel migration for users table", "expected_remember": false, "expected_reason_code": "SKIP_TASK"},
+  {"message": "Generate a README for my project", "expected_remember": false, "expected_reason_code": "SKIP_TASK"},
+  {"message": "Help me fix this bug", "expected_remember": false, "expected_reason_code": "SKIP_TASK"},
+  {"message": "Build me a REST API in Python", "expected_remember": false, "expected_reason_code": "SKIP_TASK"},
+
+  {"message": "2 + 2", "expected_remember": false, "expected_reason_code": "SKIP_MATH"},
+  {"message": "100 * 45 = ?", "expected_remember": false, "expected_reason_code": "SKIP_MATH"},
+
+  {"message": "Tell me a joke", "expected_remember": false, "expected_reason_code": "SKIP_JOKE"},
+  {"message": "Make me laugh", "expected_remember": false, "expected_reason_code": "SKIP_JOKE"},
+
+  {"message": "ok", "expected_remember": false, "expected_reason_code": "SKIP_SHORT"},
+  {"message": "yes please", "expected_remember": false, "expected_reason_code": "SKIP_SHORT"},
+  {"message": "thanks", "expected_remember": false, "expected_reason_code": "SKIP_SHORT"}
+]

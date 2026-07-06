@@ -96,22 +96,25 @@ class MemoryService
     public function storeSemantic(
         string $tenantId,
         string $userId,
-        string $content
+        string $content,
+        array  $decisionMeta = []
     ): Collection {
         $items = $this->semanticSegmenter->split($content);
         return $this->storeExtracted(
             $tenantId,
             $userId,
-            $items
+            $items,
+            $decisionMeta
         );
     }
 
     public function storeExtracted(
         string $tenantId,
         string $userId,
-        array $items
+        array  $items,
+        array  $decisionMeta = []
     ): Collection {
-        return DB::transaction(function () use ($tenantId, $userId, $items) {
+        return DB::transaction(function () use ($tenantId, $userId, $items, $decisionMeta) {
             $saved = [];
 
             foreach ($items as $item) {
@@ -126,6 +129,11 @@ class MemoryService
                 $segmentMetadata = is_array($item['metadata'] ?? null)
                     ? $item['metadata']
                     : [];
+
+                // Merge decision engine traceability metadata (engine_version, rule_version, etc.)
+                if (! empty($decisionMeta)) {
+                    $segmentMetadata = array_merge($decisionMeta, $segmentMetadata);
+                }
 
                 // Skip storage for gated items (e.g., raw code without explicit remember)
                 if ($segmentMetadata['skip_storage'] ?? false) {

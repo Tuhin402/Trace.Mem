@@ -17,6 +17,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/semantic-segment', [MemoryController::class, 'debugSemanticSegment']);
             Route::post('/extract', [MemoryController::class, 'debugExtract']);
             Route::post('/conflicts', [MemoryController::class, 'debugConflicts']);
+            Route::post('/memory-decision', [MemoryController::class, 'debugMemoryDecision']);
         });
     });
 });

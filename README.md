@@ -44,7 +44,7 @@ Ensure your environment meets the following requirements:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/context-memory-layer.git
+   git clone https://github.com/Tuhin402/context-memory-layer.git
    cd context-memory-layer
    ```
 
@@ -89,7 +89,7 @@ Ensure your environment meets the following requirements:
 
 TraceMem provides a clean REST API. All endpoints (except the health check) require authentication via a Bearer token. Generate an API Key from your TraceMem Dashboard.
 
-**Base URL:** `https://api.tracemem.one/api/v1`
+**Base URL:** `https://api.tracemem.one/v1`
 
 ### Authentication
 

@@ -800,10 +800,10 @@ class MemoryTemporalService
             }
         }
 
-        // ── "coming monday", "this coming friday" ────────────────
+        // ── "coming monday", "upcoming sunday", "this coming friday" ─
         $weekdayRe = self::WEEKDAY_RE;
 
-        if (preg_match('/\b(?:this\s+)?coming\s+(' . $weekdayRe . ')\b/u', $text, $m)) {
+        if (preg_match('/\b(?:this\s+)?(?:coming|upcoming)\s+(' . $weekdayRe . ')\b/u', $text, $m)) {
             $day = $this->resolveWeekday($m[1]);
             $targetIso = self::WEEKDAY_TO_ISO[$day] ?? null;
 

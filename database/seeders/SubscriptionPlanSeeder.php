@@ -104,6 +104,18 @@ class SubscriptionPlanSeeder extends Seeder
         $this->seedPlanFeatures($ai, [
             [
                 'feature_scope' => 'model',
+                'model_provider' => 'internal',
+                'model_name' => 'semantic-engine',
+                'feature_key' => 'memory.semantic.search',
+                'feature_value' => [
+                    'enabled' => true,
+                    'mode' => 'ai_first',
+                    'description' => 'Semantic segmentation and structured memory search are enabled.',
+                ],
+                'is_enabled' => true,
+            ],
+            [
+                'feature_scope' => 'model',
                 'model_provider' => 'openai',
                 'model_name' => 'gpt-4o-mini',
                 'feature_key' => 'memory.ai.extraction',

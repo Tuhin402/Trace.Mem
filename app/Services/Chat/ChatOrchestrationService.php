@@ -7,7 +7,7 @@ use App\Services\Memory\Decision\DecisionResult;
 use App\Services\Memory\Decision\MemoryDecisionEngine;
 use App\Services\Memory\MemoryContextAssemblyService;
 use App\Services\Memory\MemoryIngestionOrchestrator;
-use Illuminate\Support\Facades\Http;
+// use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
@@ -15,26 +15,26 @@ use Throwable;
 /**
  * Orchestrates the full POST /api/v1/chat pipeline.
  *
+ * This endpoint is a pure memory service — no LLM reply is generated.
+ *
  * Execution order (non-dry-run):
  *   1. Idempotency check  → return cached response immediately if hit
  *   2. Decision           → MemoryDecisionEngine (deterministic, no AI, no HTTP)
  *   3. Memory ingestion   → MemoryIngestionOrchestrator (existing, unchanged)
  *   4. Context assembly   → MemoryContextAssemblyService (existing, unchanged)
- *   5. Prompt build       → PromptAssemblyService
- *   6. NIM chat call      → one LLM call, 30 s timeout, no retry
- *   7. Build response
- *   8. Cache in idempotency store
- *   9. Log latency metrics (no user content)
+ *   5. Build response
+ *   6. Cache in idempotency store
+ *   7. Log latency metrics (no user content)
  *
  * Failure isolation:
  *   Steps 2, 3, 4 are each wrapped independently. A failure in any one
  *   continues the pipeline (with degraded output) rather than aborting.
- *   Only step 6 (LLM) can produce a non-200 response (502).
+ *   Always returns HTTP 200 — no upstream LLM dependency.
  *
  * Memory infrastructure guarantee:
- *   Steps 1–4 are fully operational even when NVIDIA/OpenAI are unreachable.
+ *   All steps are fully operational with zero external HTTP calls.
  *   The MemoryDecisionEngine performs ZERO external calls.
- *
+ * 
  * One LLM call guaranteed:
  *   The decision engine adds zero LLM calls. The chat NIM call is always
  *   exactly one.
@@ -46,7 +46,7 @@ class ChatOrchestrationService
         private readonly IdempotencyStore             $idempotencyStore,
         private readonly MemoryIngestionOrchestrator  $orchestrator,
         private readonly MemoryContextAssemblyService $contextAssembler,
-        private readonly PromptAssemblyService        $promptAssembler,
+        // private readonly PromptAssemblyService        $promptAssembler,
     ) {}
 
     // ── Public entry point ────────────────────────────────────────────────────
@@ -180,68 +180,67 @@ class ChatOrchestrationService
             $contextMs = $this->elapsedMs($contextStart);
         }
 
+        
         // ── 5. Prompt assembly ────────────────────────────────────────────────
-        $systemPrompt = $this->promptAssembler->buildSystemPrompt($contextText, $contextUsed);
-        $messages     = $this->promptAssembler->buildMessages($systemPrompt, $message);
+        // $systemPrompt = $this->promptAssembler->buildSystemPrompt($contextText, $contextUsed);
+        // $messages     = $this->promptAssembler->buildMessages($systemPrompt, $message);
 
         // ── 6. NIM chat call (ONE call, 30 s timeout, no retry) ──────────────
-        $llmStart = hrtime(true);
+        // $llmStart = hrtime(true);
+        // try {
+        //     $nimResponse = Http::withToken(config('services.nvidia_nim_openai.api_key'))
+        //         ->acceptJson()
+        //         ->timeout(30)
+        //         ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
+        //             'model'       => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
+        //             'messages'    => $messages,
+        //             'temperature' => 0.7,
+        //             'top_p'       => 1,
+        //             'max_tokens'  => 1024,
+        //             'stream'      => false,
+        //         ]);
 
-        try {
-            $nimResponse = Http::withToken(config('services.nvidia_nim_openai.api_key'))
-                ->acceptJson()
-                ->timeout(30)
-                ->post(config('services.nvidia_nim_openai.base_url') . '/chat/completions', [
-                    'model'       => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
-                    'messages'    => $messages,
-                    'temperature' => 0.7,
-                    'top_p'       => 1,
-                    'max_tokens'  => 1024,
-                    'stream'      => false,
-                ]);
+        //     $llmMs   = $this->elapsedMs($llmStart);
+        //     $totalMs = $this->elapsedMs($totalStart);
 
-            $llmMs   = $this->elapsedMs($llmStart);
-            $totalMs = $this->elapsedMs($totalStart);
+        //     if (! $nimResponse->successful()) {
+        //         return $this->fail502(
+        //             $requestId, $decision, $memorySaved, $memoryType,
+        //             $decisionMs, $memoryMs,
+        //             $contextUsed, $contextMemories, $contextMs,
+        //             $llmMs, $totalMs,
+        //             $apiKeyId, $idempotencyKey
+        //         );
+        //     }
 
-            if (! $nimResponse->successful()) {
-                return $this->fail502(
-                    $requestId, $decision, $memorySaved, $memoryType,
-                    $decisionMs, $memoryMs,
-                    $contextUsed, $contextMemories, $contextMs,
-                    $llmMs, $totalMs,
-                    $apiKeyId, $idempotencyKey
-                );
-            }
+        //     $reply = (string) $nimResponse->json('choices.0.message.content', '');
 
-            $reply = (string) $nimResponse->json('choices.0.message.content', '');
+        // } catch (Throwable $e) {
+        //     $llmMs   = $this->elapsedMs($llmStart);
+        //     $totalMs = $this->elapsedMs($totalStart);
 
-        } catch (Throwable $e) {
-            $llmMs   = $this->elapsedMs($llmStart);
-            $totalMs = $this->elapsedMs($totalStart);
-
-            return $this->fail502(
-                $requestId, $decision, $memorySaved, $memoryType,
-                $decisionMs, $memoryMs,
-                $contextUsed, $contextMemories, $contextMs,
-                $llmMs, $totalMs,
-                $apiKeyId, $idempotencyKey
-            );
-        }
+        //     return $this->fail502(
+        //         $requestId, $decision, $memorySaved, $memoryType,
+        //         $decisionMs, $memoryMs,
+        //         $contextUsed, $contextMemories, $contextMs,
+        //         $llmMs, $totalMs,
+        //         $apiKeyId, $idempotencyKey
+        //     );
+        // }
 
         $totalMs = $this->elapsedMs($totalStart);
 
         // ── 7. Build success response ─────────────────────────────────────────
         $response = [
-            'request_id' => $requestId,
-            'reply'      => $reply,
-            'memory'     => [
+            'request_id'    => $requestId,
+            'memory'        => [
                 'saved'       => $memorySaved,
                 'type'        => $memoryType,
                 'reason'      => $decision->reason,
                 'reason_code' => $decision->reasonCode,
                 'via'         => $decision->via,
             ],
-            'context'    => [
+            'context'       => [
                 'used'            => $contextUsed,
                 'candidate_count' => $candidateCount,
                 'returned_count'  => $contextMemories,
@@ -255,15 +254,11 @@ class ChatOrchestrationService
                 'engine_version' => $decision->engineVersion,
                 'rule_version'   => $decision->ruleVersion,
             ],
-            'chat_engine' => [
-                'provider'       => 'nvidia',
-                'model'          => config('services.nvidia_nim_openai.model', 'openai/gpt-oss-20b'),
-            ],
-            'latency_ms' => [
+            'latency_ms'    => [
                 'decision' => $decisionMs,
                 'memory'   => $memoryMs,
                 'context'  => $contextMs,
-                'llm'      => $llmMs,
+                // 'llm'      => $llmMs,
                 'total'    => $totalMs,
             ],
         ];
@@ -296,7 +291,7 @@ class ChatOrchestrationService
 
         Log::info('chat.latency', [
             'request_id'       => $requestId,
-            'prompt_version'   => config('chat.prompt_version', 'v1'),
+            // 'prompt_version'   => config('chat.prompt_version', 'v1'),
             'dry_run'          => false,
             'decision_via'     => $decision->via,
             'decision_ms'      => $decisionMs,
@@ -305,7 +300,7 @@ class ChatOrchestrationService
             'context_used'     => $contextUsed,
             'context_memories' => $contextMemories,
             'context_ms'       => $contextMs,
-            'llm_ms'           => $llmMs,
+            // 'llm_ms'           => $llmMs,
             'total_ms'         => $totalMs,
             'http_status'      => 200,
             'idempotency_hit'  => false,
@@ -341,62 +336,64 @@ class ChatOrchestrationService
         }
     }
 
+
     /**
      * Build a 502 failure payload, cache it in idempotency store, and return it.
      * Memory state at time of failure is included so developers can see what succeeded.
      */
-    private function fail502(
-        string  $requestId,
-        DecisionResult $decision,
-        bool    $memorySaved,
-        ?string $memoryType,
-        int     $decisionMs,
-        int     $memoryMs,
-        bool    $contextUsed,
-        int     $contextMemories,
-        int     $contextMs,
-        int     $llmMs,
-        int     $totalMs,
-        int     $apiKeyId,
-        ?string $idempotencyKey
-    ): array {
-        Log::info('chat.latency', [
-            'request_id'       => $requestId,
-            'prompt_version'   => config('chat.prompt_version', 'v1'),
-            'dry_run'          => false,
-            'decision_via'     => $decision->via,
-            'decision_ms'      => $decisionMs,
-            'memory_saved'     => $memorySaved,
-            'memory_ms'        => $memoryMs,
-            'context_used'     => $contextUsed,
-            'context_memories' => $contextMemories,
-            'context_ms'       => $contextMs,
-            'llm_ms'           => $llmMs,
-            'total_ms'         => $totalMs,
-            'http_status'      => 502,
-            'idempotency_hit'  => false,
-        ]);
+    // private function fail502(
+    //     string  $requestId,
+    //     DecisionResult $decision,
+    //     bool    $memorySaved,
+    //     ?string $memoryType,
+    //     int     $decisionMs,
+    //     int     $memoryMs,
+    //     bool    $contextUsed,
+    //     int     $contextMemories,
+    //     int     $contextMs,
+    //     int     $llmMs,
+    //     int     $totalMs,
+    //     int     $apiKeyId,
+    //     ?string $idempotencyKey
+    // ): array {
+    //     Log::info('chat.latency', [
+    //         'request_id'       => $requestId,
+    //         'prompt_version'   => config('chat.prompt_version', 'v1'),
+    //         'dry_run'          => false,
+    //         'decision_via'     => $decision->via,
+    //         'decision_ms'      => $decisionMs,
+    //         'memory_saved'     => $memorySaved,
+    //         'memory_ms'        => $memoryMs,
+    //         'context_used'     => $contextUsed,
+    //         'context_memories' => $contextMemories,
+    //         'context_ms'       => $contextMs,
+    //         'llm_ms'           => $llmMs,
+    //         'total_ms'         => $totalMs,
+    //         'http_status'      => 502,
+    //         'idempotency_hit'  => false,
+    //     ]);
 
-        $payload = [
-            'request_id'    => $requestId,
-            'error'         => 'upstream_llm_unavailable',
-            'message'       => 'The AI model is temporarily unavailable. Memory operations completed successfully.',
-            'memory'        => [
-                'saved'       => $memorySaved,
-                'type'        => $memoryType,
-                'reason'      => $decision->reason,
-                'reason_code' => $decision->reasonCode,
-                'via'         => $decision->via,
-            ],
-            '__http_status' => 502,
-        ];
+    //     $payload = [
+    //         'request_id'    => $requestId,
+    //         'error'         => 'upstream_llm_unavailable',
+    //         'message'       => 'The AI model is temporarily unavailable. Memory operations completed successfully.',
+    //         'memory'        => [
+    //             'saved'       => $memorySaved,
+    //             'type'        => $memoryType,
+    //             'reason'      => $decision->reason,
+    //             'reason_code' => $decision->reasonCode,
+    //             'via'         => $decision->via,
+    //         ],
+    //         '__http_status' => 502,
+    //     ];
 
-        if ($idempotencyKey !== null) {
-            $this->idempotencyStore->put($apiKeyId, $idempotencyKey, $payload);
-        }
+    //     if ($idempotencyKey !== null) {
+    //         $this->idempotencyStore->put($apiKeyId, $idempotencyKey, $payload);
+    //     }
 
-        return $payload;
-    }
+    //     return $payload;
+    // }
+
 
     /**
      * Parse memory types from formatted context lines.

@@ -32,7 +32,7 @@
     /* deep purple/fuchsia */
     --tm-secondary: #cebdff;
     /* light lavender */
-    --tm-tertiary: #ffafd3;  
+    --tm-tertiary: #ffafd3;
     /* soft pink */
 
     /* Text */
@@ -185,13 +185,11 @@
     right: 0;
     z-index: 100;
     height: var(--nav-h);
-    background: linear-gradient(
-        180deg,
-        rgba(20, 14, 22, 0.30) 0%,
-        rgba(14, 14, 15, 0.28) 100%
-    );
+    background: linear-gradient(180deg,
+            rgba(20, 14, 22, 0.30) 0%,
+            rgba(14, 14, 15, 0.28) 100%);
     backdrop-filter: blur(40px) saturate(2.2) brightness(0.9);
-    --webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(0.9);
+    -webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(0.9);
     border-bottom: 1px solid rgba(251, 171, 255, 0.12);
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow:
@@ -1010,7 +1008,8 @@
     flex-direction: column;
     gap: 10px;
     overflow: hidden;
-    max-height: 300px;  /* open by default on desktop */
+    max-height: 300px;
+    /* open by default on desktop */
     transition: max-height 0.3s ease;
 }
 
@@ -1023,6 +1022,7 @@
     .footer-group-head .fg-chevron {
         transform: rotate(180deg) !important;
     }
+
     .footer-group-head.open .fg-chevron {
         transform: rotate(180deg) !important;
     }
@@ -1128,12 +1128,15 @@
     .footer-group-body {
         max-height: 0;
     }
+
     .footer-group-body.open {
         max-height: 300px;
     }
+
     .footer-group-head .fg-chevron {
         transform: rotate(0deg) !important;
     }
+
     .footer-group-head.open .fg-chevron {
         transform: rotate(180deg) !important;
     }
@@ -1150,7 +1153,8 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--tm-tertiary);   /* soft pink from theme */
+    background: var(--tm-tertiary);
+    /* soft pink from theme */
     border: none;
     cursor: pointer;
     display: flex;
@@ -1206,6 +1210,11 @@
 }
 
 @keyframes marquee-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
 }

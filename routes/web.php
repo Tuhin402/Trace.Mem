@@ -9,6 +9,7 @@ use App\Http\Controllers\MemoryInspectorController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\RazorpayWebhookController;
 use App\Http\Controllers\ResendWebhookController;
+use App\Http\Controllers\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'public/Landing')->name('home');
@@ -65,7 +66,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/billing/cancel', [BillingController::class, 'cancel'])->name('billing.cancel');
     Route::get('/billing', [BillingController::class, 'index'])->name('billing.index');
     Route::post('/billing/cancel-subscription', [BillingController::class, 'cancelSubscription'])->name('billing.cancel-subscription');
+
+    // ── Workspace routes (Company accounts only) ──────────────────────────
+    Route::get('/workspaces', [WorkspaceController::class, 'index'])->name('workspaces.index');
+    Route::post('/workspaces', [WorkspaceController::class, 'store'])->name('workspaces.store');
+    Route::post('/workspaces/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('workspaces.switch');
+    Route::patch('/workspaces/{workspace}', [WorkspaceController::class, 'update'])->name('workspaces.update');
+    Route::post('/workspaces/{workspace}/archive', [WorkspaceController::class, 'archive'])->name('workspaces.archive');
 });
+
 
 Route::post('/razorpay/webhook', [RazorpayWebhookController::class, 'handle'])->name('razorpay.webhook');
 Route::post('/resend/webhook', [ResendWebhookController::class, 'handle'])->name('resend.webhook');

@@ -87,4 +87,17 @@ class TeamPolicy
     {
         return ! $team->is_personal && $user->hasTeamPermission($team, TeamPermission::DeleteTeam);
     }
+
+    /**
+     * Determine whether the user can archive the workspace.
+     *
+     * Rules:
+     *  - Default (is_personal=true) workspaces can NEVER be archived.
+     *  - Only Owners can archive a workspace.
+     */
+    public function archive(User $user, Team $team): bool
+    {
+        return ! $team->isLocked()
+            && $user->hasTeamPermission($team, TeamPermission::DeleteTeam);
+    }
 }

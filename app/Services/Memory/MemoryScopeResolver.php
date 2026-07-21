@@ -10,8 +10,9 @@ class MemoryScopeResolver
     {
         if ($scope = $request->attributes->get('resolved_scope')) {
             return [
-                'tenant_id' => (string) ($scope['tenant_id'] ?? ''),
-                'user_id' => (string) ($scope['user_id'] ?? ''),
+                'tenant_id'    => (string) ($scope['tenant_id'] ?? ''),
+                'user_id'      => (string) ($scope['user_id'] ?? ''),
+                'workspace_id' => isset($scope['workspace_id']) ? (int) $scope['workspace_id'] : null,
             ];
         }
 
@@ -19,18 +20,20 @@ class MemoryScopeResolver
 
         if ($user) {
             return [
-                'tenant_id' => (string) $user->tenant_scope_id,
-                'user_id' => (string) $user->id,
+                'tenant_id'    => (string) $user->tenant_scope_id,
+                'user_id'      => (string) $user->id,
+                'workspace_id' => $user->current_team_id ? (int) $user->current_team_id : null,
             ];
         }
 
         $tenantId = $request->input('tenant_id');
-        $userId = $request->input('user_id');
+        $userId   = $request->input('user_id');
 
         if (filled($tenantId) && filled($userId)) {
             return [
-                'tenant_id' => (string) $tenantId,
-                'user_id' => (string) $userId,
+                'tenant_id'    => (string) $tenantId,
+                'user_id'      => (string) $userId,
+                'workspace_id' => null,
             ];
         }
 

@@ -45,9 +45,10 @@ class ApiKeyController extends Controller
 
         try {
             $result = $service->createForUser(
-                $request->user(),
-                $data['name'],
-                $data['environment']
+                user:        $request->user(),
+                name:        $data['name'],
+                environment: $data['environment'],
+                workspace:   $request->user()?->currentTeam, // scoped to current workspace
             );
         } catch (HttpException $e) {
             return redirect()

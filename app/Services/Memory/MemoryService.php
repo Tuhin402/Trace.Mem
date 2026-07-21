@@ -26,11 +26,12 @@ class MemoryService
         string $type,
         string $content,
         float $confidence = 0.5,
-        array $metadata = []
+        array $metadata = [],
+        ?int $workspaceId = null,  // optional — backfilled for existing data
     ): Memory {
         $type = $this->sanitizeType($type);
 
-        return DB::transaction(function () use ($tenantId, $userId, $type, $content, $confidence, $metadata) {
+        return DB::transaction(function () use ($tenantId, $userId, $type, $content, $confidence, $metadata, $workspaceId) {
             // ── Transient confidence cap ─────────────────────────────
             if ($metadata['transient'] ?? false) {
                 $confidence = min($confidence, 0.35);
@@ -73,18 +74,19 @@ class MemoryService
             }
 
             $memory = Memory::create([
-                'tenant_id' => $tenantId,
-                'user_id' => $userId,
-                'type' => $type,
-                'content' => $content,
+                'tenant_id'          => $tenantId,
+                'user_id'            => $userId,
+                'workspace_id'       => $workspaceId,  // null for pre-workspace data
+                'type'               => $type,
+                'content'            => $content,
                 'normalized_content' => $normalizedContent,
-                'content_hash' => $contentHash,
-                'importance' => $this->scoring->baseImportance($type, $content),
-                'confidence' => $confidence,
-                'decay_score' => 1.0,
-                'last_accessed_at' => null,
-                'access_count' => 0,
-                'metadata' => $mergedMetadata,
+                'content_hash'       => $contentHash,
+                'importance'         => $this->scoring->baseImportance($type, $content),
+                'confidence'         => $confidence,
+                'decay_score'        => 1.0,
+                'last_accessed_at'   => null,
+                'access_count'       => 0,
+                'metadata'           => $mergedMetadata,
             ]);
 
             $this->conflicts->resolve($memory);
@@ -97,14 +99,16 @@ class MemoryService
         string $tenantId,
         string $userId,
         string $content,
-        array  $decisionMeta = []
+        array  $decisionMeta = [],
+        ?int   $workspaceId = null,
     ): Collection {
         $items = $this->semanticSegmenter->split($content);
         return $this->storeExtracted(
             $tenantId,
             $userId,
             $items,
-            $decisionMeta
+            $decisionMeta,
+            $workspaceId,
         );
     }
 
@@ -112,9 +116,10 @@ class MemoryService
         string $tenantId,
         string $userId,
         array  $items,
-        array  $decisionMeta = []
+        array  $decisionMeta = [],
+        ?int   $workspaceId = null,
     ): Collection {
-        return DB::transaction(function () use ($tenantId, $userId, $items, $decisionMeta) {
+        return DB::transaction(function () use ($tenantId, $userId, $items, $decisionMeta, $workspaceId) {
             $saved = [];
 
             foreach ($items as $item) {
@@ -146,7 +151,8 @@ class MemoryService
                     $type,
                     $content,
                     (float) ($item['confidence'] ?? 0.5),
-                    $segmentMetadata
+                    $segmentMetadata,
+                    $workspaceId,
                 );
             }
 
@@ -160,15 +166,20 @@ class MemoryService
         int $limit = 5,
         int $page = 1,
         string $sortBy = 'recall_score',
-        string $sortOrder = 'desc'
+        string $sortOrder = 'desc',
+        ?int $workspaceId = null,
     ): Collection {
         $query = Memory::query()
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
+            // When workspace_id is set, scope to that workspace.
+            // When null, fall back to tenant+user isolation (backward compat).
+            ->when($workspaceId, fn ($q) => $q->where('workspace_id', $workspaceId))
             ->where(function ($q) {
                 $q->whereNull('status')
                     ->orWhereIn('status', ['active', 'stale']);
             });
+
 
         if ($sortBy !== 'recall_score') {
             $query->orderBy($sortBy, $sortOrder);

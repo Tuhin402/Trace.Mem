@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\Auth\EmailBloomFilterService;
+use App\Services\Workspace\WorkspaceService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -67,16 +68,25 @@ class AuthController extends Controller
 
         try {
             $user = DB::transaction(function () use ($data, $email) {
-                return User::create([
+                $user = User::create([
                     'tenant_scope_id' => (string) Str::uuid(),
-                    'name' => $data['name'],
-                    'email' => $email,
-                    'password' => Hash::make($data['password']),
-                    'account_type' => $data['account_type'],
-                    'company_name' => $data['account_type'] === 'tenant'
+                    'name'            => $data['name'],
+                    'email'           => $email,
+                    'password'        => Hash::make($data['password']),
+                    'account_type'    => $data['account_type'],
+                    'company_name'    => $data['account_type'] === 'tenant'
                         ? $data['company_name']
                         : null,
                 ]);
+
+                // Create default workspace + first test API key inside the same transaction.
+                // WorkspaceService handles the team_members row (owner role).
+                $workspace = app(WorkspaceService::class)->createDefaultWorkspace($user);
+
+                // Set current_team_id on the user to the new default workspace.
+                $user->forceFill(['current_team_id' => $workspace->id])->save();
+
+                return $user;
             });
         } catch (QueryException $e) {
             if ($this->isDuplicateEmailException($e)) {

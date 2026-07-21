@@ -3,6 +3,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { TracememAppSidebar } from '@/components/app/tracemem-sidebar';
+import { WorkspaceStatusBanner } from '@/components/workspace-status-banner';
 import type { AppLayoutProps } from '@/types';
 import type { BreadcrumbItem } from '@/types';
 
@@ -56,7 +57,13 @@ export default function AppSidebarLayout({
     useEffect(() => {
         const removeStart = router.on('start', (e) => {
             const path = e.detail.visit.url.pathname;
-            if (path.startsWith('/dashboard') || path.startsWith('/api-keys') || path.startsWith('/settings') || path.startsWith('/memory-inspector')) {
+            if (
+                path.startsWith('/dashboard') ||
+                path.startsWith('/api-keys') ||
+                path.startsWith('/settings') ||
+                path.startsWith('/memory-inspector') ||
+                path.startsWith('/workspaces')
+            ) {
                 setLoadingUrl(path);
             }
         });
@@ -78,6 +85,7 @@ export default function AppSidebarLayout({
             <TracememAppSidebar />
             <AppContent variant="sidebar" className="overflow-x-hidden">
                 <AppTopBar breadcrumbs={breadcrumbs} />
+                <WorkspaceStatusBanner />
 
                 {/* Keep children mounted to prevent Inertia reconciliation errors */}
                 <div style={{ display: loadingUrl ? 'none' : 'block' }}>

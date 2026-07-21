@@ -9,9 +9,11 @@ import {
     LogOut,
     ChevronUp,
     Activity,
+    Building2,
 } from 'lucide-react';
 import { useState } from 'react';
 import AppLogo from '@/components/app-logo';
+import { WorkspaceSwitcher } from '@/components/workspace-switcher';
 import {
     Sidebar,
     SidebarContent,
@@ -20,6 +22,7 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@/components/ui/sidebar';
+import type { AccountContext } from '@/types';
 
 /* ── Nav definition ─────────────────────────────────────── */
 const mainNav = [
@@ -28,6 +31,11 @@ const mainNav = [
     { title: 'Logs',      href: '/logs',        icon: Activity   },
     { title: 'Billing',   href: '/billing',     icon: CreditCard },
     { title: 'Settings',  href: '/settings',    icon: Settings2  },
+];
+
+// Company-only nav items (hidden for Individual accounts)
+const companyNav = [
+    { title: 'Workspaces', href: '/workspaces', icon: Building2 },
 ];
 
 const footerNav = [
@@ -149,6 +157,8 @@ export function TracememAppSidebar() {
     const { url } = usePage();
     const { state } = useSidebar();
     const collapsed = state === 'collapsed';
+    const account = usePage().props.account as AccountContext | null;
+    const isCompany = account?.isCompany ?? false;
 
     const isActive = (href: string) => {
         if (href === '/dashboard') return url === '/dashboard';
@@ -166,6 +176,13 @@ export function TracememAppSidebar() {
                     {/* Collapse trigger: only shown on mobile; desktop uses topbar trigger */}
                     <SidebarTrigger className="tracemem-sidebar-trigger tracemem-sidebar-trigger--mobile" />
                 </div>
+
+                {/* Workspace switcher — Company accounts only */}
+                {isCompany && (
+                    <div className="px-1 pt-1">
+                        <WorkspaceSwitcher />
+                    </div>
+                )}
             </SidebarHeader>
 
             {/* ── Main nav ── */}
@@ -175,6 +192,17 @@ export function TracememAppSidebar() {
                 )}
                 <nav className="tracemem-nav-list">
                     {mainNav.map((item) => (
+                        <NavItem
+                            key={item.href}
+                            href={item.href}
+                            icon={item.icon}
+                            title={item.title}
+                            active={isActive(item.href)}
+                        />
+                    ))}
+
+                    {/* Company-only nav items */}
+                    {isCompany && companyNav.map((item) => (
                         <NavItem
                             key={item.href}
                             href={item.href}

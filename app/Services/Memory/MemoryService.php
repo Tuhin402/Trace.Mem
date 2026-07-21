@@ -154,19 +154,41 @@ class MemoryService
         });
     }
 
-    public function recall(string $tenantId, string $userId, int $limit = 5): Collection
-    {
-        $memories = Memory::query()
+    public function recall(
+        string $tenantId,
+        string $userId,
+        int $limit = 5,
+        int $page = 1,
+        string $sortBy = 'recall_score',
+        string $sortOrder = 'desc'
+    ): Collection {
+        $query = Memory::query()
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
-            ->where(function ($query) {
-                $query->whereNull('status')
+            ->where(function ($q) {
+                $q->whereNull('status')
                     ->orWhereIn('status', ['active', 'stale']);
-            })
-            ->get()
-            ->sortByDesc(fn (Memory $memory) => $this->scoring->recallScore($memory))
-            ->take($limit)
-            ->values();
+            });
+
+        if ($sortBy !== 'recall_score') {
+            $query->orderBy($sortBy, $sortOrder);
+            
+            $offset = ($page - 1) * $limit;
+            $query->offset($offset)->limit($limit);
+            
+            $memories = $query->get();
+        } else {
+            $allMemories = $query->get();
+            
+            if ($sortOrder === 'desc') {
+                $sorted = $allMemories->sortByDesc(fn (Memory $memory) => $this->scoring->recallScore($memory));
+            } else {
+                $sorted = $allMemories->sortBy(fn (Memory $memory) => $this->scoring->recallScore($memory));
+            }
+            
+            $offset = ($page - 1) * $limit;
+            $memories = $sorted->slice($offset, $limit)->values();
+        }
 
         // ── Batched async reinforcement ────────────────────────────────────
         // One job per recall request — not one per memory. This eliminates

@@ -52,7 +52,10 @@ class MemoryController extends Controller
     public function recall(Request $request)
     {
         $data = $request->validate([
-            'limit' => ['sometimes', 'integer', 'min:1', 'max:20'],
+            'limit' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'sort_by' => ['sometimes', 'string', 'in:recall_score,created_at,updated_at'],
+            'sort_order' => ['sometimes', 'string', 'in:asc,desc'],
         ]);
 
         $scope = $this->scopeResolver->resolve($request);
@@ -60,7 +63,10 @@ class MemoryController extends Controller
         $memories = $this->memoryService->recall(
             $scope['tenant_id'],
             $scope['user_id'],
-            $data['limit'] ?? 5
+            $data['limit'] ?? 5,
+            $data['page'] ?? 1,
+            $data['sort_by'] ?? 'recall_score',
+            $data['sort_order'] ?? 'desc'
         );
 
         return response()->json([

@@ -86,7 +86,7 @@ class MemoryTemporalService
     private const ORDINAL_WORD_RE = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last|\d+';
 
     /** Time unit words (singular/plural/abbreviations) */
-    private const TIME_UNIT_RE = 'minutes?|mins?|hours?|hrs?|days?|weeks?|wks?|months?|years?|yrs?';
+    private const TIME_UNIT_RE = 'minutes?|mins?|hours?|hrs?|days?|nights?|weeks?|wks?|months?|years?|yrs?';
 
     // ═════════════════════════════════════════════════════════════
     //  PUBLIC — Main entry point
@@ -1637,7 +1637,7 @@ class MemoryTemporalService
         }
 
         $numberRe = self::NUMBER_WORD_RE;
-        $unitRe = 'minutes?|mins?|hours?|hrs?|days?';
+        $unitRe = 'minutes?|mins?|hours?|hrs?|days?|nights?';
 
         $patterns = [
             '/\bfor\s+(' . $numberRe . ')\s+(' . $unitRe . ')\b/u',
@@ -1888,7 +1888,7 @@ class MemoryTemporalService
         return match (true) {
             in_array($unit, ['minute', 'minutes', 'min', 'mins']) => 'minute',
             in_array($unit, ['hour', 'hours', 'hr', 'hrs'])      => 'hour',
-            in_array($unit, ['day', 'days'])                       => 'day',
+            in_array($unit, ['day', 'days', 'night', 'nights'])    => 'day',
             in_array($unit, ['week', 'weeks', 'wk', 'wks'])       => 'week',
             in_array($unit, ['month', 'months'])                   => 'month',
             in_array($unit, ['year', 'years', 'yr', 'yrs'])       => 'year',

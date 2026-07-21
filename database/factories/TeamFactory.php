@@ -21,19 +21,42 @@ class TeamFactory extends Factory
         $name = fake()->unique()->company();
 
         return [
-            'name' => $name,
-            'slug' => Str::slug($name),
+            'name'        => $name,
+            'slug'        => Str::slug($name),
             'is_personal' => false,
+            'status'      => 'active',
+            'environment' => null,
+            'purpose'     => null,
         ];
     }
 
     /**
-     * Indicate that the team is a personal team.
+     * Indicate that the team is a personal (default) team.
      */
     public function personal(): static
     {
         return $this->state(fn (array $attributes) => [
             'is_personal' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the team is active.
+     */
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'active',
+        ]);
+    }
+
+    /**
+     * Indicate that the team is archived.
+     */
+    public function archived(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'archived',
         ]);
     }
 

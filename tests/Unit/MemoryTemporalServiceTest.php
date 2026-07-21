@@ -155,6 +155,24 @@ test('detects "5 days from today"', function () use ($ref) {
     expect($start->toDateString())->toBe('2026-06-15');
 });
 
+test('detects "after 3 nights"', function () use ($ref) {
+    $service = new MemoryTemporalService();
+    $result = $service->extract('hotel booking after 3 nights', $ref);
+
+    expect($result['has_temporal'])->toBeTrue();
+    $start = CarbonImmutable::parse($result['start_at']);
+    expect($start->toDateString())->toBe('2026-06-13');
+});
+
+test('detects "in a night"', function () use ($ref) {
+    $service = new MemoryTemporalService();
+    $result = $service->extract('finish work in a night', $ref);
+
+    expect($result['has_temporal'])->toBeTrue();
+    $start = CarbonImmutable::parse($result['start_at']);
+    expect($start->toDateString())->toBe('2026-06-11');
+});
+
 // ═════════════════════════════════════════════════════════════
 //  Ordinal Week Day
 // ═════════════════════════════════════════════════════════════

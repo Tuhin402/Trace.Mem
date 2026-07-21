@@ -27,14 +27,16 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
-            'two_factor_confirmed_at' => null,
+            'name'                        => fake()->name(),
+            'email'                       => fake()->unique()->safeEmail(),
+            'email_verified_at'           => now(),
+            'password'                    => static::$password ??= Hash::make('password'),
+            'remember_token'              => Str::random(10),
+            'two_factor_secret'           => null,
+            'two_factor_recovery_codes'   => null,
+            'two_factor_confirmed_at'     => null,
+            'account_type'                => 'individual',
+            'tenant_scope_id'             => (string) Str::uuid(),
         ];
     }
 
@@ -45,15 +47,27 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function ($user) {
             $team = Team::factory()->personal()->create([
-                'name' => $user->name."'s Team",
+                'name' => $user->name . "'s Team",
             ]);
 
-            $team->members()->attach($user, [
-                'role' => TeamRole::Owner->value,
+            $team->memberships()->create([
+                'user_id' => $user->id,
+                'role'    => TeamRole::Owner->value,
             ]);
 
-            $user->switchTeam($team);
+            $user->forceFill(['current_team_id' => $team->id])->save();
         });
+    }
+
+    /**
+     * Indicate that the user is a Company (tenant) account.
+     */
+    public function company(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'account_type' => 'tenant',
+            'company_name' => fake()->company(),
+        ]);
     }
 
     /**
@@ -65,6 +79,7 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
 
     /**
      * Indicate that the model has two-factor authentication configured.

@@ -4,16 +4,24 @@ namespace App\Enums;
 
 enum TeamRole: string
 {
-    case Owner = 'owner';
-    case Admin = 'admin';
-    case Member = 'member';
+    case Owner     = 'owner';
+    case Admin     = 'admin';
+    case Member    = 'member';
+    case Developer = 'developer';
+    case Viewer    = 'viewer';
 
     /**
      * Get the display label for the role.
      */
     public function label(): string
     {
-        return ucfirst($this->value);
+        return match ($this) {
+            self::Owner     => 'Owner',
+            self::Admin     => 'Admin',
+            self::Member    => 'Member',
+            self::Developer => 'Developer',
+            self::Viewer    => 'Viewer',
+        };
     }
 
     /**
@@ -29,8 +37,22 @@ enum TeamRole: string
                 TeamPermission::UpdateTeam,
                 TeamPermission::CreateInvitation,
                 TeamPermission::CancelInvitation,
+                TeamPermission::AddMember,
+                TeamPermission::UpdateMember,
+                TeamPermission::RemoveMember,
             ],
-            self::Member => [],
+            self::Developer => [
+                TeamPermission::CreateApiKey,
+                TeamPermission::ViewApiKey,
+                TeamPermission::ViewUsage,
+            ],
+            self::Member => [
+                TeamPermission::ViewApiKey,
+                TeamPermission::ViewUsage,
+            ],
+            self::Viewer => [
+                TeamPermission::ViewApiKey,
+            ],
         };
     }
 
@@ -49,9 +71,11 @@ enum TeamRole: string
     public function level(): int
     {
         return match ($this) {
-            self::Owner => 3,
-            self::Admin => 2,
-            self::Member => 1,
+            self::Owner     => 5,
+            self::Admin     => 4,
+            self::Developer => 3,
+            self::Member    => 2,
+            self::Viewer    => 1,
         };
     }
 

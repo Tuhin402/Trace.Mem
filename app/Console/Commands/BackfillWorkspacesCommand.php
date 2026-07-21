@@ -45,21 +45,14 @@ class BackfillWorkspacesCommand extends Command
 
     // =========================================================================
     // Step 1 — Create default workspaces for users with no team memberships
-    //
-    // NOTE: Uses raw DB queries instead of User::teams() relationship because
-    //       the HasTeams concern is added in Phase B. This command must be
-    //       self-contained and runnable from Phase A onwards.
     // =========================================================================
 
     private function step1_createDefaultWorkspaces(int $chunk, bool $dryRun): void
     {
         $this->info('Step 1: Creating default workspaces for users with no team memberships...');
 
-        // Find users who have zero rows in team_members — no model relationship needed
-        $usersWithoutTeams = User::whereNotIn(
-            'id',
-            DB::table('team_members')->select('user_id')
-        )->cursor();
+        // User model now has HasTeams — can use teams() relationship
+        $usersWithoutTeams = User::whereDoesntHave('teams')->cursor();
 
         $created = 0;
 
@@ -81,19 +74,13 @@ class BackfillWorkspacesCommand extends Command
                         'features'    => null,
                     ]);
 
-                    DB::table('team_members')->insert([
-                        'team_id'    => $workspace->id,
-                        'user_id'    => $user->id,
-                        'role'       => TeamRole::Owner->value,
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                    $workspace->memberships()->create([
+                        'user_id' => $user->id,
+                        'role'    => TeamRole::Owner->value,
                     ]);
 
-                    // Set current_team_id if not already set
                     if ($user->current_team_id === null) {
-                        DB::table('users')
-                            ->where('id', $user->id)
-                            ->update(['current_team_id' => $workspace->id]);
+                        $user->forceFill(['current_team_id' => $workspace->id])->save();
                     }
                 });
 
@@ -113,9 +100,6 @@ class BackfillWorkspacesCommand extends Command
 
     // =========================================================================
     // Step 2 — Backfill workspace_id on api_keys
-    //
-    // For each key: find the user's personal/default team from DB directly.
-    // workspace_id is IMMUTABLE once set — this only runs on NULL rows.
     // =========================================================================
 
     private function step2_backfillApiKeys(int $chunk, bool $dryRun): void
@@ -128,7 +112,6 @@ class BackfillWorkspacesCommand extends Command
         ApiKey::whereNull('workspace_id')
             ->chunkById($chunk, function ($keys) use ($dryRun, &$total, &$skipped) {
                 foreach ($keys as $key) {
-                    // Find user's default workspace via raw DB — no model relationship
                     $workspace = $this->resolveDefaultWorkspace($key->user_id);
 
                     if (!$workspace) {
@@ -164,9 +147,6 @@ class BackfillWorkspacesCommand extends Command
 
     // =========================================================================
     // Step 3 — Backfill workspace_id on memories
-    //
-    // Match memory.tenant_id → users.tenant_scope_id to find the owner,
-    // then assign their default workspace.
     // =========================================================================
 
     private function step3_backfillMemories(int $chunk, bool $dryRun): void
@@ -179,11 +159,7 @@ class BackfillWorkspacesCommand extends Command
         Memory::whereNull('workspace_id')
             ->chunkById($chunk, function ($memories) use ($dryRun, &$total, &$skipped) {
                 foreach ($memories as $memory) {
-                    // Match tenant_id → user.tenant_scope_id via raw DB
-                    $user = DB::table('users')
-                        ->where('tenant_scope_id', $memory->tenant_id)
-                        ->select('id')
-                        ->first();
+                    $user = User::where('tenant_scope_id', $memory->tenant_id)->first();
 
                     if (!$user) {
                         $this->warn("  ⚠ Memory #{$memory->id} tenant_id={$memory->tenant_id} — no matching user, skipping");
@@ -225,20 +201,18 @@ class BackfillWorkspacesCommand extends Command
     }
 
     // =========================================================================
-    // Internal — resolve the default workspace for a given user_id via raw DB.
-    // Prefers the personal (is_personal=true) team. Falls back to any active team.
-    // Returns null if the user has no teams at all.
+    // Resolve default workspace via model relationship (Phase B+)
     // =========================================================================
 
-    private function resolveDefaultWorkspace(int $userId): ?object
+    private function resolveDefaultWorkspace(int $userId): ?Team
     {
-        return DB::table('teams')
-            ->join('team_members', 'teams.id', '=', 'team_members.team_id')
-            ->where('team_members.user_id', $userId)
+        $user = User::find($userId);
+        if (!$user) return null;
+
+        return $user->teams()
             ->where('teams.status', 'active')
             ->whereNull('teams.deleted_at')
-            ->select('teams.id', 'teams.name', 'teams.is_personal')
-            ->orderByDesc('teams.is_personal') // personal workspace first
+            ->orderByRaw('teams.is_personal DESC') // prefer default workspace
             ->first();
     }
 
@@ -252,7 +226,7 @@ class BackfillWorkspacesCommand extends Command
 
         $nullApiKeys  = DB::table('api_keys')->whereNull('workspace_id')->count();
         $nullMemories = DB::table('memories')->whereNull('workspace_id')->count();
-        $noTeamUsers  = User::whereNotIn('id', DB::table('team_members')->select('user_id'))->count();
+        $noTeamUsers  = User::whereDoesntHave('teams')->count();
 
         $this->line("  api_keys  WHERE workspace_id IS NULL → {$nullApiKeys}");
         $this->line("  memories  WHERE workspace_id IS NULL → {$nullMemories}");

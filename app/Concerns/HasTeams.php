@@ -168,13 +168,21 @@ trait HasTeams
         $role = $this->teamRole($team);
 
         return new TeamPermissions(
-            canUpdateTeam: $role?->hasPermission(TeamPermission::UpdateTeam) ?? false,
-            canDeleteTeam: $role?->hasPermission(TeamPermission::DeleteTeam) ?? false,
-            canAddMember: $role?->hasPermission(TeamPermission::AddMember) ?? false,
-            canUpdateMember: $role?->hasPermission(TeamPermission::UpdateMember) ?? false,
-            canRemoveMember: $role?->hasPermission(TeamPermission::RemoveMember) ?? false,
+            // ── Existing (unchanged) ─────────────────────────────────────────
+            canUpdateTeam:      $role?->hasPermission(TeamPermission::UpdateTeam)      ?? false,
+            canDeleteTeam:      $role?->hasPermission(TeamPermission::DeleteTeam)      ?? false,
+            canAddMember:       $role?->hasPermission(TeamPermission::AddMember)       ?? false,
+            canUpdateMember:    $role?->hasPermission(TeamPermission::UpdateMember)    ?? false,
+            canRemoveMember:    $role?->hasPermission(TeamPermission::RemoveMember)    ?? false,
             canCreateInvitation: $role?->hasPermission(TeamPermission::CreateInvitation) ?? false,
             canCancelInvitation: $role?->hasPermission(TeamPermission::CancelInvitation) ?? false,
+            // ── New workspace permissions ────────────────────────────────────
+            canCreateApiKey:    $role?->hasPermission(TeamPermission::CreateApiKey)    ?? false,
+            canViewApiKey:      $role?->hasPermission(TeamPermission::ViewApiKey)      ?? false,
+            canViewUsage:       $role?->hasPermission(TeamPermission::ViewUsage)       ?? false,
+            canViewBilling:     $role?->hasPermission(TeamPermission::ViewBilling)     ?? false,
+            canManageBilling:   $role?->hasPermission(TeamPermission::ManageBilling)   ?? false,
+            canSuspendWorkspace: $role?->hasPermission(TeamPermission::SuspendWorkspace) ?? false,
         );
     }
 

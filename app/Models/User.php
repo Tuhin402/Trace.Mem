@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasTeams;
 use App\Enums\EmailTemplate;
 use App\Jobs\SendEmailJob;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -17,9 +18,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable;
+    use HasFactory, HasTeams, Notifiable;
 
     protected $fillable = [
+        'current_team_id',          // managed by HasTeams::switchTeam()
         'tenant_scope_id',
         'stripe_customer_id',       // kept for historical Stripe billing records
         'razorpay_customer_id',     // Razorpay customer ID (set on first subscription)

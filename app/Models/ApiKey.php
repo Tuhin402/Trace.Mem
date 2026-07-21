@@ -10,6 +10,7 @@ class ApiKey extends Model
     protected $fillable = [
         'user_id',
         'tenant_scope_id',
+        'workspace_id',           // immutable once set — never moved between workspaces
         'subscription_plan_id',
 
         'name',
@@ -40,31 +41,32 @@ class ApiKey extends Model
     ];
 
     protected $casts = [
-        'user_id' => 'integer',
+        'user_id'              => 'integer',
+        'workspace_id'         => 'integer',   // nullable
         'subscription_plan_id' => 'integer',
 
         'tenant_scope_id' => 'string',
 
         'environment' => 'string',
-        'mode' => 'string',
+        'mode'        => 'string',
 
-        'sandbox_only' => 'boolean',
-        'key_version' => 'integer',
-        'issued_at' => 'datetime',
-        'last_rotated_at' => 'datetime',
-        'allowed_origins' => 'array',
-        'allowed_ips' => 'array',
+        'sandbox_only'     => 'boolean',
+        'key_version'      => 'integer',
+        'issued_at'        => 'datetime',
+        'last_rotated_at'  => 'datetime',
+        'allowed_origins'  => 'array',
+        'allowed_ips'      => 'array',
 
-        'rate_limit_max_requests' => 'integer',
+        'rate_limit_max_requests'  => 'integer',
         'rate_limit_window_seconds' => 'integer',
 
         'usage_count' => 'integer',
 
         'last_used_at' => 'datetime',
-        'expires_at' => 'datetime',
-        'revoked_at' => 'datetime',
+        'expires_at'   => 'datetime',
+        'revoked_at'   => 'datetime',
 
-        'scopes' => 'array',
+        'scopes'   => 'array',
         'metadata' => 'array',
     ];
     
@@ -83,6 +85,16 @@ class ApiKey extends Model
     public function subscriptionPlan(): BelongsTo
     {
         return $this->belongsTo(SubscriptionPlan::class);
+    }
+
+    /**
+     * The workspace this key belongs to.
+     * workspace_id is immutable — once set it never changes.
+     * Key rotation creates a new key in the SAME workspace as the original.
+     */
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'workspace_id');
     }
 
     /*

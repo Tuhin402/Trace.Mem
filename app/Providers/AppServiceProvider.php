@@ -11,6 +11,9 @@ use App\Services\Cache\TraceMemCache;
 use App\Services\Memory\Decision\DecisionTelemetry;
 use App\Services\Memory\Decision\MemoryDecisionEngine;
 use App\Services\Memory\Decision\MemoryRuleRegistry;
+use App\Services\Workspace\WorkspaceAuditService;
+use App\Services\Workspace\WorkspaceContextService;
+use App\Services\Workspace\WorkspaceService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +80,23 @@ class AppServiceProvider extends ServiceProvider
         //   MemoryNormalizationService, CodeDetectionService (both stateless),
         //   MemoryRuleRegistry (singleton), DecisionTelemetry (singleton).
         $this->app->singleton(MemoryDecisionEngine::class);
+
+        // ── Workspace infrastructure ──────────────────────────────────────────
+        // WorkspaceAuditService — fire-and-forget audit writer; singleton.
+        $this->app->singleton(WorkspaceAuditService::class);
+
+        // WorkspaceContextService — single source of truth for workspace resolution.
+        // Depends on SubscriptionCacheService (already a singleton above).
+        $this->app->singleton(
+            WorkspaceContextService::class,
+            fn ($app) => new WorkspaceContextService(
+                $app->make(SubscriptionCacheService::class),
+            )
+        );
+
+        // WorkspaceService — workspace CRUD + audit logging.
+        // Depends on ApiKeyService (auto-resolved) + WorkspaceAuditService (singleton).
+        $this->app->singleton(WorkspaceService::class);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Models\ApiKey;
 use App\Models\ApiKeyRotation;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -15,9 +16,18 @@ class ApiKeyService
         private readonly SubscriptionCacheService $subscriptionCache,
     ) {}
 
-    public function createForUser(User $user, string $name, string $environment = 'test', array $options = [], ?ApiKey $replacing = null): array
+    public function createForUser(
+        User $user,
+        string $name,
+        string $environment = 'test',
+        array $options = [],
+        ?ApiKey $replacing = null,
+        ?Team $workspace = null,  // immutable once set; null = use $user->currentTeam
+    ): array
     {
-        return DB::transaction(function () use ($user, $name, $environment, $options, $replacing) {
+        return DB::transaction(function () use ($user, $name, $environment, $options, $replacing, $workspace) {
+            // Resolve workspace — fall back to user's current team if not specified
+            $resolvedWorkspace = $workspace ?? $user->currentTeam;
             $policy = $this->entitlements->resolveForUser($user);
             $plan = $policy['plan'];
             $subscription = $policy['subscription'];
@@ -78,32 +88,33 @@ class ApiKeyService
                 : ['memory:read', 'memory:write', 'memory:context'];
 
             $apiKey = ApiKey::create([
-                'user_id' => $user->id,
+                'user_id'         => $user->id,
                 'tenant_scope_id' => $user->tenant_scope_id,
+                'workspace_id'    => $resolvedWorkspace?->id,  // immutable — set once, never changed
                 'subscription_plan_id' => $plan?->id,
-                'name' => $name,
-                'key_prefix' => $environment === 'test' ? 'cmtest_' : 'cmlive_',
-                'key_hash' => $hash,
-                'key_last4' => substr($plainKey, -4),
-                'environment' => $environment,
-                'mode' => $mode,
-                'sandbox_only' => $environment === 'test',
-                'key_version' => 1,
-                'issued_at' => now(),
-                'expires_at' => $expiresAt,
-                'rate_limit_max_requests' => $environment === 'test'
+                'name'            => $name,
+                'key_prefix'      => $environment === 'test' ? 'cmtest_' : 'cmlive_',
+                'key_hash'        => $hash,
+                'key_last4'       => substr($plainKey, -4),
+                'environment'     => $environment,
+                'mode'            => $mode,
+                'sandbox_only'    => $environment === 'test',
+                'key_version'     => 1,
+                'issued_at'       => now(),
+                'expires_at'      => $expiresAt,
+                'rate_limit_max_requests'  => $environment === 'test'
                     ? (int) ($policy['test_rate_limit_max_requests'] ?? 1)
                     : (int) ($policy['request_rate_limit_max_requests'] ?? 1),
                 'rate_limit_window_seconds' => $environment === 'test'
                     ? (int) ($policy['test_rate_limit_window_seconds'] ?? 30)
                     : (int) ($policy['request_rate_limit_window_seconds'] ?? 30),
-                'scopes' => $scopes,
+                'scopes'   => $scopes,
                 'metadata' => [
-                    'source' => 'dashboard',
+                    'source'    => 'dashboard',
                     'plan_slug' => $plan?->slug,
                 ],
                 'allowed_origins' => $options['allowed_origins'] ?? null,
-                'allowed_ips' => $options['allowed_ips'] ?? null,
+                'allowed_ips'     => $options['allowed_ips'] ?? null,
             ]);
 
             return [
@@ -117,12 +128,15 @@ class ApiKeyService
     {
         abort_unless($apiKey->user_id === $user->id, 403);
 
+        // Pass the ORIGINAL key's workspace — workspace binding is immutable through rotations.
+        // The new key belongs to the same workspace as the key it replaces.
         $created = $this->createForUser(
-            $user,
-            $apiKey->name,
-            $apiKey->environment,
-            $options,
-            $apiKey
+            user:        $user,
+            name:        $apiKey->name,
+            environment: $apiKey->environment,
+            options:     $options,
+            replacing:   $apiKey,
+            workspace:   $apiKey->workspace, // ← preserves workspace immutability
         );
 
         $this->revoke($apiKey, 'rotated');

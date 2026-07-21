@@ -142,7 +142,8 @@ export default function ApiKeys() {
     useEffect(() => {
         if (flashMsg) toast(flashMsg, 'success');
         if (flashErr) toast(flashErr, 'error');
-    }, []);
+    }, [flashMsg, flashErr]);
+
 
     const canCreateTest = plan?.allow_test_keys ?? true;
     const canCreateLive = plan?.allow_live_keys ?? false;

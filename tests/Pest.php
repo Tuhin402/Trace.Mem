@@ -15,7 +15,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+ // ->use(RefreshDatabase::class)  // Not global — workspace tests use it per-file via uses()
     ->in('Feature');
 
 /*

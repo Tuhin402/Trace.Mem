@@ -10,7 +10,6 @@ import {
     Loader2,
     Lock,
 } from 'lucide-react';
-import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import type { WorkspaceContext } from '@/types';
 
 /* ── Types ──────────────────────────────────────────────────────────────── */
@@ -178,7 +177,7 @@ function WorkspaceRow({ workspace }: { workspace: WorkspaceRow }) {
         }
         setSaving(true);
         router.patch(
-            `/workspaces/${workspace.id}`,
+            `/workspaces/${workspace.slug}`,
             { name: newName },
             {
                 onFinish: () => { setSaving(false); setEditing(false); },
@@ -190,7 +189,7 @@ function WorkspaceRow({ workspace }: { workspace: WorkspaceRow }) {
         if (workspace.isCurrent) return;
         setSwitching(true);
         router.post(
-            `/workspaces/${workspace.id}/switch`,
+            `/workspaces/${workspace.slug}/switch`,
             {},
             {
                 onFinish: () => setSwitching(false),
@@ -203,7 +202,7 @@ function WorkspaceRow({ workspace }: { workspace: WorkspaceRow }) {
         if (!confirm(`Archive "${workspace.name}"? This cannot be undone from the dashboard.`)) return;
         setArchiving(true);
         router.post(
-            `/workspaces/${workspace.id}/archive`,
+            `/workspaces/${workspace.slug}/archive`,
             {},
             { onFinish: () => setArchiving(false) }
         );
@@ -302,7 +301,7 @@ export default function Workspaces({ workspaces, flash }: PageProps) {
     const [showCreate, setShowCreate] = useState(false);
 
     return (
-        <AppSidebarLayout>
+        <>
             <Head title="Workspaces — Trace.Mem" />
 
             <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
@@ -367,6 +366,6 @@ export default function Workspaces({ workspaces, flash }: PageProps) {
             </div>
 
             {showCreate && <CreateWorkspaceModal onClose={() => setShowCreate(false)} />}
-        </AppSidebarLayout>
+        </>
     );
 }

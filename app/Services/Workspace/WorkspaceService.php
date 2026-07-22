@@ -33,7 +33,8 @@ class WorkspaceService
         return DB::transaction(function () use ($user) {
             $workspace = Team::create([
                 'name'        => 'Default',
-                'is_personal' => $user->account_type === 'individual',
+                'is_personal' => true,
+                // 'is_personal' => $user->account_type === 'individual',
                 'status'      => 'active',
                 'settings'    => null,
                 'features'    => null,

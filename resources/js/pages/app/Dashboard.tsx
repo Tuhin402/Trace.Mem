@@ -15,6 +15,7 @@ import {
     Shield,
     CreditCard,
     ShieldCheck,
+    Copy,
 } from 'lucide-react';
 import { useToast } from '@/components/app/toast';
 import { fmtNum, fmtLatency, fmtRate, fmtMoney, statusClass } from '@/lib/fmt';
@@ -459,9 +460,25 @@ export default function Dashboard() {
                                                 <div className="db-key-dot" data-env={key.environment} aria-hidden="true" />
                                                 <div className="db-key-info">
                                                     <span className="db-key-name">{key.name}</span>
-                                                    <span className="db-key-meta">
+                                                    <span className="db-key-meta" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                         {key.key_prefix}••••{key.key_last4 ?? '----'}
-                                                        &nbsp;&nbsp;{fmtNum(key.usage_count)} uses
+                                                        <button
+                                                            type="button"
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await navigator.clipboard.writeText(`${key.key_prefix}••••${key.key_last4 ?? '----'}`);
+                                                                    toast('API key copied to clipboard.', 'success');
+                                                                } catch {
+                                                                    toast('Unable to copy.', 'error');
+                                                                }
+                                                            }}
+                                                            className="text-subtle hover:text-accent transition-colors"
+                                                            title="Copy masked key"
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                                        >
+                                                            <Copy size={12} />
+                                                        </button>
+                                                        <span style={{ marginLeft: '4px' }}>{fmtNum(key.usage_count)} uses</span>
                                                     </span>
                                                 </div>
                                                 <div className="db-key-right">

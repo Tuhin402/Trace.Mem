@@ -228,6 +228,23 @@ export default function ApiKeys() {
 
             <div className="app-page">
 
+                {latestKey && (
+                    <div className="app-alert app-alert-success" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <strong>New API Key Generated:</strong> <code style={{ margin: '0 8px', padding: '4px 8px', background: 'rgba(0,0,0,0.1)', borderRadius: '4px' }}>{latestKey}</code>
+                            <div style={{ fontSize: '12px', marginTop: '4px' }}>Please copy this key now. It will not be shown again.</div>
+                        </div>
+                        <button
+                            type="button"
+                            className="app-btn app-btn-secondary"
+                            onClick={() => copyKey(latestKey)}
+                            title="Copy API Key"
+                        >
+                            <Copy size={14} />
+                        </button>
+                    </div>
+                )}
+
                 {/* ── Header ── */}
                 <div className="app-page-header">
                     <div>
@@ -474,8 +491,17 @@ export default function ApiKeys() {
 
                                                     {/* Meta row */}
                                                     <div className="ak-key-meta">
-                                                        <span className="ak-key-prefix">
+                                                        <span className="ak-key-prefix" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                             {key.key_prefix}••••{key.key_last4 ?? '----'}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => copyKey(`${key.key_prefix}••••${key.key_last4 ?? '----'}`)}
+                                                                className="text-subtle hover:text-accent transition-colors"
+                                                                title="Copy masked key"
+                                                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                                            >
+                                                                <Copy size={12} />
+                                                            </button>
                                                         </span>
                                                         <span className="ak-key-sep">|</span>
                                                         <span>{fmtNum(key.usage_count)} uses</span>

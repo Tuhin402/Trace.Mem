@@ -76,16 +76,21 @@ class WorkspaceController extends Controller
             'environment' => ['nullable', 'in:development,staging,production,testing'],
         ]);
 
-        $workspace = $this->workspaceService->createWorkspace(
+        [$workspace, $plainKey] = $this->workspaceService->createWorkspace(
             user:        $user,
             name:        $data['name'],
             purpose:     $data['purpose'] ?? null,
             environment: $data['environment'] ?? null,
         );
 
-        return redirect()
-            ->route('workspaces.index')
+        $redirect = redirect()->route('workspaces.index')
             ->with('message', "Workspace \"{$workspace->name}\" created. A test key has been generated automatically.");
+        
+        if (!empty($plainKey)) {
+            $redirect->with('plain_key', $plainKey);
+        }
+
+        return $redirect;
     }
 
     /**

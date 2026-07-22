@@ -67,7 +67,7 @@ class AuthController extends Controller
         }
 
         try {
-            $user = DB::transaction(function () use ($data, $email) {
+            [$user, $plainKey] = DB::transaction(function () use ($data, $email) {
                 $user = User::create([
                     'tenant_scope_id' => (string) Str::uuid(),
                     'name'            => $data['name'],
@@ -81,12 +81,12 @@ class AuthController extends Controller
 
                 // Create default workspace + first test API key inside the same transaction.
                 // WorkspaceService handles the team_members row (owner role).
-                $workspace = app(WorkspaceService::class)->createDefaultWorkspace($user);
+                [$workspace, $plainKey] = app(WorkspaceService::class)->createDefaultWorkspace($user);
 
                 // Set current_team_id on the user to the new default workspace.
                 $user->forceFill(['current_team_id' => $workspace->id])->save();
 
-                return $user;
+                return [$user, $plainKey];
             });
         } catch (QueryException $e) {
             if ($this->isDuplicateEmailException($e)) {
@@ -115,6 +115,11 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $this->clearRateLimit($rateKey);
+
+        if (!empty($plainKey)) {
+            $request->session()->flash('plain_key', $plainKey);
+            $request->session()->flash('message', 'Default workspace created. Copy your test API key now - it is shown only once.');
+        }
 
         return redirect()->route('verification.notice');
     }

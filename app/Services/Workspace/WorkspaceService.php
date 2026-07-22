@@ -28,7 +28,7 @@ class WorkspaceService
      * Owner is recorded exclusively via team_members (role='owner').
      * No owner_user_id column — single source of truth.
      */
-    public function createDefaultWorkspace(User $user): Team
+    public function createDefaultWorkspace(User $user): array
     {
         return DB::transaction(function () use ($user) {
             $workspace = Team::create([
@@ -46,14 +46,14 @@ class WorkspaceService
             ]);
 
             // One test key only — no live key
-            $this->autoCreateTestKey($user, $workspace);
+            $plainKey = $this->autoCreateTestKey($user, $workspace);
 
             $this->audit->log($workspace, $user, 'workspace.created', [
                 'is_personal' => $workspace->is_personal,
                 'source'      => 'registration',
             ]);
 
-            return $workspace;
+            return [$workspace, $plainKey];
         });
     }
 
@@ -68,7 +68,7 @@ class WorkspaceService
         string $name,
         ?string $purpose = null,
         ?string $environment = null,
-    ): Team {
+    ): array {
         return DB::transaction(function () use ($user, $name, $purpose, $environment) {
             $workspace = Team::create([
                 'name'        => $name,
@@ -86,7 +86,7 @@ class WorkspaceService
             ]);
 
             // One test key only
-            $this->autoCreateTestKey($user, $workspace);
+            $plainKey = $this->autoCreateTestKey($user, $workspace);
 
             $this->audit->log($workspace, $user, 'workspace.created', [
                 'purpose'     => $purpose,
@@ -94,7 +94,7 @@ class WorkspaceService
                 'source'      => 'manual',
             ]);
 
-            return $workspace;
+            return [$workspace, $plainKey];
         });
     }
 
@@ -104,10 +104,10 @@ class WorkspaceService
      * Failure is non-fatal — logged, never thrown.
      * The workspace is still usable; owner can create keys manually.
      */
-    public function autoCreateTestKey(User $user, Team $workspace): void
+    public function autoCreateTestKey(User $user, Team $workspace): ?string
     {
         try {
-            $this->apiKeys->createForUser(
+            $result = $this->apiKeys->createForUser(
                 user: $user,
                 name: 'Default Test Key',
                 environment: 'test',
@@ -115,12 +115,14 @@ class WorkspaceService
                 replacing: null,
                 workspace: $workspace,
             );
+            return $result['plain_key'] ?? null;
         } catch (\Throwable $e) {
             Log::warning('WorkspaceService: auto test-key creation failed', [
                 'workspace_id' => $workspace->id,
                 'user_id'      => $user->id,
                 'error'        => $e->getMessage(),
             ]);
+            return null;
         }
     }
 

@@ -403,29 +403,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* ── New key reveal ── */}
-                {flashKey && (
-                    <div className="app-key-reveal">
-                        <div className="app-key-reveal-header">
-                            <span className="app-key-reveal-label">New API Key Generated</span>
-                            <button
-                                type="button"
-                                className="app-btn app-btn-sm app-btn-secondary"
-                                onClick={async () => {
-                                    await navigator.clipboard.writeText(flashKey);
-                                    toast('API key copied to clipboard.', 'success');
-                                }}
-                            >
-                                Copy Key
-                            </button>
-                        </div>
-                        <code className="app-key-reveal-code">{flashKey}</code>
-                        <div className="app-key-reveal-warning">
-                            This secret is shown only once. Copy it now and store it securely.
-                        </div>
-                    </div>
-                )}
-
                 {/* ── Main two-column grid ── */}
                 <div className="app-main-grid">
 

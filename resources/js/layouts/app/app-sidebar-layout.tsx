@@ -4,6 +4,7 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { TracememAppSidebar } from '@/components/app/tracemem-sidebar';
 import { WorkspaceStatusBanner } from '@/components/workspace-status-banner';
+import { NewApiKeyBanner } from '@/components/app/new-api-key-banner';
 import type { AppLayoutProps } from '@/types';
 import type { BreadcrumbItem } from '@/types';
 
@@ -86,6 +87,7 @@ export default function AppSidebarLayout({
             <AppContent variant="sidebar" className="overflow-x-hidden">
                 <AppTopBar breadcrumbs={breadcrumbs} />
                 <WorkspaceStatusBanner />
+                <NewApiKeyBanner />
 
                 {/* Keep children mounted to prevent Inertia reconciliation errors */}
                 <div style={{ display: loadingUrl ? 'none' : 'block' }}>

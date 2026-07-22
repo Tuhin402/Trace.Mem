@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Services\Workspace\WorkspaceContextService;
 use App\Services\Workspace\WorkspaceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class WorkspaceController extends Controller
@@ -67,7 +68,7 @@ class WorkspaceController extends Controller
             abort(403, 'Workspace management is only available for Company accounts.');
         }
 
-        $this->authorize('create', Team::class);
+        Gate::authorize('create', Team::class);
 
         $data = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
@@ -108,7 +109,7 @@ class WorkspaceController extends Controller
      */
     public function update(Request $request, Team $workspace)
     {
-        $this->authorize('update', $workspace);
+        Gate::authorize('update', $workspace);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -125,7 +126,7 @@ class WorkspaceController extends Controller
      */
     public function archive(Request $request, Team $workspace)
     {
-        $this->authorize('archive', $workspace);
+        Gate::authorize('archive', $workspace);
 
         $this->workspaceService->archiveWorkspace($request->user(), $workspace);
 

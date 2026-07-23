@@ -45,6 +45,7 @@ class WorkspaceController extends Controller
                 'isLocked'    => $w->isLocked(),
                 'isCurrent'   => $user->current_team_id === $w->id,
                 'memberCount' => $w->memberships()->count(),
+                'canManageMembers' => $user->toTeamPermissions($w)->canAddMember,
             ]);
 
         return Inertia::render('app/Workspaces', [

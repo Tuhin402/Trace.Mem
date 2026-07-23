@@ -116,6 +116,8 @@ class AuthController extends Controller
 
         $this->clearRateLimit($rateKey);
 
+        $this->processPendingInvitation($request, $user);
+
         if (!empty($plainKey)) {
             $request->session()->flash('plain_key', $plainKey);
             $request->session()->flash('message', 'Default workspace created. Copy your test API key now - it is shown only once.');
@@ -160,11 +162,13 @@ class AuthController extends Controller
             // The intended URL (the verification link) is preserved in session and
             // Laravel will redirect there after login. The 'verified' middleware
             // blocks all other protected routes until email_verified_at is set.
+            $this->processPendingInvitation($request, $user);
             return redirect()->intended(route('verification.notice'));
         }
 
         if ($user) {
             $user->forceFill(['last_login_at' => now()])->save();
+            $this->processPendingInvitation($request, $user);
         }
 
         $this->clearRateLimit($rateKey);
@@ -221,5 +225,28 @@ class AuthController extends Controller
     private function clearRateLimit(string $key): void
     {
         RateLimiter::clear($key);
+    }
+
+    private function processPendingInvitation(Request $request, User $user): void
+    {
+        $code = $request->session()->get('invitation_code');
+        if (!$code) {
+            return;
+        }
+
+        $invitation = \App\Models\TeamInvitation::where('code', $code)->first();
+        if ($invitation && !$invitation->isExpired() && !$invitation->isAccepted()) {
+            $workspace = $invitation->team;
+            if (!$user->belongsToTeam($workspace)) {
+                $workspace->members()->attach($user->id, ['role' => $invitation->role->value]);
+            }
+            $invitation->update(['accepted_at' => now()]);
+            app(\App\Services\Workspace\WorkspaceContextService::class)->switchTo($user, $workspace);
+            
+            // Note: flash data set here might be overridden by other flashes, but it usually works.
+            $request->session()->flash('message', "You have joined the {$workspace->name} workspace!");
+        }
+
+        $request->session()->forget('invitation_code');
     }
 }

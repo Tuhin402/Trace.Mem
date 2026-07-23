@@ -78,8 +78,9 @@ class HandleInertiaRequests extends Middleware
      */
     private function resolveCurrentWorkspaceProps($user): ?array
     {
-        // Individual accounts: no workspace UI — return null to hide workspace elements
-        if ($this->workspaceContext->isIndividual($user)) {
+        // Individual accounts: hide workspace UI unless they belong to multiple workspaces
+        // (i.e., they accepted an invitation to another workspace)
+        if ($this->workspaceContext->isIndividual($user) && $user->teams()->count() <= 1) {
             return null;
         }
 

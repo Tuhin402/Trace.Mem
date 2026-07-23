@@ -11,12 +11,12 @@ TraceMem provides long-term, persistent context to AI agents by extracting, stor
 ![TraceMem System Architecture](public/tracemem-architecture.png)
 
 The diagram above shows the complete system across six layers:
-1. **Workspace Architecture** — multi-tenant, workspace-scoped isolation
+1. **Workspace Architecture** — multi-tenant, workspace-scoped isolation with Members & Invitations
 2. **Ingestion (Remember Flow)** — AI-First and Semantic-Only pipelines
 3. **Retrieval (Recall + Context Assembly)** — scored, ranked, reinforced recall
 4. **Billing** — Razorpay subscription engine
 5. **Transactional Email** — Resend with full delivery lifecycle
-6. **CI/CD Pipeline** — test → build → deploy
+6. **CI/CD Pipeline** — automated test → build → deploy lifecycle
 
 ---
 
@@ -59,7 +59,9 @@ The diagram above shows the complete system across six layers:
 Tenant (User or Company account)
     └── Subscription (Razorpay — Tenant-level, not Workspace-level)
             └── Workspaces (1 for Individual · 1..N for Company)
-                    └── API Keys (scoped per workspace)
+                    ├── Members (Roles: Owner, Admin, Developer, Member, Viewer)
+                    ├── Invitations (Secure email links for joining)
+                    ├── API Keys (scoped per workspace)
                     └── Memories (scoped per workspace)
 ```
 
@@ -465,29 +467,42 @@ php artisan queue:prune-failed --hours=168
 
 ## CI/CD Deployment
 
-```
-Local
-  ├─ php artisan test        ← all green
-  ├─ npm run build           ← TypeScript clean
-  └─ git push origin main
-          │
-          ▼
-      GitHub
-          │
-          ▼
-      Production Server
-          ├─ git pull origin main
-          ├─ composer install --no-dev --optimize-autoloader
-          ├─ npm install && npm run build
-          ├─ php artisan migrate
-          ├─ php artisan workspace:backfill   ← ONE TIME ONLY
-          ├─ php artisan config:cache
-          ├─ php artisan route:cache
-          ├─ php artisan view:cache
-          └─ php artisan queue:restart
+We employ a robust, automated CI/CD pipeline to ensure that Trace.Mem remains stable in production.
+
+```mermaid
+graph TD
+    %% Environments
+    subgraph Local Environment
+        A[Developer Commits Code] --> B{Run Local Tests}
+        B -->|Pass| C[Push to GitHub main]
+        B -->|Fail| D[Fix Code]
+        D --> A
+    end
+
+    subgraph GitHub Actions
+        C --> E[Checkout Source Code]
+        E --> F[Setup PHP & Node.js]
+        F --> G[Install Dependencies]
+        G --> H{Run Automated Test Suite}
+        H -->|Pass| I[Trigger Deployment Webhook]
+        H -->|Fail| J[Notify Developer]
+    end
+
+    subgraph Production Server
+        I --> K[git pull origin main]
+        K --> L[composer install --no-dev --optimize-autoloader]
+        L --> M[npm install && npm run build]
+        M --> N[php artisan migrate --force]
+        N --> O[php artisan config:cache]
+        O --> P[php artisan route:cache]
+        P --> Q[php artisan view:cache]
+        Q --> R[php artisan queue:restart]
+        R --> S[Application Deployed Successfully]
+    end
 ```
 
 > `workspace:backfill` is a **one-time** command. Never schedule it. All new records get `workspace_id` set automatically at creation time.
+
 
 ---
 

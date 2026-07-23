@@ -31,6 +31,8 @@ Route::inertia('/api-reference/context-assemble', 'public/api-reference/ContextA
 Route::inertia('/api-reference/chat', 'public/api-reference/Chat')->name('api.reference.chat');
 
 
+Route::get('/invitations/{code}', [\App\Http\Controllers\WorkspaceInvitationController::class, 'accept'])->name('workspaces.invitations.accept');
+
 Route::middleware('guest')->group(function () {
     Route::inertia('/login', 'auth/Login')->name('login');
     Route::inertia('/register', 'auth/Register')->name('register');
@@ -73,6 +75,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/workspaces/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('workspaces.switch');
     Route::patch('/workspaces/{workspace}', [WorkspaceController::class, 'update'])->name('workspaces.update');
     Route::post('/workspaces/{workspace}/archive', [WorkspaceController::class, 'archive'])->name('workspaces.archive');
+    Route::get('/workspaces/{workspace}/members', [\App\Http\Controllers\WorkspaceMemberController::class, 'index'])->name('workspaces.members.index');
+    Route::delete('/workspaces/{workspace}/members/{user}', [\App\Http\Controllers\WorkspaceMemberController::class, 'destroy'])->name('workspaces.members.destroy');
+    Route::post('/workspaces/{workspace}/invitations', [\App\Http\Controllers\WorkspaceInvitationController::class, 'store'])->name('workspaces.invitations.store');
+    Route::delete('/workspaces/{workspace}/invitations/{invitation}', [\App\Http\Controllers\WorkspaceInvitationController::class, 'destroy'])->name('workspaces.invitations.destroy');
 });
 
 

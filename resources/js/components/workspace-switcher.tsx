@@ -30,8 +30,9 @@ export function WorkspaceSwitcher({ inHeader = false }: WorkspaceSwitcherProps) 
     const workspace = page.props.workspace as WorkspaceContext | null;
     const account = page.props.account;
 
-    // Don't render for Individual accounts or when no workspace context
-    if (!account?.isCompany || !workspace?.id) {
+    // Don't render when no workspace context is provided
+    // if (!account?.isCompany || !workspace?.id) {
+    if (!workspace?.id) {
         return null;
     }
 
@@ -136,20 +137,24 @@ export function WorkspaceSwitcher({ inHeader = false }: WorkspaceSwitcherProps) 
                     </DropdownMenuItem>
                 ))}
 
-                <DropdownMenuSeparator />
+                {account?.isCompany && (
+                    <>
+                        <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                    data-test="workspace-switcher-manage"
-                    className={
-                        inHeader
-                            ? 'cursor-pointer gap-2'
-                            : 'cursor-pointer gap-2 p-2'
-                    }
-                    onSelect={() => router.visit('/workspaces')}
-                >
-                    <Plus className={inHeader ? 'size-4' : 'h-4 w-4'} />
-                    <span className="text-muted-foreground">Manage workspaces</span>
-                </DropdownMenuItem>
+                        <DropdownMenuItem
+                            data-test="workspace-switcher-manage"
+                            className={
+                                inHeader
+                                    ? 'cursor-pointer gap-2'
+                                    : 'cursor-pointer gap-2 p-2'
+                            }
+                            onSelect={() => router.visit('/workspaces')}
+                        >
+                            <Plus className={inHeader ? 'size-4' : 'h-4 w-4'} />
+                            <span className="text-muted-foreground">Manage workspaces</span>
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

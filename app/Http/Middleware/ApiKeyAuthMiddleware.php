@@ -113,7 +113,7 @@ class ApiKeyAuthMiddleware
         $request->attributes->set('api_key', $apiKey);
         $request->attributes->set('resolved_scope', [
             'tenant_id'    => $apiKey->tenant_scope_id,
-            'user_id'      => $apiKey->user_id,
+            // 'user_id'      => $apiKey->user_id,
             'workspace_id' => $apiKey->workspace_id,   // nullable — backfilled for all existing keys
             'environment'  => $apiKey->environment,    // 'test' | 'live'
         ]);
@@ -285,4 +285,4 @@ class ApiKeyAuthMiddleware
             return null;
         }
     }
-}
+}

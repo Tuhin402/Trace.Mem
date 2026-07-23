@@ -57,6 +57,7 @@ class ChatController extends Controller
 
         // ── 3. Validation ─────────────────────────────────────────────────────
         $data = $request->validate([
+            'user_id'         => ['required', 'string', 'max:255'],
             'message'         => ['required', 'string', 'max:10000'],
             'memory_mode'     => ['sometimes', 'string', 'in:auto,force,off'],
             'context'         => ['sometimes', 'boolean'],

@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "TraceMem API Reference",
+    "description": "TraceMem is a semantic memory layer for AI applications. This collection demonstrates how to use the TraceMem API with strict isolation boundaries.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/health",
+          "host": ["{{base_url}}"],
+          "path": ["v1", "health"]
+        },
+        "description": "Returns the health status of the API and backend queues."
+      },
+      "response": []
+    },
+    {
+      "name": "Memory",
+      "item": [
+        {
+          "name": "Remember (Ingest Memory)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-API-Key", "value": "{{api_key}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"customer_8472\",\n  \"content\": \"I have a meeting with Q2 investors on Monday at 3pm.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/remember",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "remember"]
+            },
+            "description": "Extracts semantic memories from the given content and stores them.\n\n### Identity & Isolation\n- **Workspace Isolation:** TraceMem automatically determines the `tenant_scope_id` and `workspace_id` from your authenticated `X-API-Key`.\n- **User Isolation (`user_id`):** This is a strictly required, client-supplied identifier representing your downstream end-user (e.g., `customer_8472`, `patient_991`, `employee_42`, `session_abcd1234`).\n- **Stability:** It must be a stable identifier across sessions. Changing it creates a completely separate, strictly partitioned memory graph. TraceMem never attempts to merge identities automatically."
+          }
+        },
+        {
+          "name": "Recall (Retrieve Memory)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-API-Key", "value": "{{api_key}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"customer_8472\",\n  \"limit\": 10,\n  \"page\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/recall",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "recall"]
+            },
+            "description": "Retrieves the raw memory objects that have been stored for this user.\n\n### Identity & Isolation\n- **Workspace Isolation:** TraceMem automatically determines the `tenant_scope_id` and `workspace_id` from your authenticated `X-API-Key`. Memories from other workspaces are physically incapable of being retrieved.\n- **User Isolation (`user_id`):** This strictly required parameter represents the specific end-user (e.g., `customer_8472`). TraceMem groups memories by this `user_id`. Memories belonging to other users within this same workspace are strictly isolated and never returned."
+          }
+        },
+        {
+          "name": "Assemble Context",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-API-Key", "value": "{{api_key}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"customer_8472\",\n  \"query\": \"What are my meetings next week?\",\n  \"token_budget\": 600\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/context/assemble",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "context", "assemble"]
+            },
+            "description": "Fetches a prompt-ready memory context block constructed from the most semantically relevant memories.\n\n### Identity & Isolation\n- **Workspace & Tenant Isolation:** Enforced strictly via the `X-API-Key`.\n- **User Isolation (`user_id`):** Required. Ensures that the semantic search and context assembly only draw upon the exact memory graph for the human/entity assigned to `customer_8472`. Cross-contamination is impossible."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Chat with Memory Context",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-API-Key", "value": "{{api_key}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"customer_8472\",\n  \"message\": \"Remind me about the investor meeting.\",\n  \"context\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/chat",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "chat"]
+            },
+            "description": "Interacts with the AI, automatically injecting context retrieved from the user's memory graph.\n\n### Identity & Isolation\n- **Boundary Enforcement:** Relies purely on the API Key (`workspace_id`) and the payload `user_id` (`customer_8472`).\n- **Identity Expectation:** TraceMem does not authenticate the actual human. It trusts the client to pass the correct, stable identifier for whoever is initiating this chat session."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.tracemem.one",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "cmtest_your_key_here",
+      "type": "string"
+    }
+  ]
+}

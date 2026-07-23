@@ -9,9 +9,14 @@ class MemoryScopeResolver
     public function resolve(Request $request): array
     {
         if ($scope = $request->attributes->get('resolved_scope')) {
+            $userId = $request->input('user_id');
+            if (empty($userId)) {
+                abort(422, 'The user_id field is required in the request payload.');
+            }
+
             return [
                 'tenant_id'    => (string) ($scope['tenant_id'] ?? ''),
-                'user_id'      => (string) ($scope['user_id'] ?? ''),
+                'user_id'      => (string) $userId,
                 'workspace_id' => isset($scope['workspace_id']) ? (int) $scope['workspace_id'] : null,
             ];
         }

@@ -200,6 +200,16 @@ composer run dev
 X-API-Key: cmtest_your_key_here
 ```
 
+### Identity & Memory Isolation Guarantees
+
+Every memory operation in TraceMem relies on three layers of isolation:
+
+1. **`tenant_scope_id` (Internal):** Resolved automatically via the authenticated API Key. Represents your Razorpay billing account.
+2. **`workspace_id` (Internal):** Resolved automatically via the authenticated API Key. Represents the strict data boundary (e.g., a specific hospital branch or CRM customer).
+3. **`user_id` (Client-Supplied):** **Required** on all memory endpoints. This is a stable identifier representing your downstream end-user (e.g., `customer_8472`, `patient_991`, `session_abcd1234`).
+
+> **Warning:** You must supply a stable `user_id` in your JSON payloads. Changing the `user_id` creates a completely separate memory graph. TraceMem never merges identities.
+
 ### Endpoints
 
 | Method | Endpoint | Description |
@@ -213,9 +223,11 @@ X-API-Key: cmtest_your_key_here
 
 #### `POST /remember`
 
+Stores semantic facts mapped to the tuple `(tenant_scope_id, workspace_id, user_id)`.
+
 ```json
 {
-  "user_id": "user-123",
+  "user_id": "customer_8472",
   "content": "I have a meeting with Q2 investors on Monday at 3pm.",
   "category": "schedule"
 }
@@ -223,9 +235,11 @@ X-API-Key: cmtest_your_key_here
 
 #### `POST /recall`
 
+Retrieves raw memories strictly isolated to the specified `user_id` within the API Key's workspace.
+
 ```json
 {
-  "user_id": "user-123",
+  "user_id": "customer_8472",
   "query": "What are my meetings next week?",
   "limit": 10
 }

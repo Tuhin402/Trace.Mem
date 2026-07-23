@@ -30,6 +30,7 @@ class MemoryController extends Controller
     public function remember(Request $request)
     {
         $data = $request->validate([
+            'user_id' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:10000'],
         ]);
 
@@ -52,6 +53,7 @@ class MemoryController extends Controller
     public function recall(Request $request)
     {
         $data = $request->validate([
+            'user_id' => ['required', 'string', 'max:255'],
             'limit' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'page' => ['sometimes', 'integer', 'min:1'],
             'sort_by' => ['sometimes', 'string', 'in:recall_score,created_at,updated_at'],
@@ -77,6 +79,7 @@ class MemoryController extends Controller
     public function assembleContext(Request $request)
     {
         $data = $request->validate([
+            'user_id' => ['required', 'string', 'max:255'],
             'query' => ['required', 'string', 'max:10000'],
             'token_budget' => ['sometimes', 'integer', 'min:64', 'max:4000'],
             'candidate_limit' => ['sometimes', 'integer', 'min:1', 'max:100'],
@@ -141,6 +144,7 @@ class MemoryController extends Controller
         $this->assertDebugScope($request);
         
         $data = $request->validate([
+            'user_id'   => ['required', 'string', 'max:255'],
             'content'   => ['required', 'string', 'max:10000'],
         ]);
 

@@ -42,7 +42,22 @@ export default function Recall() {
                     {
                         key:         'limit',
                         type:        'integer',
-                        description: 'Optional. Maximum number of memory units to return, ordered by relevance score. Defaults to the plan limit (typically 10).',
+                        description: 'Optional. Maximum number of memory units to return per page. Defaults to the plan limit (typically 10).',
+                    },
+                    {
+                        key:         'page',
+                        type:        'integer',
+                        description: 'Optional. Page number for pagination. Defaults to 1.',
+                    },
+                    {
+                        key:         'sort_by',
+                        type:        'string',
+                        description: "Optional. Field to sort by. Supported values: 'recall_score', 'created_at', 'updated_at'. Defaults to 'recall_score'.",
+                    },
+                    {
+                        key:         'sort_order',
+                        type:        'string',
+                        description: "Optional. Sort direction. Supported values: 'asc', 'desc'. Defaults to 'desc'.",
                     },
                 ]}
                 responses={{

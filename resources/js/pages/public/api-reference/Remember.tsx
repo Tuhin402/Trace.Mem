@@ -40,6 +40,12 @@ export default function Remember() {
                 auth="Authorization: Bearer <api_key>"
                 body={[
                     {
+                        key:         'user_id',
+                        type:        'string',
+                        required:    true,
+                        description: 'A stable identifier representing your downstream end-user (e.g., customer_8472). TraceMem groups memories exclusively by this ID.',
+                    },
+                    {
                         key:         'content',
                         type:        'string',
                         required:    true,
@@ -56,7 +62,7 @@ export default function Remember() {
 response = requests.post(
     "${apiUrl}/v1/remember",
     headers={"Authorization": "Bearer cmlive_xxx"},
-    json={"content": "User likes React"}
+    json={"user_id": "customer_8472", "content": "User likes React"}
 )
 print(response.json())
 # {"message": "Memory saved", "memory": {"id": "mem_abc123", ...}}`,
@@ -64,12 +70,13 @@ print(response.json())
 
 const { data } = await axios.post(
   "${apiUrl}/v1/remember",
-  { content: "User likes React" },
+  { user_id: "customer_8472", content: "User likes React" },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );
 console.log(data.memory.id); // "mem_abc123"`,
                     php: `$response = Http::withToken('cmlive_xxx')
     ->post('${apiUrl}/v1/remember', [
+        'user_id' => 'customer_8472',
         'content' => 'User likes React',
     ]);
 
@@ -77,8 +84,8 @@ $memory = $response->json('memory');`,
                     curl: `curl -X POST "${apiUrl}/v1/remember" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
-  -d '{ "content": "User likes React" }'`,
-                    java: `String body = "{\"content\":\"User likes React\"}";
+  -d '{ "user_id": "customer_8472", "content": "User likes React" }'`,
+                    java: `String body = "{\"user_id\":\"customer_8472\",\"content\":\"User likes React\"}";
 
 HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("${apiUrl}/v1/remember"))
@@ -89,7 +96,7 @@ HttpRequest request = HttpRequest.newBuilder()
 
 HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
-                    go: `reqBody := strings.NewReader(\`{"content":"User likes React"}\`)
+                    go: `reqBody := strings.NewReader(\`{"user_id":"customer_8472","content":"User likes React"}\`)
 
 req, _ := http.NewRequest("POST", "${apiUrl}/v1/remember", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
@@ -101,7 +108,16 @@ defer resp.Body.Close()`,
                 groups={apiRefGroups}
                 prev={{ href: '/api-reference/health', label: 'Health' }}
                 next={{ href: '/api-reference/recall', label: 'Recall' }}
-            />
+            >
+                <div className="pt-4 border-t border-zinc-800/50 mt-8 space-y-4">
+                    <h2 className="text-white text-lg font-semibold mb-3">Identity & Isolation</h2>
+                    <ul className="list-disc pl-5 space-y-2 text-zinc-400">
+                        <li><strong>Workspace Isolation:</strong> TraceMem automatically determines the <code>tenant_scope_id</code> and <code>workspace_id</code> from your authenticated <code>X-API-Key</code>.</li>
+                        <li><strong>User Isolation:</strong> The <code>user_id</code> is strictly required. This memory will be permanently attached to this downstream human/entity.</li>
+                        <li><strong>Stability:</strong> It must be a stable identifier. Changing it creates a completely separate, strictly partitioned memory graph.</li>
+                    </ul>
+                </div>
+            </ApiReferencePage>
         </>
     );
 }

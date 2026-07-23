@@ -34,6 +34,7 @@ type Props = {
     groups:      SidebarGroup[];
     prev?:       NavLink;
     next?:       NavLink;
+    children?:   React.ReactNode;
 };
 
 /* ── Method badge color map ─────────────────────────────────── */
@@ -60,6 +61,7 @@ export default function ApiReferencePage({
     groups,
     prev,
     next,
+    children,
 }: Props) {
     return (
         <div className="api-docs-shell">
@@ -75,6 +77,11 @@ export default function ApiReferencePage({
                         <div className="api-page-eyebrow">TraceMem API</div>
                         <h1 className="api-page-title">{title}</h1>
                         <p className="api-page-desc">{description}</p>
+                        {children && (
+                            <div className="mt-8 text-[15px] leading-relaxed text-zinc-300 space-y-6">
+                                {children}
+                            </div>
+                        )}
                     </div>
 
                     {/* ── Endpoint + Auth card ─────────────────────────── */}

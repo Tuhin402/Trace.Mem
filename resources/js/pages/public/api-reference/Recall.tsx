@@ -40,6 +40,12 @@ export default function Recall() {
                 auth="Authorization: Bearer <api_key>"
                 body={[
                     {
+                        key:         'user_id',
+                        type:        'string',
+                        required:    true,
+                        description: 'A stable identifier representing your downstream end-user (e.g., customer_8472). TraceMem groups memories exclusively by this ID.',
+                    },
+                    {
                         key:         'limit',
                         type:        'integer',
                         description: 'Optional. Maximum number of memory units to return per page. Defaults to the plan limit (typically 10).',
@@ -70,7 +76,7 @@ export default function Recall() {
 response = requests.post(
     "${apiUrl}/v1/recall",
     headers={"Authorization": "Bearer cmlive_xxx"},
-    json={"limit": 5}
+    json={"user_id": "customer_8472", "limit": 5}
 )
 
 memories = response.json().get("memories", [])
@@ -80,13 +86,14 @@ for memory in memories:
 
 const { data } = await axios.post(
   "${apiUrl}/v1/recall",
-  { limit: 5 },
+  { user_id: "customer_8472", limit: 5 },
   { headers: { Authorization: "Bearer cmlive_xxx" } }
 );
 
 data.memories.forEach((m) => console.log(m.content, m.score));`,
                     php: `$response = Http::withToken('cmlive_xxx')
     ->post('${apiUrl}/v1/recall', [
+        'user_id' => 'customer_8472',
         'limit' => 5,
     ]);
 
@@ -97,8 +104,8 @@ foreach ($memories as $memory) {
                     curl: `curl -X POST "${apiUrl}/v1/recall" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
-  -d '{ "limit": 5 }'`,
-                    java: `String body = "{\"limit\":5}";
+  -d '{ "user_id": "customer_8472", "limit": 5 }'`,
+                    java: `String body = "{\"user_id\":\"customer_8472\",\"limit\":5}";
 
 HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("${apiUrl}/v1/recall"))
@@ -109,7 +116,7 @@ HttpRequest request = HttpRequest.newBuilder()
 
 HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
-                    go: `reqBody := strings.NewReader(\`{"limit":5}\`)
+                    go: `reqBody := strings.NewReader(\`{"user_id":"customer_8472","limit":5}\`)
 
 req, _ := http.NewRequest("POST", "${apiUrl}/v1/recall", reqBody)
 req.Header.Set("Authorization", "Bearer cmlive_xxx")
@@ -121,7 +128,15 @@ defer resp.Body.Close()`,
                 groups={apiRefGroups}
                 prev={{ href: '/api-reference/remember',         label: 'Remember'         }}
                 next={{ href: '/api-reference/context-assemble', label: 'Context assemble' }}
-            />
+            >
+                <div className="pt-4 border-t border-zinc-800/50 mt-8 space-y-4">
+                    <h2 className="text-white text-lg font-semibold mb-3">Identity & Isolation</h2>
+                    <ul className="list-disc pl-5 space-y-2 text-zinc-400">
+                        <li><strong>Workspace Isolation:</strong> TraceMem automatically limits the search space to the <code>workspace_id</code> bound to your API key. Memories from other workspaces are physically impossible to retrieve.</li>
+                        <li><strong>User Isolation:</strong> The <code>user_id</code> strictly filters the retrieval. Memories belonging to other users within your workspace are strictly isolated and never returned.</li>
+                    </ul>
+                </div>
+            </ApiReferencePage>
         </>
     );
 }

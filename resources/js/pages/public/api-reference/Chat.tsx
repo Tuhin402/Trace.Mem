@@ -40,6 +40,12 @@ export default function Chat() {
                 auth="Authorization: Bearer <api_key>"
                 body={[
                     {
+                        key:         'user_id',
+                        type:        'string',
+                        required:    true,
+                        description: 'A stable identifier representing your downstream end-user (e.g., customer_8472). TraceMem groups memories exclusively by this ID.',
+                    },
+                    {
                         key:         'message',
                         type:        'string',
                         required:    true,
@@ -109,6 +115,7 @@ curl -X POST "${apiUrl}/v1/chat" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "user_id": "customer_8472",
     "message": "I prefer React over Vue."
   }'
 
@@ -117,6 +124,7 @@ curl -X POST "${apiUrl}/v1/chat" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "user_id": "customer_8472",
     "message": "I prefer React over Vue.",
     "dry_run": true
   }'
@@ -126,6 +134,7 @@ curl -X POST "${apiUrl}/v1/chat" \\
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "user_id": "customer_8472",
     "message": "My name is Alex.",
     "memory_mode": "force"
   }'`,
@@ -137,7 +146,7 @@ headers = {"Authorization": "Bearer cmlive_xxx"}
 response = requests.post(
     "${apiUrl}/v1/chat",
     headers=headers,
-    json={"message": "I prefer React over Vue."}
+    json={"user_id": "customer_8472", "message": "I prefer React over Vue."}
 )
 data = response.json()
 print(data["reply"])
@@ -148,6 +157,7 @@ preview = requests.post(
     "${apiUrl}/v1/chat",
     headers=headers,
     json={
+        "user_id": "customer_8472",
         "message": "I prefer React over Vue.",
         "dry_run": True
     }
@@ -161,7 +171,7 @@ const headers = { Authorization: "Bearer cmlive_xxx" };
 // Standard chat call
 const { data } = await axios.post(
   "${apiUrl}/v1/chat",
-  { message: "I prefer React over Vue." },
+  { user_id: "customer_8472", message: "I prefer React over Vue." },
   { headers }
 );
 console.log(data.reply);
@@ -171,7 +181,7 @@ console.log("Request ID:", data.request_id);
 // Dry-run: preview memory decision before committing
 const { data: preview } = await axios.post(
   "${apiUrl}/v1/chat",
-  { message: "I prefer React over Vue.", dry_run: true },
+  { user_id: "customer_8472", message: "I prefer React over Vue.", dry_run: true },
   { headers }
 );
 // { dry_run: true, would_remember: true, type: "preference", via: "heuristic" }
@@ -179,7 +189,7 @@ const { data: preview } = await axios.post(
 // Idempotent request — safe to retry on network failure
 await axios.post(
   "${apiUrl}/v1/chat",
-  { message: "My name is Alex.", memory_mode: "force" },
+  { user_id: "customer_8472", message: "My name is Alex.", memory_mode: "force" },
   { headers: { ...headers, "Idempotency-Key": "req_unique_abc123" } }
 );`,
                     php: `$headers = ['Authorization' => 'Bearer cmlive_xxx'];
@@ -187,6 +197,7 @@ await axios.post(
 // Standard chat call
 $response = Http::withHeaders($headers)
     ->post('${apiUrl}/v1/chat', [
+        'user_id' => 'customer_8472',
         'message' => 'I prefer React over Vue.',
     ]);
 
@@ -197,6 +208,7 @@ echo 'Memory saved: ' . ($data['memory']['saved'] ? 'yes' : 'no');
 // Dry-run: preview memory decision only
 $preview = Http::withHeaders($headers)
     ->post('${apiUrl}/v1/chat', [
+        'user_id'  => 'customer_8472',
         'message'  => 'I prefer React over Vue.',
         'dry_run'  => true,
     ]);
@@ -207,6 +219,7 @@ Http::withHeaders(array_merge($headers, [
         'Idempotency-Key' => 'req_unique_abc123',
     ]))
     ->post('${apiUrl}/v1/chat', [
+        'user_id'     => 'customer_8472',
         'message'     => 'My name is Alex.',
         'memory_mode' => 'force',
     ]);`,
@@ -214,7 +227,7 @@ Http::withHeaders(array_merge($headers, [
 String auth = "Bearer cmlive_xxx";
 
 // Standard chat call
-String body = "{\"message\":\"I prefer React over Vue.\"}";
+String body = "{\"user_id\":\"customer_8472\",\"message\":\"I prefer React over Vue.\"}";
 
 HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("${apiUrl}/v1/chat"))
@@ -230,6 +243,7 @@ HttpResponse<String> response = client.send(request,
 // Dry-run
 String dryBody = """
     {
+        "user_id": "customer_8472",
         "message": "I prefer React over Vue.",
         "dry_run": true
     }""";
@@ -243,7 +257,7 @@ HttpRequest dryRequest = HttpRequest.newBuilder()
                     go: `client := &http.Client{}
 
 // Standard chat call
-payload := `+"`"+`{"message":"I prefer React over Vue."}`+"`"+`
+payload := `+"`"+`{"user_id":"customer_8472","message":"I prefer React over Vue."}`+"`"+`
 
 req, _ := http.NewRequest("POST", "${apiUrl}/v1/chat",
     strings.NewReader(payload))
@@ -255,7 +269,7 @@ defer resp.Body.Close()
 // resp.Header.Get("X-Request-ID") → "tm_chat_..."
 
 // Dry-run
-dryPayload := `+"`"+`{"message":"I prefer React over Vue.","dry_run":true}`+"`"+`
+dryPayload := `+"`"+`{"user_id":"customer_8472","message":"I prefer React over Vue.","dry_run":true}`+"`"+`
 
 dryReq, _ := http.NewRequest("POST", "${apiUrl}/v1/chat",
     strings.NewReader(dryPayload))
@@ -267,7 +281,15 @@ defer dryResp.Body.Close()`,
                 }}
                 groups={apiRefGroups}
                 prev={{ href: '/api-reference/context-assemble', label: 'Context assemble' }}
-            />
+            >
+                <div className="pt-4 border-t border-zinc-800/50 mt-8 space-y-4">
+                    <h2 className="text-white text-lg font-semibold mb-3">Identity & Isolation</h2>
+                    <ul className="list-disc pl-5 space-y-2 text-zinc-400">
+                        <li><strong>Complete Isolation:</strong> This endpoint performs classification, context assembly, and LLM generation purely within the memory graph defined by the <code>(tenant_scope_id, workspace_id, user_id)</code> tuple.</li>
+                        <li><strong>Identity Expectation:</strong> TraceMem trusts the client to pass the correct, stable <code>user_id</code> for whoever is initiating this chat session. This ensures the AI's personalized reply is strictly grounded in their specific memory history.</li>
+                    </ul>
+                </div>
+            </ApiReferencePage>
         </>
     );
 }

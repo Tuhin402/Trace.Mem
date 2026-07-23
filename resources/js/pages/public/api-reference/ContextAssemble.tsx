@@ -40,6 +40,12 @@ export default function ContextAssemble() {
                 auth="Authorization: Bearer <api_key>"
                 body={[
                     {
+                        key:         'user_id',
+                        type:        'string',
+                        required:    true,
+                        description: 'A stable identifier representing your downstream end-user (e.g., customer_8472). TraceMem groups memories exclusively by this ID.',
+                    },
+                    {
                         key:         'query',
                         type:        'string',
                         required:    true,
@@ -72,6 +78,7 @@ response = requests.post(
     "${apiUrl}/v1/context/assemble",
     headers={"Authorization": "Bearer cmlive_xxx"},
     json={
+        "user_id":      "customer_8472",
         "query":        "Help me answer this question about frameworks",
         "token_budget": 1200,
     }
@@ -85,6 +92,7 @@ print(context)`,
 const { data } = await axios.post(
   "${apiUrl}/v1/context/assemble",
   {
+    user_id:      "customer_8472",
     query:        "Help me answer this question about frameworks",
     token_budget: 1200,
   },
@@ -95,6 +103,7 @@ const { data } = await axios.post(
 const systemPrompt = \`Context:\n\${data.context}\n\nUser: ...\`;`,
                     php: `$response = Http::withToken('cmlive_xxx')
     ->post('${apiUrl}/v1/context/assemble', [
+        'user_id'      => 'customer_8472',
         'query'        => 'Help me answer this question about frameworks',
         'token_budget' => 1200,
     ]);
@@ -105,11 +114,13 @@ $context = $response->json('context');
   -H "Authorization: Bearer cmlive_xxx" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "user_id": "customer_8472",
     "query": "Help me answer this question about frameworks",
     "token_budget": 1200
   }'`,
                     java: `String body = """
     {
+        "user_id": "customer_8472",
         "query": "Help me answer this question about frameworks",
         "token_budget": 1200
     }""";
@@ -124,6 +135,7 @@ HttpRequest request = HttpRequest.newBuilder()
 HttpResponse<String> response = HttpClient.newHttpClient()
     .send(request, HttpResponse.BodyHandlers.ofString());`,
                     go: `payload := \`{
+    "user_id":      "customer_8472",
     "query":        "Help me answer this question about frameworks",
     "token_budget": 1200
 }\`
@@ -142,7 +154,15 @@ defer resp.Body.Close()`,
                 groups={apiRefGroups}
                 prev={{ href: '/api-reference/recall', label: 'Recall' }}
                 next={{ href: '/api-reference/chat', label: 'Chat' }}
-            />
+            >
+                <div className="pt-4 border-t border-zinc-800/50 mt-8 space-y-4">
+                    <h2 className="text-white text-lg font-semibold mb-3">Identity & Isolation</h2>
+                    <ul className="list-disc pl-5 space-y-2 text-zinc-400">
+                        <li><strong>Workspace Isolation:</strong> TraceMem enforces workspace boundaries at the semantic search level via the API key. Cross-contamination is structurally impossible.</li>
+                        <li><strong>User Isolation:</strong> Required. The <code>user_id</code> ensures that context assembly strictly draws upon the exact memory graph representing <em>only</em> this downstream end-user.</li>
+                    </ul>
+                </div>
+            </ApiReferencePage>
         </>
     );
 }

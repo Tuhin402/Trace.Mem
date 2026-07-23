@@ -41,22 +41,26 @@ class WorkspaceInvitationController extends Controller
             return back()->with('error', 'This user is already a member of the workspace.');
         }
 
-        // Check if an invitation already exists
-        $existingInvitation = $workspace->invitations()->where('email', $email)->first();
+        // Check if a pending active invitation already exists
+        $existingInvitation = $workspace->invitations()
+            ->where('email', $email)
+            ->whereNull('accepted_at')
+            ->first();
+
         if ($existingInvitation && !$existingInvitation->isExpired()) {
             return back()->with('error', 'An active invitation has already been sent to this email address.');
         }
 
-        // Create the invitation
-        $invitation = $workspace->invitations()->updateOrCreate(
-            ['email' => $email],
-            [
-                'role'       => $validated['role'],
-                'invited_by' => $user->id,
-                'expires_at' => now()->addDays(7),
-                'code'       => Str::random(64), // Force new code if updating
-            ]
-        );
+        // Delete any old invitations (expired or accepted) for this email so we can cleanly create a new one
+        $workspace->invitations()->where('email', $email)->delete();
+
+        // Create the new invitation
+        $invitation = $workspace->invitations()->create([
+            'email'      => $email,
+            'role'       => $validated['role'],
+            'invited_by' => $user->id,
+            'expires_at' => now()->addDays(7),
+        ]);
 
         // Send email
         $acceptUrl = url(route('workspaces.invitations.accept', ['code' => $invitation->code], absolute: false));

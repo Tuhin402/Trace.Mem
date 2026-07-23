@@ -10,7 +10,6 @@ import {
     Clock,
     Check
 } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
 
 /* ── Types ──────────────────────────────────────────────────────────────── */
 type Member = {
@@ -145,7 +144,7 @@ export default function WorkspaceMembers({ targetWorkspace, members, invitations
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Members — ${targetWorkspace.name}`} />
 
             <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
@@ -295,6 +294,6 @@ export default function WorkspaceMembers({ targetWorkspace, members, invitations
             </div>
 
             {showInvite && <InviteMemberModal workspaceSlug={targetWorkspace.slug} onClose={() => setShowInvite(false)} />}
-        </AppLayout>
+        </>
     );
 }

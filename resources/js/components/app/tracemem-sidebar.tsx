@@ -159,6 +159,7 @@ export function TracememAppSidebar() {
     const collapsed = state === 'collapsed';
     const account = usePage().props.account as AccountContext | null;
     const isCompany = account?.isCompany ?? false;
+    const hasWorkspaceUI = !!usePage().props.workspace;
 
     const isActive = (href: string) => {
         if (href === '/dashboard') return url === '/dashboard';
@@ -177,8 +178,8 @@ export function TracememAppSidebar() {
                     <SidebarTrigger className="tracemem-sidebar-trigger tracemem-sidebar-trigger--mobile" />
                 </div>
 
-                {/* Workspace switcher — Company accounts only */}
-                {isCompany && (
+                {/* Workspace switcher — Company accounts or Individuals with >1 workspaces */}
+                {hasWorkspaceUI && (
                     <div className="px-1 pt-1">
                         <WorkspaceSwitcher />
                     </div>

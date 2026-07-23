@@ -1203,14 +1203,16 @@
 .docs-sidebar {
     width: 260px;
     flex-shrink: 0;
-    padding: 40px 24px;
+    padding: 52px 28px 40px 0;
     border-right: 1px solid var(--tm-border);
     position: sticky;
-    top: 60px;
-    height: calc(100vh - 60px);
+    top: var(--nav-h);
+    height: calc(100vh - var(--nav-h));
     overflow-y: auto;
-    background: var(--tm-surface-1);
+    overflow-x: hidden;
+    scrollbar-width: none;
 }
+.docs-sidebar::-webkit-scrollbar { display: none; }
 
 .docs-sidebar-inner {
     display: flex;
@@ -1393,12 +1395,11 @@
         flex-direction: column;
     }
     .docs-sidebar {
+        display: none;
+    }
+    #docs-mobile-nav {
+        display: block !important;
         width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--tm-border);
-        position: static;
-        padding: 24px var(--section-px);
     }
     .docs-doc-container {
         padding: 40px var(--section-px);

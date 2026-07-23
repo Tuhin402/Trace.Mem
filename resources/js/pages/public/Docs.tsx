@@ -1,13 +1,40 @@
 import { Head, Link } from '@inertiajs/react';
 import { Helmet } from 'react-helmet-async';
 import { useDomains } from '@/lib/domains';
-import { ArrowRight, BookOpen, Zap, Brain, Layers, Code2, Target, Pin, Scale, Wrench, Inbox, Wand2, GitMerge, PackageCheck, Briefcase, Calendar, LayoutTemplate, Database, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, Zap, Brain, Layers, Code2, Target, Pin, Scale, Wrench, Inbox, Wand2, GitMerge, PackageCheck, Briefcase, Calendar, LayoutTemplate, Database, Users, ChevronDown } from 'lucide-react';
 import CtaButton from '@/components/public/cta-button';
 import FaqAccordion from '@/components/public/faq-accordion';
 import UseCaseCard from '@/components/public/use-case-card';
 
 import { useState } from 'react';
 import MemoryBoundaries from '@/components/public/docs/MemoryBoundaries';
+import MarkdownRenderer from '@/components/public/docs/MarkdownRenderer';
+
+const rawDocs = import.meta.glob('../../../../docs/**/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+
+const docPaths: Record<string, string> = {
+    'workspace-architecture': '../../../../docs/architecture/WORKSPACE_ARCHITECTURE.md',
+    'memory-pipeline': '../../../../docs/architecture/MEMORY_PIPELINE.md',
+    'api-key-lifecycle': '../../../../docs/architecture/API_KEY_LIFECYCLE.md',
+    'retrieval-pipeline': '../../../../docs/architecture/RETRIEVAL_PIPELINE.md',
+    'ingestion-pipeline': '../../../../docs/architecture/INGESTION_PIPELINE.md',
+    'api-overview': '../../../../docs/api/OVERVIEW.md',
+    'authentication': '../../../../docs/api/AUTHENTICATION.md',
+    'api-reference': '../../../../docs/api/API_REFERENCE.md',
+    'error-handling': '../../../../docs/api/ERROR_HANDLING.md',
+    'rate-limits': '../../../../docs/api/RATE_LIMITS.md',
+    'versioning': '../../../../docs/api/VERSIONING.md',
+    'production-deployment': '../../../../docs/deployment/PRODUCTION_DEPLOYMENT.md',
+    'ci-cd': '../../../../docs/deployment/CI_CD.md',
+    'queues': '../../../../docs/deployment/QUEUES.md',
+    'scheduler': '../../../../docs/deployment/SCHEDULER.md',
+    'backups': '../../../../docs/deployment/BACKUPS.md',
+    'security-model': '../../../../docs/security/SECURITY_MODEL.md',
+    'api-key-security': '../../../../docs/security/API_KEY_SECURITY.md',
+    'webhook-security': '../../../../docs/security/WEBHOOK_SECURITY.md',
+    'http-headers': '../../../../docs/security/HTTP_HEADERS.md',
+    'data-isolation': '../../../../docs/security/DATA_ISOLATION.md',
+};
 
 /* ── Memory types data ────────────────────────────────────── */
 const memoryTypes = [
@@ -145,6 +172,7 @@ export default function Docs() {
     const { siteUrl } = useDomains();
     const postmanUrl = import.meta.env.VITE_POSTMAN_WORKSPACE_URL;
     const [activeDoc, setActiveDoc] = useState('overview');
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const renderContent = () => {
         if (activeDoc === 'memory-boundaries') {
@@ -154,7 +182,19 @@ export default function Docs() {
                 </div>
             );
         }
+        
         if (activeDoc !== 'overview') {
+            const mdPath = docPaths[activeDoc];
+            const markdownContent = mdPath ? rawDocs[mdPath] : null;
+            
+            if (markdownContent) {
+                return (
+                    <div className="docs-doc-container">
+                        <MarkdownRenderer content={markdownContent} />
+                    </div>
+                );
+            }
+            
             return (
                 <div className="docs-doc-container docs-coming-soon">
                     <h2 className="docs-section-h2" style={{ marginBottom: 16 }}>Coming Soon</h2>
@@ -746,6 +786,68 @@ export default function Docs() {
             <Head title="Documentation" />
 
             <div className="docs-layout-container">
+                {/* MOBILE SIDEBAR PANEL */}
+                <div className="api-sidebar-mobile" style={{ display: 'none' }} id="docs-mobile-nav">
+                    <button
+                        type="button"
+                        className="api-sidebar-mobile-trigger"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                    >
+                        <span className="api-sidebar-mobile-label">Navigation</span>
+                        <ChevronDown
+                            size={14}
+                            style={{
+                                transform: mobileOpen ? 'rotate(180deg)' : 'none',
+                                transition: 'transform 0.2s ease',
+                                flexShrink: 0,
+                            }}
+                        />
+                    </button>
+
+                    {mobileOpen && (
+                        <div className="api-sidebar-mobile-panel" style={{ zIndex: 50, position: 'relative', background: 'var(--tm-surface-1)' }}>
+                            <div className="api-sidebar-mobile-group">
+                                <div className="api-sidebar-mobile-group-title">Getting Started</div>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'overview' ? 'active' : ''}`} onClick={() => { setActiveDoc('overview'); setMobileOpen(false); }}>Overview</button>
+                            </div>
+                            <div className="api-sidebar-mobile-group">
+                                <div className="api-sidebar-mobile-group-title">Architecture</div>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'memory-boundaries' ? 'active' : ''}`} onClick={() => { setActiveDoc('memory-boundaries'); setMobileOpen(false); }}>Memory Boundaries</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'workspace-architecture' ? 'active' : ''}`} onClick={() => { setActiveDoc('workspace-architecture'); setMobileOpen(false); }}>Workspace Architecture</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'memory-pipeline' ? 'active' : ''}`} onClick={() => { setActiveDoc('memory-pipeline'); setMobileOpen(false); }}>Memory Pipeline</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'api-key-lifecycle' ? 'active' : ''}`} onClick={() => { setActiveDoc('api-key-lifecycle'); setMobileOpen(false); }}>API Key Lifecycle</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'retrieval-pipeline' ? 'active' : ''}`} onClick={() => { setActiveDoc('retrieval-pipeline'); setMobileOpen(false); }}>Retrieval Pipeline</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'ingestion-pipeline' ? 'active' : ''}`} onClick={() => { setActiveDoc('ingestion-pipeline'); setMobileOpen(false); }}>Ingestion Pipeline</button>
+                            </div>
+                            <div className="api-sidebar-mobile-group">
+                                <div className="api-sidebar-mobile-group-title">API</div>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'api-overview' ? 'active' : ''}`} onClick={() => { setActiveDoc('api-overview'); setMobileOpen(false); }}>API Overview</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'authentication' ? 'active' : ''}`} onClick={() => { setActiveDoc('authentication'); setMobileOpen(false); }}>Authentication</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'api-reference' ? 'active' : ''}`} onClick={() => { setActiveDoc('api-reference'); setMobileOpen(false); }}>API Reference</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'error-handling' ? 'active' : ''}`} onClick={() => { setActiveDoc('error-handling'); setMobileOpen(false); }}>Error Handling</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'rate-limits' ? 'active' : ''}`} onClick={() => { setActiveDoc('rate-limits'); setMobileOpen(false); }}>Rate Limits</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'versioning' ? 'active' : ''}`} onClick={() => { setActiveDoc('versioning'); setMobileOpen(false); }}>Versioning</button>
+                            </div>
+                            <div className="api-sidebar-mobile-group">
+                                <div className="api-sidebar-mobile-group-title">Deployment</div>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'production-deployment' ? 'active' : ''}`} onClick={() => { setActiveDoc('production-deployment'); setMobileOpen(false); }}>Production Deployment</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'ci-cd' ? 'active' : ''}`} onClick={() => { setActiveDoc('ci-cd'); setMobileOpen(false); }}>CI/CD</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'queues' ? 'active' : ''}`} onClick={() => { setActiveDoc('queues'); setMobileOpen(false); }}>Queues</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'scheduler' ? 'active' : ''}`} onClick={() => { setActiveDoc('scheduler'); setMobileOpen(false); }}>Scheduler</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'backups' ? 'active' : ''}`} onClick={() => { setActiveDoc('backups'); setMobileOpen(false); }}>Backups</button>
+                            </div>
+                            <div className="api-sidebar-mobile-group">
+                                <div className="api-sidebar-mobile-group-title">Security</div>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'security-model' ? 'active' : ''}`} onClick={() => { setActiveDoc('security-model'); setMobileOpen(false); }}>Security Model</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'api-key-security' ? 'active' : ''}`} onClick={() => { setActiveDoc('api-key-security'); setMobileOpen(false); }}>API Key Security</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'webhook-security' ? 'active' : ''}`} onClick={() => { setActiveDoc('webhook-security'); setMobileOpen(false); }}>Webhook Security</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'http-headers' ? 'active' : ''}`} onClick={() => { setActiveDoc('http-headers'); setMobileOpen(false); }}>HTTP Headers</button>
+                                <button className={`api-sidebar-mobile-link ${activeDoc === 'data-isolation' ? 'active' : ''}`} onClick={() => { setActiveDoc('data-isolation'); setMobileOpen(false); }}>Data Isolation</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* SIDEBAR NAVIGATION */}
                 <aside className="docs-sidebar">
                     <div className="docs-sidebar-inner">

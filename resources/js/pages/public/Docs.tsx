@@ -6,6 +6,9 @@ import CtaButton from '@/components/public/cta-button';
 import FaqAccordion from '@/components/public/faq-accordion';
 import UseCaseCard from '@/components/public/use-case-card';
 
+import { useState } from 'react';
+import MemoryBoundaries from '@/components/public/docs/MemoryBoundaries';
+
 /* ── Memory types data ────────────────────────────────────── */
 const memoryTypes = [
     {
@@ -141,39 +144,26 @@ const quickLinks = [
 export default function Docs() {
     const { siteUrl } = useDomains();
     const postmanUrl = import.meta.env.VITE_POSTMAN_WORKSPACE_URL;
+    const [activeDoc, setActiveDoc] = useState('overview');
 
-    return (
-        <>
-            <Helmet>
-                <title>Documentation | TraceMem</title>
-                <meta
-                    name="description"
-                    content="Official documentation for TraceMem, the context memory layer for AI applications. Learn how to store, recall, and assemble structured memory for LLMs."
-                />
-                <meta
-                    name="keywords"
-                    content="AI memory API, LLM memory layer, semantic memory, contextual memory, RAG memory, AI infrastructure, TraceMem docs"
-                />
-                <meta property="og:title" content="Documentation | TraceMem" />
-                <meta property="og:description" content="Persistent memory infrastructure for AI and LLM applications. Learn how to store, recall, and assemble structured memory." />
-                <meta property="og:type" content="website" />
-                <meta property="og:url" content={`${siteUrl}/docs`} />
-                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
-                <meta property="og:image:width"  content="1200" />
-                <meta property="og:image:height" content="630" />
-                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
-                <meta property="og:site_name"    content="TraceMem" />
-                <meta property="og:locale"       content="en_US" />
-                <meta name="twitter:card"        content="summary_large_image" />
-                <meta name="twitter:title"       content="Documentation | TraceMem" />
-                <meta name="twitter:description" content="Persistent memory infrastructure for AI and LLM applications. Learn how to store, recall, and assemble structured memory." />
-                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
-                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
-                <link rel="canonical" href={`${siteUrl}/docs`} />
-            </Helmet>
+    const renderContent = () => {
+        if (activeDoc === 'memory-boundaries') {
+            return (
+                <div className="docs-doc-container">
+                    <MemoryBoundaries />
+                </div>
+            );
+        }
+        if (activeDoc !== 'overview') {
+            return (
+                <div className="docs-doc-container docs-coming-soon">
+                    <h2 className="docs-section-h2" style={{ marginBottom: 16 }}>Coming Soon</h2>
+                    <p className="docs-section-lead">This documentation page is currently being written.</p>
+                </div>
+            );
+        }
 
-            <Head title="Documentation" />
-
+        return (
             <div className="docs-shell">
 
                 {/* ══ 1. HERO ═══════════════════════════════════════════ */}
@@ -719,6 +709,91 @@ export default function Docs() {
                     </div>
                 </section>
 
+            </div>
+        );
+    };
+
+    return (
+        <>
+            <Helmet>
+                <title>Documentation | TraceMem</title>
+                <meta
+                    name="description"
+                    content="Official documentation for TraceMem, the context memory layer for AI applications. Learn how to store, recall, and assemble structured memory for LLMs."
+                />
+                <meta
+                    name="keywords"
+                    content="AI memory API, LLM memory layer, semantic memory, contextual memory, RAG memory, AI infrastructure, TraceMem docs"
+                />
+                <meta property="og:title" content="Documentation | TraceMem" />
+                <meta property="og:description" content="Persistent memory infrastructure for AI and LLM applications. Learn how to store, recall, and assemble structured memory." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${siteUrl}/docs`} />
+                <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+                <meta property="og:image:width"  content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt"    content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <meta property="og:site_name"    content="TraceMem" />
+                <meta property="og:locale"       content="en_US" />
+                <meta name="twitter:card"        content="summary_large_image" />
+                <meta name="twitter:title"       content="Documentation | TraceMem" />
+                <meta name="twitter:description" content="Persistent memory infrastructure for AI and LLM applications. Learn how to store, recall, and assemble structured memory." />
+                <meta name="twitter:image"       content={`${siteUrl}/og-image.png`} />
+                <meta name="twitter:image:alt"   content="TraceMem - Long-Term Memory Infrastructure for AI" />
+                <link rel="canonical" href={`${siteUrl}/docs`} />
+            </Helmet>
+
+            <Head title="Documentation" />
+
+            <div className="docs-layout-container">
+                {/* SIDEBAR NAVIGATION */}
+                <aside className="docs-sidebar">
+                    <div className="docs-sidebar-inner">
+                        <div className="docs-sidebar-group">
+                            <div className="docs-sidebar-title">Getting Started</div>
+                            <button className={`docs-sidebar-link ${activeDoc === 'overview' ? 'active' : ''}`} onClick={() => setActiveDoc('overview')}>Overview</button>
+                        </div>
+                        <div className="docs-sidebar-group">
+                            <div className="docs-sidebar-title">Architecture</div>
+                            <button className={`docs-sidebar-link ${activeDoc === 'memory-boundaries' ? 'active' : ''}`} onClick={() => setActiveDoc('memory-boundaries')}>Memory Boundaries</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'workspace-architecture' ? 'active' : ''}`} onClick={() => setActiveDoc('workspace-architecture')}>Workspace Architecture</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'memory-pipeline' ? 'active' : ''}`} onClick={() => setActiveDoc('memory-pipeline')}>Memory Pipeline</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'api-key-lifecycle' ? 'active' : ''}`} onClick={() => setActiveDoc('api-key-lifecycle')}>API Key Lifecycle</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'retrieval-pipeline' ? 'active' : ''}`} onClick={() => setActiveDoc('retrieval-pipeline')}>Retrieval Pipeline</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'ingestion-pipeline' ? 'active' : ''}`} onClick={() => setActiveDoc('ingestion-pipeline')}>Ingestion Pipeline</button>
+                        </div>
+                        <div className="docs-sidebar-group">
+                            <div className="docs-sidebar-title">API</div>
+                            <button className={`docs-sidebar-link ${activeDoc === 'api-overview' ? 'active' : ''}`} onClick={() => setActiveDoc('api-overview')}>API Overview</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'authentication' ? 'active' : ''}`} onClick={() => setActiveDoc('authentication')}>Authentication</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'api-reference' ? 'active' : ''}`} onClick={() => setActiveDoc('api-reference')}>API Reference</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'error-handling' ? 'active' : ''}`} onClick={() => setActiveDoc('error-handling')}>Error Handling</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'rate-limits' ? 'active' : ''}`} onClick={() => setActiveDoc('rate-limits')}>Rate Limits</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'versioning' ? 'active' : ''}`} onClick={() => setActiveDoc('versioning')}>Versioning</button>
+                        </div>
+                        <div className="docs-sidebar-group">
+                            <div className="docs-sidebar-title">Deployment</div>
+                            <button className={`docs-sidebar-link ${activeDoc === 'production-deployment' ? 'active' : ''}`} onClick={() => setActiveDoc('production-deployment')}>Production Deployment</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'ci-cd' ? 'active' : ''}`} onClick={() => setActiveDoc('ci-cd')}>CI/CD</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'queues' ? 'active' : ''}`} onClick={() => setActiveDoc('queues')}>Queues</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'scheduler' ? 'active' : ''}`} onClick={() => setActiveDoc('scheduler')}>Scheduler</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'backups' ? 'active' : ''}`} onClick={() => setActiveDoc('backups')}>Backups</button>
+                        </div>
+                        <div className="docs-sidebar-group">
+                            <div className="docs-sidebar-title">Security</div>
+                            <button className={`docs-sidebar-link ${activeDoc === 'security-model' ? 'active' : ''}`} onClick={() => setActiveDoc('security-model')}>Security Model</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'api-key-security' ? 'active' : ''}`} onClick={() => setActiveDoc('api-key-security')}>API Key Security</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'webhook-security' ? 'active' : ''}`} onClick={() => setActiveDoc('webhook-security')}>Webhook Security</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'http-headers' ? 'active' : ''}`} onClick={() => setActiveDoc('http-headers')}>HTTP Headers</button>
+                            <button className={`docs-sidebar-link ${activeDoc === 'data-isolation' ? 'active' : ''}`} onClick={() => setActiveDoc('data-isolation')}>Data Isolation</button>
+                        </div>
+                    </div>
+                </aside>
+
+                {/* MAIN CONTENT AREA */}
+                <main className="docs-main-content-area">
+                    {renderContent()}
+                </main>
             </div>
         </>
     );

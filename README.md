@@ -6,6 +6,42 @@ TraceMem provides long-term, persistent context to AI agents by extracting, stor
 
 ---
 
+## Documentation
+
+Welcome to the official TraceMem documentation. Dive into the deep architecture, API references, deployment guides, and security model.
+
+**Architecture**
+- [Memory Boundaries](docs/architecture/MEMORY_BOUNDARIES.md)
+- [Workspace Architecture](docs/architecture/WORKSPACE_ARCHITECTURE.md)
+- [Memory Pipeline](docs/architecture/MEMORY_PIPELINE.md)
+- [API Key Lifecycle](docs/architecture/API_KEY_LIFECYCLE.md)
+- [Retrieval Pipeline](docs/architecture/RETRIEVAL_PIPELINE.md)
+- [Ingestion Pipeline](docs/architecture/INGESTION_PIPELINE.md)
+
+**API**
+- [API Overview](docs/api/OVERVIEW.md)
+- [Authentication](docs/api/AUTHENTICATION.md)
+- [API Reference](docs/api/API_REFERENCE.md)
+- [Error Handling](docs/api/ERROR_HANDLING.md)
+- [Rate Limits](docs/api/RATE_LIMITS.md)
+- [Versioning](docs/api/VERSIONING.md)
+
+**Deployment**
+- [Production Deployment](docs/deployment/PRODUCTION_DEPLOYMENT.md)
+- [CI/CD](docs/deployment/CI_CD.md)
+- [Queues](docs/deployment/QUEUES.md)
+- [Scheduler](docs/deployment/SCHEDULER.md)
+- [Backups](docs/deployment/BACKUPS.md)
+
+**Security**
+- [Security Model](docs/security/SECURITY_MODEL.md)
+- [API Key Security](docs/security/API_KEY_SECURITY.md)
+- [Webhook Security](docs/security/WEBHOOK_SECURITY.md)
+- [HTTP Headers](docs/security/HTTP_HEADERS.md)
+- [Data Isolation](docs/security/DATA_ISOLATION.md)
+
+---
+
 ## Architecture Overview
 
 ![TraceMem System Architecture](public/tracemem-architecture.png)

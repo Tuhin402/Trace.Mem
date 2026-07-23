@@ -5,6 +5,8 @@ import { AppShell } from '@/components/app-shell';
 import { TracememAppSidebar } from '@/components/app/tracemem-sidebar';
 import { WorkspaceStatusBanner } from '@/components/workspace-status-banner';
 import { NewApiKeyBanner } from '@/components/app/new-api-key-banner';
+import { FloatingVideoWidget } from '@/components/app/floating-video-widget';
+import { FLOATING_VIDEO_CONFIG } from '@/config/floating-videos';
 import type { AppLayoutProps } from '@/types';
 import type { BreadcrumbItem } from '@/types';
 
@@ -88,6 +90,14 @@ export default function AppSidebarLayout({
                 <AppTopBar breadcrumbs={breadcrumbs} />
                 <WorkspaceStatusBanner />
                 <NewApiKeyBanner />
+
+                {/* Floating Video automatically mounts if current URL is in config */}
+                {FLOATING_VIDEO_CONFIG[usePage().url] && (
+                    <FloatingVideoWidget 
+                        rawVideoData={FLOATING_VIDEO_CONFIG[usePage().url]} 
+                        pagePath={usePage().url} 
+                    />
+                )}
 
                 {/* Keep children mounted to prevent Inertia reconciliation errors */}
                 <div style={{ display: loadingUrl ? 'none' : 'block' }}>

@@ -32,6 +32,7 @@ import '../css/app/toast.css';
 import '../css/app/sidebar.css';
 import '../css/app/loader.css';
 import '../css/app/skeletons.css';
+import '../css/app/floating-video.css';
 
 // App page styles
 import '../css/pages/dashboard.css';

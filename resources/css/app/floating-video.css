@@ -1,0 +1,88 @@
+/* Floating Video Widget Styles */
+.tracemem-floating-video-wrapper {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 50; /* High z-index to stay above other UI */
+    width: 340px;
+    aspect-ratio: 16 / 9; /* Landscape, laptop-like */
+    border-radius: 12px;
+    background-color: hsl(var(--card));
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), 0 0 0 1px hsl(var(--border));
+    overflow: visible; /* To allow the floating close button to break out */
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    animation: floatingVideoSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes floatingVideoSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.tracemem-floating-video-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.tracemem-floating-video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Floating close button */
+.tracemem-floating-video-close {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 51;
+    transition: all 0.2s ease;
+}
+
+.tracemem-floating-video-close:hover {
+    background-color: hsl(var(--destructive) / 0.1);
+    color: hsl(var(--destructive));
+    border-color: hsl(var(--destructive) / 0.3);
+    transform: scale(1.1);
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .tracemem-floating-video-wrapper {
+        width: 280px;
+        bottom: 16px;
+        right: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tracemem-floating-video-wrapper {
+        width: 240px;
+        bottom: 12px;
+        right: 12px;
+    }
+}

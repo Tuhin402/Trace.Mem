@@ -22,13 +22,13 @@ export default function Register() {
 
     return (
         <>
-            <Head title="Admin Registration" />
+            <Head title="Control Registration" />
 
             <div className="w-full max-w-md mx-auto bg-surface border border-almost-black p-8">
                 <div className="mb-8 text-center">
-                    <h1 className="text-2xl font-bold font-heading text-primary">Provision Admin</h1>
+                    <h1 className="text-2xl font-bold font-heading text-primary">Operations Control</h1>
                     <p className="text-sm text-on-background/70 mt-2 font-mono">
-                        Create a new platform administrator.
+                        Initialize Control Credentials
                     </p>
                 </div>
 

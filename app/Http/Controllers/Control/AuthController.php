@@ -129,8 +129,10 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        if (! PlatformSetting::getSetting('allow_admin_registration', false)) {
-            abort(403, 'Admin registration is currently disabled.');
+        $isFirst = User::whereNotNull('platform_role')->count() === 0;
+
+        if (! $isFirst && ! PlatformSetting::getSetting('allow_admin_registration', false)) {
+            abort(403, 'Control registration is currently disabled.');
         }
 
         $request->validate([
@@ -154,13 +156,30 @@ class AuthController extends Controller
         ]);
 
         // Auto grant super_admin to the first admin.
-        // The plan stated: "After the first successful administrator login, disable public admin registration"
-        // We will disable it when they successfully login for the first time, or just here.
         if ($isFirst) {
             PlatformSetting::setSetting('allow_admin_registration', false);
         }
 
-        // We can just redirect them to login so they get an OTP.
-        return redirect()->route('control.login')->with('status', 'Registration successful. Please login to receive your OTP.');
+        // Generate and store OTP (Cache only, 5 mins, Hashed)
+        $otp = (string) random_int(100000, 999999);
+        if (app()->environment('local')) {
+            $otp = '123456';
+            \Illuminate\Support\Facades\Log::info("Control OTP for {$email}: {$otp}");
+        }
+        Cache::put('control_otp_' . $email, Hash::make($otp), now()->addMinutes(5));
+
+        // Send Email
+        SendEmailJob::dispatch(
+            template: EmailTemplate::ControlOtp,
+            data: [
+                'user_name' => $user->name,
+                'otp' => $otp,
+            ],
+            recipientEmail: $email,
+            userId: $user->id,
+            requestId: Str::uuid()->toString(),
+        );
+
+        return redirect()->route('control.verify-otp')->with('email', $email)->with('status', 'Registration successful. Check your email for the OTP.');
     }
 }

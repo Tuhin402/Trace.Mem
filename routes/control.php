@@ -29,7 +29,10 @@ Route::middleware(['web', 'control.admin'])->group(function () {
     Route::inertia('/tenants', 'control/Scaffold', ['title' => 'Tenant Workspaces', 'description' => 'Oversee all company workspaces.', 'icon' => 'database'])->name('control.tenants');
     Route::inertia('/billing', 'control/Scaffold', ['title' => 'Billing & Revenue', 'description' => 'Track subscriptions, trials, and invoices.', 'icon' => 'credit-card'])->name('control.billing');
     Route::inertia('/platform', 'control/Scaffold', ['title' => 'Platform Jobs', 'description' => 'Monitor background queues and system health.', 'icon' => 'shield'])->name('control.platform');
-    Route::inertia('/settings', 'control/Scaffold', ['title' => 'Platform Settings', 'description' => 'Configure global operations flags and security.', 'icon' => 'settings'])->name('control.settings');
+    
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\Control\SettingsController::class, 'index'])->name('control.settings');
+    Route::put('/settings', [\App\Http\Controllers\Control\SettingsController::class, 'update'])->name('control.settings.update');
     
     // Global Search API
     Route::get('/api/search', [\App\Http\Controllers\Control\GlobalSearchController::class, 'search'])->name('control.search');

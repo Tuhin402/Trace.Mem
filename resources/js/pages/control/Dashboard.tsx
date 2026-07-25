@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import WorldMap from '@/components/control/WorldMap';
 
 export default function Dashboard() {
     return (
@@ -21,12 +22,9 @@ export default function Dashboard() {
                     <MetricCard title="System Health" value="100%" trend="Stable" />
                 </div>
 
-                {/* World Map Placeholder */}
-                <div className="h-96 w-full border border-almost-black bg-surface p-4 flex flex-col">
-                    <h2 className="text-lg font-semibold font-heading mb-4">Global Distribution</h2>
-                    <div className="flex-1 flex items-center justify-center border border-dashed border-almost-black/20 text-on-background/50 font-mono">
-                        [GeoJSON World Map Component]
-                    </div>
+                {/* Global Distribution Map */}
+                <div className="h-[400px] w-full">
+                    <WorldMap />
                 </div>
             </div>
         </>

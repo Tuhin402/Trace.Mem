@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEvent, useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AuthPromoPanel from '@/components/public/auth-promo-panel';
@@ -13,7 +13,7 @@ export default function Login() {
     });
     const [showPw, setShowPw] = useState(false);
 
-    function submit(e: FormEvent<HTMLFormElement>) {
+    function submit(e: SyntheticEvent) {
         e.preventDefault();
         post('/login', {
             onFinish: () => reset('password'),

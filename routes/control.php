@@ -23,4 +23,7 @@ Route::middleware(['web', 'control.admin'])->group(function () {
     });
     
     Route::inertia('/dashboard', 'control/Dashboard')->name('control.dashboard');
+    
+    // Global Search API
+    Route::get('/api/search', [\App\Http\Controllers\Control\GlobalSearchController::class, 'search'])->name('control.search');
 });

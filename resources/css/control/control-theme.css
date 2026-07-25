@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@theme {
+    /* Architectural Precision - Light Mode - Control Console */
+    --color-background: #fcf8f8;
+    --color-surface: #fcf8f8;
+    --color-surface-dim: #dcd9d9;
+    --color-surface-bright: #fcf8f8;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f6f3f2;
+    --color-surface-container: #f0edec;
+    --color-surface-container-high: #ebe7e7;
+    --color-surface-container-highest: #e5e2e1;
+
+    --color-on-background: #1c1b1b;
+    --color-on-surface: #1c1b1b;
+    --color-on-surface-variant: #4c444e;
+
+    --color-primary: #391053;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #391053;
+    --color-on-primary-container: #a77bc3;
+
+    --color-secondary: #6e5193;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #d4b3fd;
+    --color-on-secondary-container: #5e4182;
+
+    --color-tertiary: #180f00;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #322300;
+    --color-on-tertiary-container: #a18a5a;
+
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+
+    --color-outline: #7d747f;
+    --color-outline-variant: #cec3d0;
+    
+    --color-surface-stroke: #E5E1DA;
+    --color-surface-muted: #F0EDE8;
+    --color-technical-blue: #0051C3;
+    --color-warning-orange: #F38020;
+    --color-almost-black: #0A0A0A;
+
+    --font-heading: "Hanken Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --radius-xl: 0px;
+    --radius-2xl: 0px;
+    --radius-3xl: 0px;
+    --radius-full: 0px;
+}
+
+/* Specific Control Console Styles */
+body.control-console {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-body);
+    /* Technical Grid Texture: 1px lines at 24px intervals, #0A0A0A at 3% opacity */
+    background-image: 
+        linear-gradient(to right, rgba(10, 10, 10, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(10, 10, 10, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.control-console h1, .control-console h2, .control-console h3, .control-console h4, .control-console h5, .control-console h6 {
+    font-family: var(--font-heading);
+}
+
+.control-console code, .control-console pre, .control-console .font-mono {
+    font-family: var(--font-mono);
+}
+
+.control-console .label-caps {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* Base utility overwrites for control */
+.control-console * {
+    border-radius: 0px !important;
+}
+
+/* Hide scrollbars but allow scrolling */
+.control-console .no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.control-console .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

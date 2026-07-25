@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             Route::middleware('api')
                 ->group(base_path('routes/api.php'));
+                
+            Route::middleware('web')
+                ->domain('control.' . env('APP_DOMAIN', 'tracemem.one'))
+                ->group(base_path('routes/control.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -48,6 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'api.key.auth' => \App\Http\Middleware\ApiKeyAuthMiddleware::class,
+            'control.admin' => \App\Http\Middleware\ControlAdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

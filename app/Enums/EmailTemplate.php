@@ -23,6 +23,9 @@ enum EmailTemplate: string
     case FreeTrialReminder     = 'free_trial_reminder';  // shared for 7/3/1-day reminders
     // ── Workspace ─────────────────────────────────────────────────────────
     case WorkspaceInvitation   = 'workspace_invitation';
+    
+    // ── Control Console ───────────────────────────────────────────────────
+    case ControlOtp            = 'control_otp';
 
     // ── Subject lines ─────────────────────────────────────────────────────────
 
@@ -46,6 +49,7 @@ enum EmailTemplate: string
             self::FreeTrialStarted      => 'Your Founding Offer is active — first month of TraceMem is free',
             self::FreeTrialReminder     => 'Your Founding Offer ends soon — TraceMem',
             self::WorkspaceInvitation   => 'You have been invited to a Trace.Mem workspace',
+            self::ControlOtp            => 'Your TraceMem Operations Console OTP',
         };
     }
 
@@ -86,6 +90,7 @@ enum EmailTemplate: string
             self::FreeTrialStarted      => 'FreeTrialStartedEmail',
             self::FreeTrialReminder     => 'FreeTrialReminderEmail',
             self::WorkspaceInvitation   => 'WorkspaceInvitationEmail',
+            self::ControlOtp            => 'ControlOtpEmail',
         };
     }
 
@@ -110,6 +115,7 @@ enum EmailTemplate: string
             self::FreeTrialStarted      => 'emails.billing.free-trial-started',
             self::FreeTrialReminder     => 'emails.billing.free-trial-reminder',
             self::WorkspaceInvitation   => 'emails.workspace.invitation',
+            self::ControlOtp            => 'emails.auth.control-otp',
         };
     }
 }

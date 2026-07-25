@@ -13,6 +13,8 @@ import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import PublicLayout from '@/layouts/public-layout';
 import ApiReferenceLayout from '@/layouts/api-reference-layout';
+import ControlLayout from '@/layouts/control/ControlLayout';
+import ControlAuthLayout from '@/layouts/control/ControlAuthLayout';
 import ErrorBoundary from '@/components/error-boundary';
 import { useEffect, type ReactNode } from 'react';
 
@@ -43,6 +45,9 @@ import '../css/pages/logs.css';
 import '../css/pages/observability.css';
 import '../css/pages/memory-inspector.css';
 
+// Control Console theme
+import '../css/control/control-theme.css';
+
 
 
 // for SEO
@@ -55,6 +60,8 @@ const withPublicLayout = (page: ReactNode) => <PublicLayout>{page}</PublicLayout
 const withApiRefLayout = (page: ReactNode) => <ApiReferenceLayout>{page}</ApiReferenceLayout>;
 const withAuthLayout   = (page: ReactNode) => <AuthLayout>{page}</AuthLayout>;
 const withAppLayout    = (page: ReactNode) => <AppLayout>{page}</AppLayout>;
+const withControlLayout = (page: ReactNode) => <ControlLayout>{page}</ControlLayout>;
+const withControlAuthLayout = (page: ReactNode) => <ControlAuthLayout>{page}</ControlAuthLayout>;
 const withSettingsLayout = (page: ReactNode) => (
     <AppLayout><SettingsLayout>{page}</SettingsLayout></AppLayout>
 );
@@ -99,6 +106,14 @@ createInertiaApp({
                     case name.startsWith('settings/'):
                     case name.startsWith('teams/'):
                         component.layout = withSettingsLayout;
+                        break;
+                        
+                    case name.startsWith('control/auth/'):
+                        component.layout = withControlAuthLayout;
+                        break;
+
+                    case name.startsWith('control/'):
+                        component.layout = withControlLayout;
                         break;
 
                     default:

@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'account_type',
         'company_name',
         'last_login_at',
+        'platform_role',
         // ── Free trial (Founding Offer) ──────────────────────────────────────
         'free_trial_status',        // null | pending_activation | activated | completed | cancelled | upgraded
         'free_trial_activated_at',

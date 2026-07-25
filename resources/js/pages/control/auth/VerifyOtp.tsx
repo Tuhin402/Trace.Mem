@@ -21,7 +21,7 @@ export default function VerifyOtp() {
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-        post('/control/verify-otp');
+        post('/verify-otp');
     };
 
     return (

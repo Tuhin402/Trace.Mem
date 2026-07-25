@@ -17,7 +17,7 @@ export default function Register() {
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-        post('/control/register');
+        post('/register');
     };
 
     return (
@@ -77,7 +77,7 @@ export default function Register() {
                 </form>
 
                 <div className="mt-6 text-center text-sm font-mono text-on-background/60">
-                    Already provisioned? <Link href="/control/login" className="text-primary hover:underline">Log in</Link>
+                    Already provisioned? <Link href="/login" className="text-primary hover:underline">Log in</Link>
                 </div>
             </div>
         </>

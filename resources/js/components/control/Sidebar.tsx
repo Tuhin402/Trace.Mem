@@ -103,7 +103,7 @@ function NavItem({ href, icon, label, collapsed, active = false }: any) {
     return (
         <li>
             <Link 
-                href={`/control${href}`}
+                href={href}
                 className={`group flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
                     active 
                         ? 'bg-almost-black/5 text-primary border-l-4 border-primary' 

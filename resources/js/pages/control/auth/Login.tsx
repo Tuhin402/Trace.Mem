@@ -16,7 +16,7 @@ export default function Login({ status }: { status?: string }) {
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-        post('/control/login');
+        post('/login');
     };
 
     return (

@@ -47,7 +47,7 @@ class GlobalSearchController extends Controller
                 'id' => $user->id,
                 'title' => $user->name,
                 'subtitle' => $user->email,
-                'url' => "/control/users/{$user->id}",
+                'url' => "/users/{$user->id}",
             ];
         }
 
@@ -62,7 +62,7 @@ class GlobalSearchController extends Controller
                 'id' => $team->id,
                 'title' => $team->name,
                 'subtitle' => 'Workspace',
-                'url' => "/control/tenants/{$team->id}",
+                'url' => "/tenants/{$team->id}",
             ];
         }
 
@@ -78,7 +78,7 @@ class GlobalSearchController extends Controller
                 'id' => $memory->id,
                 'title' => "Memory ID: {$memory->id}",
                 'subtitle' => "Workspace: {$memory->team_id}",
-                'url' => "/control/memories/{$memory->id}",
+                'url' => "/memories/{$memory->id}",
             ];
         }
         
@@ -94,7 +94,7 @@ class GlobalSearchController extends Controller
                 'id' => $key->id,
                 'title' => $key->name,
                 'subtitle' => "Prefix: {$key->token_prefix}",
-                'url' => "/control/apikeys/{$key->id}",
+                'url' => "/apikeys/{$key->id}",
             ];
         }
 

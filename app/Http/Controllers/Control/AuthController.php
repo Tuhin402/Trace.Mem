@@ -42,8 +42,10 @@ class AuthController extends Controller
         // Verify if user exists and is an admin
         $user = User::where('email', $email)->first();
         if (! $user || ! in_array($user->platform_role, ['admin', 'super_admin'])) {
-            // Generic response to prevent enumeration
-            return redirect()->route('control.verify-otp')->with('email', $email);
+            // Explicit response to inform the user they lack privileges
+            return back()->withErrors([
+                'email' => 'Unauthorized access. This account does not have administrative privileges.',
+            ]);
         }
 
         // Generate and store OTP (Cache only, 5 mins, Hashed)

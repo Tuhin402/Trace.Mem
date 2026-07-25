@@ -126,7 +126,7 @@ class DashboardController extends Controller
         });
 
         // Use tenant's owned workspaces for recent memories to align with Tenant ownership
-        $ownedWorkspaceIds = $user->ownedTeams()->pluck('id');
+        $ownedWorkspaceIds = $user->ownedTeams()->pluck('teams.id');
         $memories = Memory::whereIn('workspace_id', $ownedWorkspaceIds)
             ->latest('created_at')
             ->take(6)

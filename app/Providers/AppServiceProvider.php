@@ -105,6 +105,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        // Isolate session for control console to prevent conflicts with the main app
+        $request = request();
+        if ($request && \Illuminate\Support\Str::startsWith($request->getHost(), 'control.')) {
+            config(['session.cookie' => config('session.cookie') . '_control']);
+        }
     }
 
     /**

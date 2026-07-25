@@ -48,6 +48,10 @@ class AuthController extends Controller
 
         // Generate and store OTP (Cache only, 5 mins, Hashed)
         $otp = (string) random_int(100000, 999999);
+        if (app()->environment('local')) {
+            $otp = '123456';
+            \Illuminate\Support\Facades\Log::info("Control OTP for {$email}: {$otp}");
+        }
         Cache::put('control_otp_' . $email, Hash::make($otp), now()->addMinutes(5));
 
         // Send Email

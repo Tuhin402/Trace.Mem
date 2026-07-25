@@ -24,7 +24,9 @@ class ApiKeyController extends Controller
         $usage = $this->analytics->forUser($user, []);   // all-time base for stats
 
         return Inertia::render('app/ApiKeys', [
-            'apiKeys'    => $user?->apiKeys()->latest()->get() ?? [],
+            'apiKeys'    => $user?->currentTeam 
+                ? $user->currentTeam->apiKeys()->with('workspace')->latest()->get() 
+                : ($user?->apiKeys()->with('workspace')->latest()->get() ?? []),
             'plan'       => $user?->currentSubscription?->subscriptionPlan,
             'usageStats' => $usage['summary'],
             'usageLogs'  => $usage['recent'],
@@ -73,9 +75,12 @@ class ApiKeyController extends Controller
 
     public function destroy(Request $request, ApiKey $apiKey, ApiKeyService $service)
     {
-        abort_unless($apiKey->user_id === $request->user()->id, 403);
-
         $user = $request->user();
+        abort_unless(
+            $apiKey->user_id === $user->id || 
+            $apiKey->tenant_scope_id === $user->tenant_scope_id, 
+            403
+        );
 
         $service->revoke($apiKey);
 
@@ -89,9 +94,12 @@ class ApiKeyController extends Controller
 
     public function rotate(Request $request, ApiKey $apiKey, ApiKeyService $service)
     {
-        abort_unless($apiKey->user_id === $request->user()->id, 403);
-
         $user   = $request->user();
+        abort_unless(
+            $apiKey->user_id === $user->id || 
+            $apiKey->tenant_scope_id === $user->tenant_scope_id, 
+            403
+        );
         $result = $service->rotateForUser($user, $apiKey);
         // Note: ApiKeyService::rotateForUser() already calls forgetEntitlements()
         // after revocation. We additionally invalidate analytics here.

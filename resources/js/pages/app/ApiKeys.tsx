@@ -32,6 +32,9 @@ type ApiKeyItem = {
     expires_at?: string | null;
     revoked_at?: string | null;
     created_at: string;
+    workspace?: {
+        name: string;
+    } | null;
 };
 
 type SubscriptionPlan = {
@@ -417,6 +420,12 @@ export default function ApiKeys() {
                                                         <div className="ak-key-title-row">
                                                             <span className="ak-key-name">{key.name}</span>
                                                             <div className="ak-key-badges">
+                                                                {key.workspace && (
+                                                                    <span className="app-badge app-badge-neutral" title="Attached Workspace">
+                                                                        <Globe size={9} style={{ marginRight: '3px' }} />
+                                                                        {key.workspace.name}
+                                                                    </span>
+                                                                )}
                                                                 <span className={`app-badge app-badge-${key.environment}`}>
                                                                     {key.environment}
                                                                 </span>

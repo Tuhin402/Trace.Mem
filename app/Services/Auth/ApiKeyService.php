@@ -28,7 +28,11 @@ class ApiKeyService
         return DB::transaction(function () use ($user, $name, $environment, $options, $replacing, $workspace) {
             // Resolve workspace — fall back to user's current team if not specified
             $resolvedWorkspace = $workspace ?? $user->currentTeam;
-            $policy = $this->entitlements->resolveForUser($user);
+            
+            // Resolve the workspace owner (fallback to the user if no workspace)
+            $workspaceOwner = $resolvedWorkspace ? ($resolvedWorkspace->owner() ?? $user) : $user;
+
+            $policy = $this->entitlements->resolveForUser($workspaceOwner);
             $plan = $policy['plan'];
             $subscription = $policy['subscription'];
 
@@ -48,7 +52,8 @@ class ApiKeyService
 
             $limit = $environment === 'test' ? $policy['test_api_key_limit'] : $policy['live_api_key_limit'];
 
-            $activeCount = $user->apiKeys()
+            $activeCount = ApiKey::query()
+                ->where('tenant_scope_id', $workspaceOwner->tenant_scope_id)
                 ->where('environment', $environment)
                 ->whereNull('revoked_at')
                 ->whereNull('cancelled_at')
@@ -89,7 +94,7 @@ class ApiKeyService
 
             $apiKey = ApiKey::create([
                 'user_id'         => $user->id,
-                'tenant_scope_id' => $user->tenant_scope_id,
+                'tenant_scope_id' => $workspaceOwner->tenant_scope_id,
                 'workspace_id'    => $resolvedWorkspace?->id,  // immutable — set once, never changed
                 'subscription_plan_id' => $plan?->id,
                 'name'            => $name,
@@ -126,7 +131,11 @@ class ApiKeyService
 
     public function rotateForUser(User $user, ApiKey $apiKey, array $options = []): array
     {
-        abort_unless($apiKey->user_id === $user->id, 403);
+        abort_unless(
+            $apiKey->user_id === $user->id || 
+            $apiKey->tenant_scope_id === $user->tenant_scope_id, 
+            403
+        );
 
         // Pass the ORIGINAL key's workspace — workspace binding is immutable through rotations.
         // The new key belongs to the same workspace as the key it replaces.

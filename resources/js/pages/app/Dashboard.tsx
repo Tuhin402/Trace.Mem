@@ -16,6 +16,12 @@ import {
     CreditCard,
     ShieldCheck,
     Copy,
+    Users,
+    Brain,
+    Database,
+    Plus,
+    UserPlus,
+    BookOpen
 } from 'lucide-react';
 import { useToast } from '@/components/app/toast';
 import { fmtNum, fmtLatency, fmtRate, fmtMoney, statusClass } from '@/lib/fmt';
@@ -114,6 +120,21 @@ type UsageStats = {
     avg_latency_ms: number;
 };
 
+type TenantStats = {
+    workspaces: { total: number; active: number; archived: number };
+    members: { total: number; roles: Record<string, number> };
+    apiKeys: { total: number; live: number; test: number };
+    memories: { total: number };
+    recentActivity: Array<{
+        id: number;
+        workspace_id: number;
+        action: string;
+        created_at: string;
+        actor?: { name: string; email: string } | null;
+        metadata?: any;
+    }>;
+};
+
 type PageProps = {
     apiKeys?: ApiKeyItem[];
     plan?: SubscriptionPlan | null;
@@ -121,6 +142,7 @@ type PageProps = {
     usageStats?: UsageStats;
     usageLogs?: UsageRecentItem[];
     todayInsights?: InsightsData;
+    tenantStats?: TenantStats;
     memories?: MemoryItem[];
     subscription?: {
         starts_at?: string | null;
@@ -208,6 +230,7 @@ export default function Dashboard() {
     const usageStats = props.usageStats;
     const recentUsage = props.usageLogs ?? [];
     const todayInsights = props.todayInsights;
+    const tenantStats = props.tenantStats;
     const memories = props.memories ?? [];
     const subscription = props.subscription ?? null;
     const foundingOffer = props.founding_offer ?? null;
@@ -366,7 +389,50 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* ── Stats row ── */}
+                {/* ── Tenant Overview row ── */}
+                <div style={{ marginBottom: '32px' }}>
+                    <h2 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--app-text-dim)', marginBottom: '16px', fontWeight: 600 }}>
+                        Tenant Overview
+                    </h2>
+                    <div className="app-stats-grid">
+                        <div className="app-stat-card">
+                            <div className="app-stat-icon"><Globe size={15} /></div>
+                            <div className="app-stat-label">Workspaces</div>
+                            <div className="app-stat-value">{fmtNum(tenantStats?.workspaces.total)}</div>
+                            <div className="app-stat-trend">
+                                <span style={{ color: 'var(--app-success)' }}>{fmtNum(tenantStats?.workspaces.active)} Active</span>
+                                {tenantStats?.workspaces.archived ? `, ${fmtNum(tenantStats.workspaces.archived)} Archived` : ''}
+                            </div>
+                        </div>
+                        <div className="app-stat-card">
+                            <div className="app-stat-icon"><Users size={15} /></div>
+                            <div className="app-stat-label">Total Members</div>
+                            <div className="app-stat-value">{fmtNum(tenantStats?.members.total)}</div>
+                            <div className="app-stat-trend">
+                                {tenantStats?.members.roles.owner} Owners, {tenantStats?.members.roles.admin} Admins, {tenantStats?.members.roles.developer} Devs
+                            </div>
+                        </div>
+                        <div className="app-stat-card">
+                            <div className="app-stat-icon"><Database size={15} /></div>
+                            <div className="app-stat-label">Total Memories</div>
+                            <div className="app-stat-value">{fmtNum(tenantStats?.memories.total)}</div>
+                            <div className="app-stat-trend">Across all workspaces</div>
+                        </div>
+                        <div className="app-stat-card">
+                            <div className="app-stat-icon"><Shield size={15} /></div>
+                            <div className="app-stat-label">Subscription</div>
+                            <div className="app-stat-value">{plan ? plan.name : 'Free Tier'}</div>
+                            <div className="app-stat-trend">
+                                {subscription?.is_cancelled ? 'Cancelled' : (subscription?.renews_at ? `Renews ${subscription.renews_at}` : 'Active')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── API Health Stats row ── */}
+                <h2 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--app-text-dim)', marginBottom: '16px', fontWeight: 600 }}>
+                    API Health & Usage
+                </h2>
                 <div className="app-stats-grid">
                     <div className="app-stat-card">
                         <div className="app-stat-icon"><Activity size={15} /></div>
@@ -853,6 +919,81 @@ export default function Dashboard() {
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* ── Quick Actions & Workspace Activity ── */}
+                <div className="app-main-grid" style={{ marginTop: '24px' }}>
+                    {/* Quick Actions */}
+                    <div className="app-panel-dependent">
+                        <div className="app-panel" style={{ height: '100%' }}>
+                            <div className="app-panel-head">
+                                <div>
+                                    <h2>Quick Actions</h2>
+                                    <p>Common tasks and shortcuts</p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
+                                <Link href="/workspaces" className="app-btn app-btn-ghost" style={{ justifyContent: 'flex-start' }}>
+                                    <Plus size={14} style={{ marginRight: '6px' }} /> Create Workspace
+                                </Link>
+                                <Link href="/workspaces/members" className="app-btn app-btn-ghost" style={{ justifyContent: 'flex-start' }}>
+                                    <UserPlus size={14} style={{ marginRight: '6px' }} /> Invite Member
+                                </Link>
+                                <Link href="/api-keys" className="app-btn app-btn-ghost" style={{ justifyContent: 'flex-start' }}>
+                                    <KeyRound size={14} style={{ marginRight: '6px' }} /> Generate API Key
+                                </Link>
+                                <Link href="/billing" className="app-btn app-btn-ghost" style={{ justifyContent: 'flex-start' }}>
+                                    <CreditCard size={14} style={{ marginRight: '6px' }} /> Manage Subscription
+                                </Link>
+                                <a href="/docs" className="app-btn app-btn-ghost" style={{ justifyContent: 'flex-start' }}>
+                                    <BookOpen size={14} style={{ marginRight: '6px' }} /> View API Docs
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Workspace Activity */}
+                    <div className="app-panel app-panel-flex" style={{ height: '320px' }}>
+                        <div className="app-panel-head" style={{ flexShrink: 0, marginBottom: '16px' }}>
+                            <div>
+                                <h2>Recent Workspace Activity</h2>
+                                <p>Audit log across your workspaces</p>
+                            </div>
+                        </div>
+                        
+                        {!tenantStats?.recentActivity || tenantStats.recentActivity.length === 0 ? (
+                            <div className="app-empty-state">
+                                <div className="app-empty-state-title">No recent activity</div>
+                                <p className="app-empty-state-desc">Your workspace audit logs will appear here.</p>
+                            </div>
+                        ) : (
+                            <div className="app-panel-scroll-area">
+                                <div className="db-activity-list">
+                                    {tenantStats.recentActivity.map((log) => (
+                                        <div key={log.id} className="db-activity-row">
+                                            <div className="db-activity-dot" style={{ background: 'var(--app-accent)' }} />
+                                            <div className="db-activity-body">
+                                                <div className="db-activity-top">
+                                                    <span className="db-activity-endpoint" style={{ color: 'var(--app-text)' }}>
+                                                        {log.action}
+                                                    </span>
+                                                </div>
+                                                <div className="db-activity-meta">
+                                                    <span>{new Date(log.created_at).toLocaleDateString()} {new Date(log.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
+                                                    {log.actor && (
+                                                        <span className="db-activity-chip">
+                                                            <Users size={9} />
+                                                            {log.actor.name}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
             </div>

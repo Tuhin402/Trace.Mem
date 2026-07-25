@@ -281,4 +281,32 @@ class TraceMemCache
             ]);
         }
     }
+
+    // =========================================================================
+    // Tenant Dashboard Stats cache
+    // =========================================================================
+
+    /**
+     * Remember tenant-level dashboard stats.
+     * Uses the same tags as analytics so it clears when analytics/workspaces update.
+     */
+    public function rememberTenantStats(User $user, Closure $callback): array
+    {
+        $key = $this->key("tenant_stats:{$user->id}");
+
+        try {
+            if ($this->supportsTagging()) {
+                return Cache::tags(["user:{$user->id}", 'analytics'])
+                    ->remember($key, self::ANALYTICS_TTL, $callback);
+            }
+
+            return Cache::remember($key, self::ANALYTICS_TTL, $callback);
+        } catch (\Throwable $e) {
+            Log::warning('TraceMemCache: tenant stats cache miss, falling back to DB', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            return $callback();
+        }
+    }
 }

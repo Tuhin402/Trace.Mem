@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Memory;
+use App\Models\WorkspaceAuditLog;
+use App\Models\ApiKey;
+use Illuminate\Support\Facades\DB;
 use App\Services\Billing\ApiUsageAnalyticsService;
 use App\Services\Billing\BillingCatalogService;
 use App\Services\Billing\FreeTrialEligibilityService;
@@ -53,7 +56,81 @@ class DashboardController extends Controller
             fn () => $this->analytics->insightsForUser($user, ['period' => 'today'])
         );
 
-        $memories = Memory::where('user_id', $user->id)->latest('created_at')->take(6)->get();
+        $tenantStats = $this->cache->rememberTenantStats($user, function () use ($user) {
+            $workspaces = $user->ownedTeams()->get();
+            $workspaceIds = $workspaces->pluck('id');
+
+            // ── Workspaces ──────────────────────────────────────────────────
+            $totalWorkspaces = $workspaces->count();
+            $activeWorkspaces = $workspaces->where('status', 'active')->count();
+            $archivedWorkspaces = $workspaces->where('status', 'archived')->count();
+
+            // ── Members ─────────────────────────────────────────────────────
+            $members = DB::table('team_members')
+                ->whereIn('team_id', $workspaceIds)
+                ->select('user_id', 'role')
+                ->get();
+            
+            $roles = ['owner' => 0, 'admin' => 0, 'developer' => 0, 'member' => 0, 'viewer' => 0];
+            $userHighestRole = [];
+            $roleLevels = ['owner' => 5, 'admin' => 4, 'developer' => 3, 'member' => 2, 'viewer' => 1];
+
+            foreach ($members as $m) {
+                $role = $m->role;
+                $level = $roleLevels[$role] ?? 0;
+                $uid = $m->user_id;
+                if (!isset($userHighestRole[$uid]) || $level > $roleLevels[$userHighestRole[$uid]]) {
+                    $userHighestRole[$uid] = $role;
+                }
+            }
+            
+            foreach ($userHighestRole as $uid => $role) {
+                if (isset($roles[$role])) {
+                    $roles[$role]++;
+                }
+            }
+
+            // ── API Keys ────────────────────────────────────────────────────
+            $apiKeys = ApiKey::whereIn('workspace_id', $workspaceIds)->get();
+            
+            // ── Memories ────────────────────────────────────────────────────
+            $totalMemories = Memory::whereIn('workspace_id', $workspaceIds)->count();
+
+            // ── Recent Activity ─────────────────────────────────────────────
+            $recentActivity = WorkspaceAuditLog::whereIn('workspace_id', $workspaceIds)
+                ->with('actor:id,name,email')
+                ->latest('created_at')
+                ->take(8)
+                ->get();
+
+            return [
+                'workspaces' => [
+                    'total' => $totalWorkspaces,
+                    'active' => $activeWorkspaces,
+                    'archived' => $archivedWorkspaces,
+                ],
+                'members' => [
+                    'total' => count($userHighestRole),
+                    'roles' => $roles,
+                ],
+                'apiKeys' => [
+                    'total' => $apiKeys->count(),
+                    'live' => $apiKeys->where('environment', 'live')->whereNull('revoked_at')->count(),
+                    'test' => $apiKeys->where('environment', 'test')->whereNull('revoked_at')->count(),
+                ],
+                'memories' => [
+                    'total' => $totalMemories,
+                ],
+                'recentActivity' => $recentActivity->toArray(),
+            ];
+        });
+
+        // Use tenant's owned workspaces for recent memories to align with Tenant ownership
+        $ownedWorkspaceIds = $user->ownedTeams()->pluck('id');
+        $memories = Memory::whereIn('workspace_id', $ownedWorkspaceIds)
+            ->latest('created_at')
+            ->take(6)
+            ->get();
 
         // Active subscription (null if cancelled / none)
         $subscription = $user?->currentSubscription;
@@ -68,6 +145,7 @@ class DashboardController extends Controller
             'usageLogs'       => $usage['recent'],
             'availableMonths' => $usage['months'],
             'todayInsights'   => $todayInsights,
+            'tenantStats'     => $tenantStats,
             'memories'        => $memories,
             'selectedFilters' => $filters,
             'subscription'    => $subscription

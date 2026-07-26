@@ -23,7 +23,7 @@ export default function ControlProfileDropdown() {
 
     const trigger = (
         <div 
-            className={`flex w-full items-center p-4 cursor-pointer hover:bg-almost-black/5 transition-colors relative ${isOpen ? 'bg-almost-black/5' : ''}`}
+            className={`flex w-full items-center p-4 cursor-pointer hover:bg-almost-black/5 transition-colors relative ${isOpen ? 'bg-almost-black/5' : ''} ${collapsed ? 'justify-center' : ''}`}
             onClick={() => setIsOpen(!isOpen)}
             aria-expanded={isOpen}
             aria-haspopup="menu"

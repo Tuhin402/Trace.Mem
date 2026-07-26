@@ -46,7 +46,7 @@ export default function ControlSidebar() {
     return (
         <aside className={sidebarClasses} aria-label="Sidebar">
             {/* Branding Block */}
-            <div className="flex h-16 shrink-0 items-center justify-between px-4 bg-[var(--tm-primary-deep)] text-white shadow-sm z-10 relative">
+            <div className={`flex h-16 shrink-0 items-center px-4 bg-[#2c0133] text-white shadow-sm z-10 relative ${collapsed ? 'justify-center' : 'justify-between'}`}>
                 <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
                     <div className="shrink-0 flex items-center justify-center">
                         <AppLogoIcon className="h-7 w-auto" />
@@ -95,7 +95,7 @@ export default function ControlSidebar() {
 
                 {/* Ungrouped Items */}
                 {groupedItems._none.length > 0 && (
-                    <div className="mb-6 px-2 space-y-1">
+                    <div className={`mb-6 space-y-1 ${collapsed ? '' : 'px-2'}`}>
                         {groupedItems._none.map(item => (
                             <ControlSidebarNavItem key={item.route_name} {...item} pinnable />
                         ))}

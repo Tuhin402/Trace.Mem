@@ -30,7 +30,9 @@ export function ControlSidebarNavItem({ route_name, title, icon, pinnable = fals
     const content = (
         <Link 
             href={`/${pathSegment}`}
-            className={`group relative flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
+            className={`group relative flex items-center py-2 text-sm font-medium transition-colors ${
+                collapsed ? 'justify-center pr-1' : 'gap-3 px-3'
+            } ${
                 isActive 
                     ? 'bg-primary/10 text-primary border-l-4 border-primary rounded-r' 
                     : 'text-on-background/70 hover:bg-almost-black/5 hover:text-on-background border-l-4 border-transparent rounded-r'

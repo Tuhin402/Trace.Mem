@@ -4,10 +4,10 @@ import ControlSearch from '../search/ControlSearch';
 import ControlNotificationDropdown from '../notifications/ControlNotificationDropdown';
 
 export default function ControlTopbar() {
-    const { setMobileDrawerOpen } = useControlShell();
+    const { collapsed, setMobileDrawerOpen } = useControlShell();
 
     return (
-        <header className="fixed top-0 right-0 left-0 md:left-[var(--control-sidebar-expanded)] z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-almost-black/10 bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 transition-all duration-300">
+        <header className={`fixed top-0 right-0 left-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-almost-black/10 bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 transition-all duration-300 ${collapsed ? 'md:left-[var(--control-sidebar-collapsed)]' : 'md:left-[var(--control-sidebar-expanded)]'}`}>
             
             {/* Mobile Hamburger */}
             <button 

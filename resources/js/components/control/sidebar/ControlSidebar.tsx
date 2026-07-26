@@ -5,6 +5,7 @@ import { navigationGroups, navigationItems } from '@/control/navigation.config';
 import { ControlSidebarNavItem } from './ControlSidebarNavItem';
 import { ControlSidebarGroup } from './ControlSidebarGroup';
 import ControlProfileDropdown from '../profile/ControlProfileDropdown';
+import AppLogoIcon from '@/components/app-logo-icon';
 
 export default function ControlSidebar() {
     const { collapsed, setCollapsed, mobileDrawerOpen, setMobileDrawerOpen, pinnedItems } = useControlShell();
@@ -45,13 +46,13 @@ export default function ControlSidebar() {
     return (
         <aside className={sidebarClasses} aria-label="Sidebar">
             {/* Branding Block */}
-            <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-almost-black/10">
-                <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
-                    <div className="h-8 w-8 shrink-0 rounded bg-primary text-background flex items-center justify-center font-bold font-mono shadow-sm">
-                        TM
+            <div className="flex h-16 shrink-0 items-center justify-between px-4 bg-[var(--tm-primary-deep)] text-white shadow-sm z-10 relative">
+                <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
+                    <div className="shrink-0 flex items-center justify-center">
+                        <AppLogoIcon className="h-7 w-auto" />
                     </div>
                     {!collapsed && (
-                        <span className="text-lg font-bold font-heading tracking-tight text-on-background">
+                        <span className="text-lg font-bold font-heading tracking-tight text-white">
                             TraceMem
                         </span>
                     )}
@@ -61,7 +62,7 @@ export default function ControlSidebar() {
                 {!collapsed && (
                     <button 
                         onClick={() => setCollapsed(true)}
-                        className="hidden md:flex p-1 hover:bg-almost-black/5 rounded text-on-background/50 hover:text-on-background transition-colors"
+                        className="hidden md:flex p-1 hover:bg-white/20 rounded text-white/80 hover:text-white transition-colors"
                         aria-label="Collapse sidebar"
                     >
                         <ChevronLeft className="h-5 w-5" />

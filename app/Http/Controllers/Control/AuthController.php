@@ -132,7 +132,7 @@ class AuthController extends Controller
         $isFirst = User::whereNotNull('platform_role')->count() === 0;
 
         if (! $isFirst && ! PlatformSetting::getSetting('allow_admin_registration', false)) {
-            abort(403, 'Control registration is currently disabled.');
+            return back()->withErrors(['email' => 'Control registration is currently disabled.']);
         }
 
         $request->validate([
@@ -181,5 +181,17 @@ class AuthController extends Controller
         );
 
         return redirect()->route('control.verify-otp')->with('email', $email)->with('status', 'Registration successful. Check your email for the OTP.');
+    }
+
+    /**
+     * Log the user out of the control panel.
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('control.login');
     }
 }

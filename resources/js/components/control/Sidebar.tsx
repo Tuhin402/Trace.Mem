@@ -9,7 +9,8 @@ import {
     Search, 
     Database, 
     Shield,
-    CreditCard
+    CreditCard,
+    LogOut
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -95,6 +96,20 @@ export default function Sidebar() {
                     />
                 </ul>
             </nav>
+
+            {/* Logout Section */}
+            <div className="p-4 border-t border-almost-black/10">
+                <Link 
+                    href="/logout"
+                    method="post"
+                    as="button"
+                    className={`group w-full flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors text-error hover:bg-error/10 border-l-4 border-transparent`}
+                    title={collapsed ? "Logout" : undefined}
+                >
+                    <span className="shrink-0"><LogOut className="h-5 w-5" /></span>
+                    {!collapsed && <span>Logout</span>}
+                </Link>
+            </div>
         </aside>
     );
 }

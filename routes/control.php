@@ -18,6 +18,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['web', 'control.admin'])->group(function () {
+    Route::post('/logout', [\App\Http\Controllers\Control\AuthController::class, 'logout'])->name('control.logout');
+
     Route::get('/', function () {
         return redirect()->route('control.dashboard');
     });

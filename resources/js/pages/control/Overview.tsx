@@ -80,15 +80,6 @@ export default function Overview({
                             {/* 10. Users Snapshot */}
                             <Suspense fallback={<ControlPageSkeleton />}><UsersSnapshotSection data={users} /></Suspense>
                         </div>
-
-                        {/* 11. Jobs & Queues */}
-                        <Suspense fallback={<ControlPageSkeleton />}><JobsOverviewSection data={jobs} /></Suspense>
-
-                        {/* 12. Billing Snapshot */}
-                        <Suspense fallback={<ControlPageSkeleton />}><BillingOverviewSection data={billing} /></Suspense>
-
-                        {/* 13. Audit Preview */}
-                        <Suspense fallback={<ControlPageSkeleton />}><AuditPreviewSection data={audit} /></Suspense>
                     </div>
 
                     {/* Right Sidebar Column (1/3 width on xl) */}
@@ -105,6 +96,18 @@ export default function Overview({
                         {/* 17. Documentation */}
                         <Suspense fallback={<ControlPageSkeleton />}><DocumentationSection /></Suspense>
                     </div>
+                </div>
+
+                {/* Full Width Sections (Bottom) */}
+                <div className="space-y-8">
+                    {/* 11. Jobs & Queues */}
+                    <Suspense fallback={<ControlPageSkeleton />}><JobsOverviewSection data={jobs} /></Suspense>
+
+                    {/* 12. Billing Snapshot */}
+                    <Suspense fallback={<ControlPageSkeleton />}><BillingOverviewSection data={billing} /></Suspense>
+
+                    {/* 13. Audit Preview */}
+                    <Suspense fallback={<ControlPageSkeleton />}><AuditPreviewSection data={audit} /></Suspense>
                 </div>
 
             </div>

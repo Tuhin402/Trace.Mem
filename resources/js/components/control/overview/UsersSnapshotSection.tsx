@@ -1,61 +1,70 @@
-import { Users, UserPlus, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Users, Ghost } from 'lucide-react';
 import OverviewCard from './OverviewCard';
+import { Link } from '@inertiajs/react';
 
-export default function UsersSnapshotSection() {
-    const users = [
-        { id: 1, name: 'Alice Freeman', email: 'alice@example.com', status: 'verified', role: 'owner', time: '10 mins ago' },
-        { id: 2, name: 'Bob Jenkins', email: 'bob@acmecorp.com', status: 'pending', role: 'member', time: '1 hour ago' },
-        { id: 3, name: 'Charlie Davis', email: 'charlie@startup.io', status: 'verified', role: 'admin', time: '3 hours ago' },
-        { id: 4, name: 'Diana Prince', email: 'diana@themyscira.gov', status: 'verified', role: 'owner', time: '5 hours ago' },
-    ];
+export default function UsersSnapshotSection({ data }: { data: any }) {
+    if (data?.error) {
+        return (
+            <OverviewCard id="overview-users-snapshot" title="Users Snapshot" icon={<Users className="h-5 w-5" />}>
+                <div className="flex flex-col items-center justify-center py-8 text-on-background/50">
+                    <span className="text-sm font-bold text-destructive uppercase">{data.error}</span>
+                </div>
+            </OverviewCard>
+        );
+    }
+
+    const users = Array.isArray(data) ? data : [];
 
     return (
         <OverviewCard
-            id="overview-users"
-            title="Recent Users"
+            id="overview-users-snapshot"
+            title="Users Snapshot"
             icon={<Users className="h-5 w-5" />}
-            viewAllHref="/platform/users"
+            viewAllHref="/operations/users"
         >
-            <div className="space-y-4">
-                {users.map(user => (
-                    <div key={user.id} className="flex items-center justify-between p-3 border border-almost-black/10 hover:border-primary/30 transition-colors group">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="h-10 w-10 bg-primary/5 border border-primary/20 flex items-center justify-center shrink-0 text-primary font-bold font-heading">
-                                {user.name.charAt(0)}
-                            </div>
-                            <div className="flex flex-col overflow-hidden">
-                                <span className="text-sm font-bold text-on-background truncate group-hover:text-primary transition-colors">
-                                    {user.name}
-                                </span>
-                                <span className="text-xs text-on-background/60 truncate">
-                                    {user.email}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end shrink-0 ml-4">
-                            <div className="flex items-center gap-1.5">
-                                {user.status === 'verified' ? (
-                                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-                                ) : (
-                                    <ShieldAlert className="h-3.5 w-3.5 text-amber-500" />
-                                )}
-                                <span className="text-xs font-mono text-on-background/70 uppercase">
-                                    {user.role}
-                                </span>
-                            </div>
-                            <span className="text-xs font-mono text-on-background/40 mt-1">
-                                {user.time}
-                            </span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <div className="mt-6 pt-4 border-t border-almost-black/10 flex justify-between items-center text-xs font-mono text-on-background/50">
-                <div className="flex items-center gap-1.5">
-                    <UserPlus className="h-4 w-4" /> 14 new today
+            {users.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 opacity-60">
+                    <Ghost className="h-8 w-8 mb-3 text-primary/40" />
+                    <span className="text-sm font-bold uppercase tracking-wider">Empty Platform</span>
+                    <span className="text-xs text-center mt-1">No users have registered yet.</span>
                 </div>
-                <div>3,402 total active</div>
-            </div>
+            ) : (
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="border-b border-almost-black/10 text-[10px] uppercase font-bold text-on-background/50">
+                            <th className="pb-3 font-medium">User</th>
+                            <th className="pb-3 font-medium hidden sm:table-cell">Status</th>
+                            <th className="pb-3 font-medium text-right">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-almost-black/5">
+                        {users.map(user => (
+                            <tr key={user.id} className="group hover:bg-almost-black/5 transition-colors">
+                                <td className="py-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 bg-primary/10 text-primary flex items-center justify-center text-xs font-bold font-heading shrink-0">
+                                            {user.name.charAt(0)}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <Link href={`/operations/users/${user.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{user.name}</Link>
+                                            <span className="text-xs text-on-background/60">{user.email}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="py-3 hidden sm:table-cell">
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 border border-almost-black/20 text-xs font-medium">
+                                        <div className={`h-1.5 w-1.5 rounded-full ${user.status === 'Active' ? 'bg-green-500' : 'bg-destructive'}`} />
+                                        {user.status}
+                                    </span>
+                                </td>
+                                <td className="py-3 text-right">
+                                    <span className="text-xs font-mono text-on-background/60">{user.time}</span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </OverviewCard>
     );
 }

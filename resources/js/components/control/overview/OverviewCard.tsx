@@ -22,7 +22,7 @@ export default function OverviewCard({
     return (
         <section 
             id={id} 
-            className={`flex flex-col bg-surface border border-almost-black scroll-mt-24 h-full ${className}`}
+            className={`flex flex-col bg-surface border border-almost-black scroll-mt-24 ${className}`}
         >
             <div className="flex items-center justify-between px-6 py-4 border-b border-almost-black/10 shrink-0">
                 <div className="flex items-center gap-3">
@@ -45,7 +45,7 @@ export default function OverviewCard({
                 )}
             </div>
             
-            <div className="flex-1 p-6 overflow-y-auto no-scrollbar relative min-h-[200px]">
+            <div className="p-6 overflow-y-auto no-scrollbar relative min-h-[200px] max-h-[500px]">
                 {children}
             </div>
         </section>

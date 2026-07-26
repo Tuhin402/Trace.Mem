@@ -1,54 +1,61 @@
-import { Zap, LayoutGrid, Clock, Hash } from 'lucide-react';
+import { Zap, Ghost } from 'lucide-react';
 import OverviewCard from './OverviewCard';
+import { Link } from '@inertiajs/react';
 
-export default function WorkspacesSnapshotSection() {
-    const workspaces = [
-        { id: 1, name: 'Production DB', env: 'prod', tenant: 'Acme Corp', requests: '1.2M', lastActive: '2 mins ago' },
-        { id: 2, name: 'Staging Area', env: 'staging', tenant: 'Acme Corp', requests: '45K', lastActive: '1 hr ago' },
-        { id: 3, name: 'Customer Support', env: 'prod', tenant: 'Globex', requests: '890K', lastActive: '5 mins ago' },
-        { id: 4, name: 'Dev Sandbox', env: 'dev', tenant: 'Initech', requests: '124', lastActive: '3 days ago' },
-    ];
+export default function WorkspacesSnapshotSection({ data }: { data: any }) {
+    if (data?.error) {
+        return (
+            <OverviewCard id="overview-workspaces-snapshot" title="Workspaces Snapshot" icon={<Zap className="h-5 w-5" />}>
+                <div className="flex flex-col items-center justify-center py-8 text-on-background/50">
+                    <span className="text-sm font-bold text-destructive uppercase">{data.error}</span>
+                </div>
+            </OverviewCard>
+        );
+    }
 
-    const envColors: Record<string, string> = {
-        prod: 'bg-destructive/10 text-destructive border-destructive/20',
-        staging: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-        dev: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
-    };
+    const workspaces = Array.isArray(data) ? data : [];
 
     return (
         <OverviewCard
-            id="overview-workspaces"
-            title="Active Workspaces"
-            icon={<LayoutGrid className="h-5 w-5" />}
-            viewAllHref="/platform/workspaces"
+            id="overview-workspaces-snapshot"
+            title="Workspaces Snapshot"
+            icon={<Zap className="h-5 w-5" />}
+            viewAllHref="/operations/workspaces"
         >
-            <div className="space-y-4">
-                {workspaces.map(ws => (
-                    <div key={ws.id} className="flex flex-col p-3 border border-almost-black/10 hover:border-primary/30 transition-colors group">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
-                                {ws.name}
-                            </span>
-                            <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 border ${envColors[ws.env] || 'bg-almost-black/5 text-on-background'}`}>
-                                {ws.env}
-                            </span>
-                        </div>
-                        <div className="text-xs text-on-background/60 mb-2">
-                            Tenant: {ws.tenant}
-                        </div>
-                        <div className="flex items-center justify-between border-t border-almost-black/5 pt-2 mt-1">
-                            <div className="flex items-center gap-1.5 text-xs text-on-background/70 font-mono">
-                                <Zap className="h-3.5 w-3.5" />
-                                {ws.requests} reqs
-                            </div>
-                            <div className="flex items-center gap-1.5 text-xs text-on-background/50 font-mono">
-                                <Clock className="h-3.5 w-3.5" />
-                                {ws.lastActive}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {workspaces.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 opacity-60">
+                    <Ghost className="h-8 w-8 mb-3 text-primary/40" />
+                    <span className="text-sm font-bold uppercase tracking-wider">No Workspaces</span>
+                    <span className="text-xs text-center mt-1">Users haven't created any workspaces yet.</span>
+                </div>
+            ) : (
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="border-b border-almost-black/10 text-[10px] uppercase font-bold text-on-background/50">
+                            <th className="pb-3 font-medium">Workspace</th>
+                            <th className="pb-3 font-medium hidden sm:table-cell">Env</th>
+                            <th className="pb-3 font-medium text-right">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-almost-black/5">
+                        {workspaces.map(ws => (
+                            <tr key={ws.id} className="group hover:bg-almost-black/5 transition-colors">
+                                <td className="py-3">
+                                    <div className="flex flex-col">
+                                        <Link href={`/operations/workspaces/${ws.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{ws.name}</Link>
+                                    </div>
+                                </td>
+                                <td className="py-3 hidden sm:table-cell">
+                                    <span className="text-xs font-bold uppercase text-on-background/70">{ws.environment}</span>
+                                </td>
+                                <td className="py-3 text-right">
+                                    <span className="text-xs font-mono text-on-background/60">{ws.time}</span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </OverviewCard>
     );
 }

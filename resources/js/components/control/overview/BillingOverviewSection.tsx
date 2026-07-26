@@ -1,66 +1,68 @@
-import { CreditCard, ArrowDownRight, ArrowUpRight, Clock } from 'lucide-react';
+import { CreditCard, Ghost } from 'lucide-react';
 import OverviewCard from './OverviewCard';
+import { Link } from '@inertiajs/react';
 
-export default function BillingOverviewSection() {
-    const invoices = [
-        { id: 'INV-2026-042', amount: '$499.00', status: 'paid', customer: 'Acme Corp', date: 'Today' },
-        { id: 'INV-2026-041', amount: '$120.00', status: 'paid', customer: 'Globex Inc', date: 'Yesterday' },
-        { id: 'INV-2026-040', amount: '$2,450.00', status: 'failed', customer: 'Soylent', date: '2 days ago' },
-        { id: 'INV-2026-039', amount: '$99.00', status: 'paid', customer: 'Initech', date: '3 days ago' },
-    ];
+export default function BillingOverviewSection({ data }: { data: any }) {
+    if (data?.error) {
+        return (
+            <OverviewCard id="overview-billing" title="Billing Snapshot" icon={<CreditCard className="h-5 w-5" />}>
+                <div className="flex flex-col items-center justify-center py-8 text-on-background/50">
+                    <span className="text-sm font-bold text-destructive uppercase">{data.error}</span>
+                </div>
+            </OverviewCard>
+        );
+    }
+
+    const transactions = Array.isArray(data) ? data : [];
 
     return (
         <OverviewCard
             id="overview-billing"
-            title="Billing & Revenue"
+            title="Billing Snapshot"
             icon={<CreditCard className="h-5 w-5" />}
-            viewAllHref="/platform/billing"
+            viewAllHref="/operations/billing"
         >
             <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 border border-almost-black/10 bg-almost-black/5 flex flex-col">
-                    <span className="text-xs font-bold uppercase tracking-wider text-on-background/60 mb-2">MRR</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold font-heading text-on-background">$42.8k</span>
-                        <span className="flex items-center text-xs font-mono text-green-500">
-                            <ArrowUpRight className="h-3 w-3" /> 12%
-                        </span>
-                    </div>
+                <div className="p-4 bg-almost-black/5 flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50 mb-1">MRR (Estimated)</span>
+                    <span className="text-2xl font-heading font-bold text-primary">--</span>
                 </div>
-                <div className="p-4 border border-almost-black/10 bg-almost-black/5 flex flex-col">
-                    <span className="text-xs font-bold uppercase tracking-wider text-on-background/60 mb-2">Failed Payments</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold font-heading text-destructive">$2.4k</span>
-                        <span className="flex items-center text-xs font-mono text-destructive">
-                            <ArrowDownRight className="h-3 w-3" /> 3%
-                        </span>
-                    </div>
+                <div className="p-4 bg-almost-black/5 flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50 mb-1">Active Trials</span>
+                    <span className="text-2xl font-heading font-bold text-primary">--</span>
                 </div>
             </div>
 
-            <h4 className="text-xs font-bold uppercase tracking-wider text-on-background/50 mb-3 border-b border-almost-black/10 pb-2">
-                Recent Invoices
-            </h4>
-            <div className="space-y-3">
-                {invoices.map(invoice => (
-                    <div key={invoice.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-almost-black/10 hover:border-primary/30 transition-colors group">
-                        <div className="flex flex-col">
-                            <span className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">{invoice.customer}</span>
-                            <span className="text-xs font-mono text-on-background/60">{invoice.id}</span>
-                        </div>
-                        <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                            <span className="text-xs font-mono text-on-background/50 flex items-center gap-1">
-                                <Clock className="h-3 w-3" /> {invoice.date}
-                            </span>
-                            <div className="flex items-center gap-3 min-w-[100px] justify-end">
-                                <span className="font-mono font-bold text-sm">{invoice.amount}</span>
-                                <span className={`h-2 w-2 rounded-full border shrink-0 ${
-                                    invoice.status === 'paid' ? 'bg-green-500/20 border-green-500' : 'bg-destructive/20 border-destructive'
-                                }`} title={invoice.status} />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-on-background/50 mb-4">Recent Transactions</h3>
+            
+            {transactions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 opacity-60">
+                    <Ghost className="h-8 w-8 mb-3 text-primary/40" />
+                    <span className="text-xs font-bold uppercase tracking-wider">No Revenue Data</span>
+                </div>
+            ) : (
+                <div className="space-y-0 divide-y divide-almost-black/5">
+                    {transactions.map(tx => (
+                        <div key={tx.id} className="py-3 flex items-center justify-between group">
+                            <div className="flex items-center gap-3">
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center border ${tx.status === 'succeeded' ? 'bg-green-500/10 border-green-500/20 text-green-600' : 'bg-destructive/10 border-destructive/20 text-destructive'}`}>
+                                    <span className="text-xs font-bold">$</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{tx.tenant}</span>
+                                    <span className="text-xs font-mono text-on-background/50">{tx.time}</span>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-end">
+                                <span className="text-sm font-bold font-mono text-primary">{tx.amount}</span>
+                                <span className={`text-[10px] font-bold uppercase ${tx.status === 'succeeded' ? 'text-green-600' : 'text-destructive'}`}>
+                                    {tx.status}
+                                </span>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </OverviewCard>
     );
 }

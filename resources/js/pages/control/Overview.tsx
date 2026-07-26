@@ -23,8 +23,21 @@ const AuditPreviewSection = lazy(() => import('@/components/control/overview/Aud
 const ActivityFeedSection = lazy(() => import('@/components/control/overview/ActivityFeedSection'));
 const QuickActionsSection = lazy(() => import('@/components/control/overview/QuickActionsSection'));
 const DocumentationSection = lazy(() => import('@/components/control/overview/DocumentationSection'));
-
-export default function Overview({ health, metrics }: any) {
+export default function Overview({ 
+    health, 
+    metrics,
+    users,
+    tenants,
+    workspaces,
+    api,
+    memory,
+    billing,
+    jobs,
+    notifications,
+    audit,
+    activity,
+    alerts
+}: any) {
     return (
         <ControlErrorBoundary>
             <Head title="Operations Overview | TraceMem Control" />
@@ -41,41 +54,41 @@ export default function Overview({ health, metrics }: any) {
                 <ExecutiveMetricsSection data={metrics} />
 
                 {/* 4. Active Alerts */}
-                <AlertsSection />
+                <AlertsSection data={alerts} />
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
                     {/* Main Content Column (2/3 width on xl) */}
                     <div className="xl:col-span-2 space-y-8">
                         {/* 5. Memory Overview (Core Value Proposition) */}
-                        <Suspense fallback={<ControlPageSkeleton />}><MemoryOverviewSection /></Suspense>
+                        <Suspense fallback={<ControlPageSkeleton />}><MemoryOverviewSection data={memory} /></Suspense>
 
                         {/* 6. System Activity Feed */}
-                        <SystemActivitySection />
+                        <SystemActivitySection data={activity} />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                             {/* 7. Workspaces Snapshot */}
-                            <Suspense fallback={<ControlPageSkeleton />}><WorkspacesSnapshotSection /></Suspense>
+                            <Suspense fallback={<ControlPageSkeleton />}><WorkspacesSnapshotSection data={workspaces} /></Suspense>
 
                             {/* 8. API Overview */}
-                            <Suspense fallback={<ControlPageSkeleton />}><ApiOverviewSection /></Suspense>
+                            <Suspense fallback={<ControlPageSkeleton />}><ApiOverviewSection data={api} /></Suspense>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                             {/* 9. Tenants Snapshot */}
-                            <Suspense fallback={<ControlPageSkeleton />}><TenantsSnapshotSection /></Suspense>
+                            <Suspense fallback={<ControlPageSkeleton />}><TenantsSnapshotSection data={tenants} /></Suspense>
 
                             {/* 10. Users Snapshot */}
-                            <Suspense fallback={<ControlPageSkeleton />}><UsersSnapshotSection /></Suspense>
+                            <Suspense fallback={<ControlPageSkeleton />}><UsersSnapshotSection data={users} /></Suspense>
                         </div>
 
                         {/* 11. Jobs & Queues */}
-                        <Suspense fallback={<ControlPageSkeleton />}><JobsOverviewSection /></Suspense>
+                        <Suspense fallback={<ControlPageSkeleton />}><JobsOverviewSection data={jobs} /></Suspense>
 
                         {/* 12. Billing Snapshot */}
-                        <Suspense fallback={<ControlPageSkeleton />}><BillingOverviewSection /></Suspense>
+                        <Suspense fallback={<ControlPageSkeleton />}><BillingOverviewSection data={billing} /></Suspense>
 
                         {/* 13. Audit Preview */}
-                        <Suspense fallback={<ControlPageSkeleton />}><AuditPreviewSection /></Suspense>
+                        <Suspense fallback={<ControlPageSkeleton />}><AuditPreviewSection data={audit} /></Suspense>
                     </div>
 
                     {/* Right Sidebar Column (1/3 width on xl) */}
@@ -84,10 +97,10 @@ export default function Overview({ health, metrics }: any) {
                         <Suspense fallback={<ControlPageSkeleton />}><QuickActionsSection /></Suspense>
 
                         {/* 15. Notifications Preview */}
-                        <Suspense fallback={<ControlPageSkeleton />}><NotificationsPreviewSection /></Suspense>
+                        <Suspense fallback={<ControlPageSkeleton />}><NotificationsPreviewSection data={notifications} /></Suspense>
 
                         {/* 16. Full Activity Feed */}
-                        <Suspense fallback={<ControlPageSkeleton />}><ActivityFeedSection /></Suspense>
+                        <Suspense fallback={<ControlPageSkeleton />}><ActivityFeedSection data={activity} /></Suspense>
 
                         {/* 17. Documentation */}
                         <Suspense fallback={<ControlPageSkeleton />}><DocumentationSection /></Suspense>

@@ -1,86 +1,70 @@
-import { Layers, Network, Fingerprint, Zap } from 'lucide-react';
+import { Layers, Ghost } from 'lucide-react';
 import OverviewCard from './OverviewCard';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, ResponsiveContainer, Tooltip } from 'recharts';
 
-export default function MemoryOverviewSection() {
-    // Mock data for the memory accumulation chart
-    const data = [
-        { name: 'Mon', memories: 1240 },
-        { name: 'Tue', memories: 1350 },
-        { name: 'Wed', memories: 1800 },
-        { name: 'Thu', memories: 2200 },
-        { name: 'Fri', memories: 2600 },
-        { name: 'Sat', memories: 1900 },
-        { name: 'Sun', memories: 1100 },
-    ];
+export default function MemoryOverviewSection({ data }: { data: any }) {
+    if (data?.error) {
+        return (
+            <OverviewCard id="overview-memory" title="Memory Pipeline" icon={<Layers className="h-5 w-5" />}>
+                <div className="flex flex-col items-center justify-center py-8 text-on-background/50">
+                    <span className="text-sm font-bold text-destructive uppercase">{data.error}</span>
+                </div>
+            </OverviewCard>
+        );
+    }
+
+    const chartData = data?.chart || [];
 
     return (
         <OverviewCard
             id="overview-memory"
-            title="Memory Pipeline Overview"
+            title="Memory Pipeline"
             icon={<Layers className="h-5 w-5" />}
-            viewAllHref="/platform/memory"
+            viewAllHref="/operations/memory"
         >
-            <div className="flex flex-col xl:flex-row gap-8">
-                
-                {/* Left Side: Chart */}
-                <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-on-background/50 mb-4 border-b border-almost-black/10 pb-2">
-                        Weekly Injection Volume
-                    </h4>
-                    <div className="h-48 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.5 }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.5 }} />
-                                <Tooltip 
-                                    cursor={{ fill: 'var(--color-almost-black)', opacity: 0.05 }}
-                                    contentStyle={{ borderRadius: '0px', border: '1px solid var(--color-almost-black)', backgroundColor: 'var(--color-surface)', fontSize: '12px' }}
-                                    itemStyle={{ color: 'var(--color-primary)', fontWeight: 'bold' }}
-                                    labelStyle={{ color: 'var(--color-on-background)', opacity: 0.7, marginBottom: '4px' }}
-                                />
-                                <Bar dataKey="memories" fill="var(--color-primary)" radius={0}>
-                                    {data.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={index === data.length - 1 ? 'var(--color-primary)' : 'var(--color-primary)'} fillOpacity={0.7} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50 mb-1">Total Memories</span>
+                    <span className="text-2xl font-heading font-bold text-primary">{data?.total || 0}</span>
                 </div>
-
-                {/* Right Side: Heavy Metrics */}
-                <div className="w-full xl:w-64 shrink-0 flex flex-col gap-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-on-background/50 mb-0 border-b border-almost-black/10 pb-2">
-                        Pipeline Health
-                    </h4>
-                    
-                    <div className="p-3 border border-almost-black/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
-                        <div className="flex items-center gap-2">
-                            <Fingerprint className="h-4 w-4 text-on-background/50 group-hover:text-primary transition-colors" />
-                            <span className="text-sm font-medium">Resolutions</span>
-                        </div>
-                        <span className="font-mono font-bold text-primary">12.4K</span>
-                    </div>
-
-                    <div className="p-3 border border-almost-black/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
-                        <div className="flex items-center gap-2">
-                            <Network className="h-4 w-4 text-on-background/50 group-hover:text-primary transition-colors" />
-                            <span className="text-sm font-medium">Graph Edges</span>
-                        </div>
-                        <span className="font-mono font-bold text-primary">48.2M</span>
-                    </div>
-
-                    <div className="p-3 border border-almost-black/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
-                        <div className="flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-on-background/50 group-hover:text-primary transition-colors" />
-                            <span className="text-sm font-medium">Avg Latency</span>
-                        </div>
-                        <span className="font-mono font-bold text-green-500">42ms</span>
-                    </div>
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50 mb-1">Stored Today</span>
+                    <span className="text-2xl font-heading font-bold text-primary">{data?.today || 0}</span>
                 </div>
-
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50 mb-1">Avg Latency</span>
+                    <span className="text-2xl font-heading font-bold text-primary">--</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50 mb-1">Conflicts</span>
+                    <span className="text-2xl font-heading font-bold text-primary">0</span>
+                </div>
             </div>
+
+            {chartData.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 opacity-60">
+                    <Ghost className="h-8 w-8 mb-3 text-primary/40" />
+                    <span className="text-sm font-bold uppercase tracking-wider">No Memories Stored</span>
+                    <span className="text-xs text-center mt-1">Users haven't pushed any memories yet.</span>
+                </div>
+            ) : (
+                <div className="h-48 w-full mt-4 border border-almost-black/10 p-2 relative">
+                    <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider text-on-background/50 z-10">
+                        7-Day Storage Volume
+                    </span>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
+                            <Tooltip 
+                                cursor={{ fill: 'rgba(var(--color-almost-black), 0.05)' }}
+                                contentStyle={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-almost-black)', borderRadius: 0, padding: '8px' }}
+                                itemStyle={{ color: 'var(--color-primary)', fontSize: '12px', fontWeight: 'bold' }}
+                                labelStyle={{ color: 'rgba(var(--color-on-background), 0.6)', fontSize: '10px', textTransform: 'uppercase' }}
+                            />
+                            <Bar dataKey="memories" fill="var(--color-primary)" radius={[2, 2, 0, 0]} isAnimationActive={false} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </OverviewCard>
     );
 }

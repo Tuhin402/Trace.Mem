@@ -30,10 +30,10 @@
     font-weight: bold; 
     letter-spacing: 4px; 
     padding: 20px; 
-    background-color: {{ $theme::surfaceMuted() }}; 
+    background-color: {{ $theme::surfaceElevated() }}; 
     border: 1px solid {{ $theme::border() }}; 
     color: {{ $theme::primary() }};
-    border-radius: {{ $theme::borderRadius() }};
+    border-radius: {{ $theme::radius() }};
     margin-bottom: 28px;
 ">
     {{ $otp }}

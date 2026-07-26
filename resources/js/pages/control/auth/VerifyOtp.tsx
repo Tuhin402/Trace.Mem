@@ -37,7 +37,22 @@ export default function VerifyOtp() {
                 </div>
 
                 <form onSubmit={submit} className="space-y-6">
-                    <input type="hidden" name="email" value={data.email} />
+                    <div>
+                        <label htmlFor="email" className="block label-caps mb-2 text-on-background/80">
+                            Administrator Email
+                        </label>
+                        <Input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value={data.email}
+                            className="block w-full bg-almost-black/5 text-on-background/70"
+                            autoComplete="username"
+                            onChange={(e) => setData('email', e.target.value)}
+                            required
+                            readOnly={!!sessionEmail}
+                        />
+                    </div>
 
                     <div>
                         <label htmlFor="otp" className="block label-caps mb-2 text-on-background/80">
@@ -59,7 +74,7 @@ export default function VerifyOtp() {
                         )}
                     </div>
 
-                    <Button className="w-full" disabled={processing || !data.email}>
+                    <Button className="w-full" disabled={processing || !data.email || data.otp.length < 6}>
                         {processing ? 'Verifying...' : 'Verify Identity'}
                     </Button>
                 </form>

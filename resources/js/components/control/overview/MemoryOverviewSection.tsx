@@ -55,7 +55,7 @@ export default function MemoryOverviewSection({ data }: { data: any }) {
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
                             <Tooltip 
-                                cursor={{ fill: 'rgba(var(--color-almost-black), 0.05)' }}
+                                cursor={{ fill: 'transparent' }}
                                 contentStyle={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-almost-black)', borderRadius: 0, padding: '8px' }}
                                 itemStyle={{ color: 'var(--color-primary)', fontSize: '12px', fontWeight: 'bold' }}
                                 labelStyle={{ color: 'rgba(var(--color-on-background), 0.6)', fontSize: '10px', textTransform: 'uppercase' }}

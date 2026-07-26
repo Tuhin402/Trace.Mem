@@ -158,4 +158,8 @@
     --tm-text: #e5e2e3;
     --tm-text-muted: #d6c0d3;
     --tm-text-dim: #9f8b9d;
+
+    /* Control Panel Layout Variables */
+    --control-sidebar-expanded: 280px;
+    --control-sidebar-collapsed: 72px;
 }

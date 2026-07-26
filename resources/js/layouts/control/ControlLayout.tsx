@@ -1,12 +1,18 @@
 import { ReactNode, useEffect } from 'react';
-import Sidebar from '@/components/control/Sidebar';
-import Topbar from '@/components/control/Topbar';
+import { ControlShellProvider, useControlShell } from '@/providers/control/ControlShellProvider';
+import { SearchProvider } from '@/providers/control/SearchProvider';
+import { NotificationProvider } from '@/providers/control/NotificationProvider';
+import { ProfileProvider } from '@/providers/control/ProfileProvider';
+import ControlSidebar from '@/components/control/sidebar/ControlSidebar';
+import ControlTopbar from '@/components/control/topbar/ControlTopbar';
 
 interface ControlLayoutProps {
     children: ReactNode;
 }
 
-export default function ControlLayout({ children }: ControlLayoutProps) {
+function LayoutInner({ children }: ControlLayoutProps) {
+    const { collapsed, mobileDrawerOpen, setMobileDrawerOpen } = useControlShell();
+
     useEffect(() => {
         document.body.classList.add('control-console');
         return () => {
@@ -14,21 +20,61 @@ export default function ControlLayout({ children }: ControlLayoutProps) {
         };
     }, []);
 
+    // Prevent body scrolling when mobile drawer is open
+    useEffect(() => {
+        if (mobileDrawerOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [mobileDrawerOpen]);
+
     return (
-        <div className="min-h-screen bg-background flex flex-col md:flex-row">
-            {/* Sidebar Component (Fixed) */}
-            <Sidebar />
+        <div className="min-h-screen bg-background flex flex-col md:flex-row font-sans">
 
-            <div className="flex-1 flex flex-col min-w-0 md:ml-64 transition-all duration-300">
-                {/* Topbar Component (Fixed) */}
-                <Topbar />
+            {/* Mobile Drawer Overlay */}
+            {mobileDrawerOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden transition-opacity"
+                    onClick={() => setMobileDrawerOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
 
-                <main className="flex-1 p-4 md:p-8 mt-16 overflow-y-auto no-scrollbar">
+            {/* Sidebar Component */}
+            <ControlSidebar />
+
+            {/* Main Content Area */}
+            <div
+                className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out transform ${collapsed ? 'md:ml-[var(--control-sidebar-collapsed)]' : 'md:ml-[var(--control-sidebar-expanded)]'
+                    }`}
+            >
+                {/* Topbar Component */}
+                <ControlTopbar />
+
+                <main className="flex-1 p-4 md:p-8 mt-16 overflow-y-auto no-scrollbar relative z-0">
                     <div className="mx-auto w-full max-w-7xl">
                         {children}
                     </div>
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function ControlLayout({ children }: ControlLayoutProps) {
+    return (
+        <ProfileProvider>
+            <ControlShellProvider>
+                <SearchProvider>
+                    <NotificationProvider>
+                        <LayoutInner>{children}</LayoutInner>
+                    </NotificationProvider>
+                </SearchProvider>
+            </ControlShellProvider>
+        </ProfileProvider>
     );
 }

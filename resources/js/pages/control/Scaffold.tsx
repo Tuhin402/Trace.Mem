@@ -1,34 +1,50 @@
-import { Head } from '@inertiajs/react';
-import { Settings, Users, Database, Shield, CreditCard, Construction } from 'lucide-react';
+import { Head, usePage } from '@inertiajs/react';
+import { Suspense, lazy } from 'react';
+import { ControlEmptyState } from '@/components/control/ui/ControlEmptyState';
+import { ControlPageSkeleton } from '@/components/control/ui/ControlSkeleton';
+import { ControlErrorBoundary } from '@/components/control/ui/ControlErrorBoundary';
+import { navigationItems } from '@/control/navigation.config';
+import * as Icons from 'lucide-react';
 
-export default function Scaffold({ title, description, icon }: { title: string, description: string, icon: string }) {
+export default function Scaffold() {
+    const { url } = usePage();
     
-    const IconComponent = () => {
-        switch (icon) {
-            case 'users': return <Users className="h-12 w-12 text-primary" />;
-            case 'database': return <Database className="h-12 w-12 text-primary" />;
-            case 'shield': return <Shield className="h-12 w-12 text-primary" />;
-            case 'credit-card': return <CreditCard className="h-12 w-12 text-primary" />;
-            case 'settings': return <Settings className="h-12 w-12 text-primary" />;
-            default: return <Construction className="h-12 w-12 text-primary" />;
-        }
-    };
+    // Find metadata from navigation config based on URL path matching 
+    // (since Inertia does not pass route_name by default, though we can match segments)
+    // As a simple match:
+    const item = navigationItems.find(nav => 
+        url.includes(nav.route_name.replace('control.', '').replace('.', '/')) ||
+        (nav.route_name === 'control.overview' && url === '/overview')
+    );
+
+    const title = item?.title || 'Unknown Module';
+    const description = item?.description || 'This module is under development.';
+    
+    // @ts-ignore
+    const Icon = item?.icon ? Icons[item.icon] : Icons.Construction;
 
     return (
-        <>
-            <Head title={title} />
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-                <div className="mb-6 p-4 rounded-full bg-almost-black/5">
-                    <IconComponent />
+        <ControlErrorBoundary>
+            <Suspense fallback={<ControlPageSkeleton />}>
+                <Head title={`${title} | TraceMem Control`} />
+                
+                <div className="py-6">
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-bold font-heading text-on-background">{title}</h1>
+                        {item?.breadcrumb && (
+                            <p className="text-xs font-mono text-on-background/50 mt-1 uppercase tracking-wider">
+                                {item.breadcrumb}
+                            </p>
+                        )}
+                    </div>
+
+                    <ControlEmptyState 
+                        title={`${title} is currently under development`}
+                        description={description}
+                        icon={<Icon className="h-10 w-10" />}
+                    />
                 </div>
-                <h1 className="text-3xl font-bold font-heading text-primary mb-2">{title}</h1>
-                <p className="text-on-background/70 max-w-md font-mono text-sm">
-                    {description}
-                </p>
-                <div className="mt-8 px-4 py-2 border border-almost-black bg-surface-muted text-xs font-mono font-bold uppercase tracking-widest text-on-background/60">
-                    Coming in Phase 6+
-                </div>
-            </div>
-        </>
+            </Suspense>
+        </ControlErrorBoundary>
     );
 }

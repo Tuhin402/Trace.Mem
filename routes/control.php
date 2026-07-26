@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 // All routes inside here must enforce the 'control.admin' middleware
 // unless they are explicitly meant for guest admins (like login).
 
-Route::middleware('guest')->group(function () {
+Route::middleware('control.guest')->group(function () {
     Route::inertia('/login', 'control/auth/Login')->name('control.login');
     Route::post('/login', [\App\Http\Controllers\Control\AuthController::class, 'login'])->name('control.login.store');
     

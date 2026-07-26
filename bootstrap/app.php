@@ -53,6 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'api.key.auth' => \App\Http\Middleware\ApiKeyAuthMiddleware::class,
             'control.admin' => \App\Http\Middleware\ControlAdminMiddleware::class,
+            'control.guest' => \App\Http\Middleware\ControlGuestMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

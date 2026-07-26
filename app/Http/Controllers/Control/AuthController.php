@@ -188,9 +188,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Only destroy the control panel session, preserving the public app session.
+        $request->session()->forget('control_last_activity');
 
         return redirect()->route('control.login');
     }

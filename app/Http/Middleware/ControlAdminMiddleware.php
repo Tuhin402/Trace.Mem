@@ -31,17 +31,23 @@ class ControlAdminMiddleware
             abort(403, 'Unauthorized access to Operations Console.');
         }
 
-        // 2. Strict 30-minute inactivity timeout for Operations Console
+        // 2. Strict 30-minute inactivity timeout & OTP enforcement
         $lastActivity = $request->session()->get('control_last_activity');
         $timeout = 30 * 60; // 30 minutes in seconds
 
-        if ($lastActivity && (time() - $lastActivity > $timeout)) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+        if (! $lastActivity) {
+            // They are authenticated in the web guard, but never passed the Control OTP.
+            // Force them to verify via the Control login page.
+            return redirect()->route('control.login');
+        }
+
+        if (time() - $lastActivity > $timeout) {
+            // Do not destroy the whole web session, just the control session
+            // so they remain logged into the public app but must re-verify for control.
+            $request->session()->forget('control_last_activity');
             
             return redirect()->route('control.login')->withErrors([
-                'email' => 'Your session has expired due to 30 minutes of inactivity.',
+                'email' => 'Your control session has expired due to 30 minutes of inactivity.',
             ]);
         }
 

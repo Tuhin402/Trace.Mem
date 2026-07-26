@@ -70,8 +70,8 @@ export function ControlSidebarNavItem({ route_name, title, icon, pinnable = fals
 
     if (collapsed) {
         return (
-            <li className="list-none">
-                <ControlTooltip label={title} delay={100}>
+            <li className="list-none w-full">
+                <ControlTooltip label={title} delay={100} className="flex w-full">
                     {content}
                 </ControlTooltip>
             </li>

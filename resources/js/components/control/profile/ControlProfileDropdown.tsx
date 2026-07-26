@@ -84,7 +84,7 @@ export default function ControlProfileDropdown() {
             )}
 
             {collapsed ? (
-                <ControlTooltip label="Profile & Settings" delay={100}>
+                <ControlTooltip label="Profile & Settings" delay={100} className="flex w-full">
                     {trigger}
                 </ControlTooltip>
             ) : (

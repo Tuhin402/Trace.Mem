@@ -6,9 +6,10 @@ interface ControlTooltipProps {
     label: string;
     delay?: number;
     disabled?: boolean;
+    className?: string;
 }
 
-export function ControlTooltip({ children, label, delay = 200, disabled = false }: ControlTooltipProps) {
+export function ControlTooltip({ children, label, delay = 200, disabled = false, className = "inline-flex" }: ControlTooltipProps) {
     const [isVisible, setIsVisible] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0 });
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,7 +55,7 @@ export function ControlTooltip({ children, label, delay = 200, disabled = false 
     return (
         <div 
             ref={triggerRef}
-            className="inline-flex"
+            className={className}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onFocus={handleMouseEnter}

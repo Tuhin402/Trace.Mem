@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Control\AuthController;
 use App\Http\Controllers\Control\SettingsController;
 use App\Http\Controllers\Control\GlobalSearchController;
+use App\Http\Controllers\Control\OverviewController;
 
 // This route file is strictly bound to the control.* subdomain.
 // All routes inside here must enforce the 'control.admin' middleware
@@ -27,8 +28,10 @@ Route::middleware(['web', 'control.admin'])->group(function () {
         return redirect()->route('control.overview');
     });
     
-    // Overview
-    Route::inertia('/overview', 'control/Scaffold')->name('control.overview');
+    // Overview (Rate limited per requirements)
+    Route::get('/overview', [OverviewController::class, 'index'])
+        ->middleware('throttle:60,1')
+        ->name('control.overview');
 
     // Platform
     Route::prefix('platform')->name('control.platform.')->group(function () {

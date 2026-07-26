@@ -69,6 +69,11 @@ class User extends Authenticatable implements MustVerifyEmail
     // ---------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------
+    public function tenant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_scope_id', 'id');
+    }
+
     public function apiKeys(): HasMany
     {
         return $this->hasMany(ApiKey::class);

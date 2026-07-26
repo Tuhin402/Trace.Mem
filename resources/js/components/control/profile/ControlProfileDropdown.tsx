@@ -22,7 +22,7 @@ export default function ControlProfileDropdown() {
     }, []);
 
     const trigger = (
-        <div 
+        <div
             className={`flex w-full items-center p-4 cursor-pointer hover:bg-almost-black/5 transition-colors relative ${isOpen ? 'bg-almost-black/5' : ''} ${collapsed ? 'justify-center' : ''}`}
             onClick={() => setIsOpen(!isOpen)}
             aria-expanded={isOpen}
@@ -31,7 +31,7 @@ export default function ControlProfileDropdown() {
             <div className="h-8 w-8 shrink-0 bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-bold rounded">
                 <UserIcon className="h-4 w-4" />
             </div>
-            
+
             {!collapsed && (
                 <div className="ml-3 flex-1 overflow-hidden">
                     <p className="text-sm font-semibold leading-5 text-on-background truncate">
@@ -58,18 +58,18 @@ export default function ControlProfileDropdown() {
                             {user?.email || 'admin@tracemem.one'}
                         </p>
                     </div>
-                    
+
                     {/* Actions */}
                     <div className="py-1">
-                        <Link 
+                        <Link
                             href="/configuration/settings"
                             className="flex items-center w-full px-4 py-2 text-sm font-medium text-on-background hover:bg-almost-black/5 transition-colors"
                             onClick={() => setIsOpen(false)}
                         >
                             <Settings className="mr-3 h-4 w-4 text-on-background/70" />
-                            Profile Settings
+                            Platform Settings
                         </Link>
-                        
+
                         <Link
                             href="/logout"
                             method="post"

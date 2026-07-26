@@ -2,8 +2,10 @@ import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/control/ui/Button';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { SyntheticEvent } from 'react';
+import { useControlToast } from '@/providers/control/ControlToastProvider';
 
-export default function Settings({ settings, status }: any) {
+export default function Settings({ settings }: any) {
+    const { success, error } = useControlToast();
     const { data, setData, put, processing, errors } = useForm({
         allow_admin_registration: settings.allow_admin_registration || false,
         experimental_features: settings.experimental_features || false,
@@ -12,7 +14,14 @@ export default function Settings({ settings, status }: any) {
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-        put('/settings');
+        put('/settings', {
+            onSuccess: () => {
+                success('Platform settings updated successfully.');
+            },
+            onError: () => {
+                error('Failed to update platform settings. Please check your inputs.');
+            }
+        });
     };
 
     return (
@@ -24,11 +33,6 @@ export default function Settings({ settings, status }: any) {
                 <h1 className="text-3xl font-bold font-heading text-primary">Platform Settings</h1>
             </div>
 
-            {status && (
-                <div className="mb-6 p-4 bg-primary/10 border border-primary text-primary text-sm font-medium">
-                    {status}
-                </div>
-            )}
 
             <form onSubmit={submit} className="space-y-8">
                 

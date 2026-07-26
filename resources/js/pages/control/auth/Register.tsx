@@ -2,6 +2,7 @@ import { useEffect, SyntheticEvent } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { Button } from '@/components/control/ui/Button';
 import { Input } from '@/components/control/ui/Input';
+import AppLogoIcon from '@/components/app-logo-icon';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -25,8 +26,14 @@ export default function Register() {
             <Head title="Control Registration" />
 
             <div className="w-full max-w-md mx-auto bg-surface border border-almost-black p-8">
-                <div className="mb-8 text-center">
-                    <h1 className="text-2xl font-bold font-heading text-primary">Operations Control</h1>
+                <div className="mb-8 text-center flex flex-col items-center">
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                        <AppLogoIcon className="h-10 w-auto" />
+                        <span className="text-3xl font-bold font-heading tracking-tight text-[#2c0133]">
+                            TraceMem
+                        </span>
+                    </div>
+                    <h1 className="text-xl font-bold font-heading text-primary uppercase tracking-wider">Operations Control</h1>
                     <p className="text-sm text-on-background/70 mt-2 font-mono">
                         Initialize Control Credentials
                     </p>

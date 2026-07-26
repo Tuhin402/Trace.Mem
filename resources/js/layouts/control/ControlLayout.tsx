@@ -65,16 +65,20 @@ function LayoutInner({ children }: ControlLayoutProps) {
     );
 }
 
+import { ControlToastProvider } from '@/providers/control/ControlToastProvider';
+
 export default function ControlLayout({ children }: ControlLayoutProps) {
     return (
-        <ProfileProvider>
-            <ControlShellProvider>
-                <SearchProvider>
-                    <NotificationProvider>
-                        <LayoutInner>{children}</LayoutInner>
-                    </NotificationProvider>
-                </SearchProvider>
-            </ControlShellProvider>
-        </ProfileProvider>
+        <ControlToastProvider>
+            <ProfileProvider>
+                <ControlShellProvider>
+                    <SearchProvider>
+                        <NotificationProvider>
+                            <LayoutInner>{children}</LayoutInner>
+                        </NotificationProvider>
+                    </SearchProvider>
+                </ControlShellProvider>
+            </ProfileProvider>
+        </ControlToastProvider>
     );
 }

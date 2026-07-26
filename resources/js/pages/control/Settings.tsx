@@ -14,7 +14,7 @@ export default function Settings({ settings }: any) {
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-        put('/settings', {
+        put('/configuration/settings', {
             onSuccess: () => {
                 success('Platform settings updated successfully.');
             },

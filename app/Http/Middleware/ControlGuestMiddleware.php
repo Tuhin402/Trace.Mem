@@ -20,7 +20,7 @@ class ControlGuestMiddleware
         if (Auth::check() && in_array(Auth::user()->platform_role, ['admin', 'super_admin'])) {
             $lastActivity = $request->session()->get('control_last_activity');
             if ($lastActivity && (time() - $lastActivity <= 30 * 60)) {
-                return redirect()->route('control.dashboard');
+                return redirect()->route('control.overview');
             }
         }
 

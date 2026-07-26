@@ -1,5 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { ControlEmptyState } from '@/components/control/ui/ControlEmptyState';
 import { ControlPageSkeleton } from '@/components/control/ui/ControlSkeleton';
 import { ControlErrorBoundary } from '@/components/control/ui/ControlErrorBoundary';
@@ -13,7 +13,7 @@ export default function Scaffold() {
     // (since Inertia does not pass route_name by default, though we can match segments)
     // As a simple match:
     const item = navigationItems.find(nav => 
-        url.includes(nav.route_name.replace('control.', '').replace('.', '/')) ||
+        url.includes(nav.route_name.replace('control.', '').replaceAll('.', '/')) ||
         (nav.route_name === 'control.overview' && url === '/overview')
     );
 

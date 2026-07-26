@@ -19,7 +19,7 @@ export function ControlSidebarNavItem({ route_name, title, icon, pinnable = fals
     // so we parse the URL or pass it down. For now, since we asked for route name match, we can use ziggy if available, 
     // or just match URL paths roughly for active state since we have the config).
     // Assuming Ziggy is available via route().current() in a real app, but we will mock active state by URL path for now:
-    const pathSegment = route_name.replace('control.', '').replace('.', '/');
+    const pathSegment = route_name.replace('control.', '').replaceAll('.', '/');
     const isActive = url.includes(`/${pathSegment}`) || (route_name === 'control.overview' && url === '/overview');
     
     const isPinned = pinnedItems.includes(route_name);

@@ -121,7 +121,7 @@ class AuthController extends Controller
             'request_id' => (string) Str::uuid(),
         ]);
 
-        return redirect()->intended(route('control.dashboard'));
+        return redirect()->intended(route('control.overview'));
     }
 
     /**

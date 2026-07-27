@@ -44,6 +44,19 @@ readonly class UserProfileDTO
             subscription: [
                 'plan' => $user->currentSubscription?->plan_id ?? 'Free',
                 'status' => $user->currentSubscription?->is_active ? 'active' : 'inactive',
+                'history' => $user->subscriptions?->map(fn ($sub) => [
+                    'id' => $sub->id,
+                    'plan' => $sub->plan_id,
+                    'status' => $sub->cancelled_at ? 'cancelled' : ($sub->is_active ? 'active' : 'inactive'),
+                    'started_at' => $sub->starts_at?->format('M j, Y'),
+                    'cancelled_at' => $sub->cancelled_at?->format('M j, Y'),
+                    'price' => $sub->plan?->price ?? 0,
+                ])->toArray() ?? [],
+                'trials' => $user->freeTrialEvents?->map(fn ($trial) => [
+                    'id' => $trial->id,
+                    'status' => $trial->event_type,
+                    'date' => $trial->created_at->format('M j, Y'),
+                ])->toArray() ?? [],
             ],
             metrics: [
                 'api_keys' => $user->api_keys_count ?? 0,

@@ -67,7 +67,7 @@ class TenantQueryService
             ->with(['workspaces' => function ($q) {
                 $q->withCount('members');
             }, 'users' => function ($q) {
-                $q->latest()->limit(5);
+                $q->with('subscriptions.plan');
             }])
             ->withCount(['workspaces', 'users'])
             ->where('slug', $slug)

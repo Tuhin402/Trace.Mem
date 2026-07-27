@@ -16,6 +16,7 @@ readonly class WorkspaceProfileDTO
         public array $metrics,
         public array $members,
         public array $recent_api_keys,
+        public array $recent_activity,
         public string $created_at
     ) {}
 
@@ -50,6 +51,12 @@ readonly class WorkspaceProfileDTO
                 'last_used_at' => $key->last_used_at?->diffForHumans() ?? 'Never',
                 'is_active' => $key->is_active,
             ])->toArray(),
+            recent_activity: $team->auditLogs?->map(fn ($log) => [
+                'id' => $log->id,
+                'action' => $log->action,
+                'user' => $log->user?->name ?? 'System',
+                'created_at' => $log->created_at->diffForHumans(),
+            ])->toArray() ?? [],
             created_at: $team->created_at->format('M j, Y')
         );
     }

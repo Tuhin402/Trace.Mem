@@ -48,7 +48,7 @@ export default function ControlEntityLayout({
         <ControlErrorBoundary>
             <Head title={`${title} | Platform`} />
 
-            <div className="w-full pb-24 space-y-6">
+            <div className="w-full flex flex-col gap-6">
                 
                 {/* 1. Breadcrumbs */}
                 <nav className="flex flex-wrap items-center gap-2 text-xs font-mono text-on-background/60 uppercase tracking-wider">

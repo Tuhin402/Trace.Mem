@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, router } from '@inertiajs/react';
-import ControlLayout from '@/layouts/control/ControlLayout';
+
 import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
 import { Settings, Ban, Key } from 'lucide-react';
 
@@ -40,7 +40,7 @@ export default function WorkspaceProfile({ workspace }: { workspace: any }) {
     ];
 
     return (
-        <ControlLayout>
+        <>
             <ControlEntityLayout
                 title={workspace.name}
                 breadcrumbs={breadcrumbs}
@@ -163,13 +163,32 @@ export default function WorkspaceProfile({ workspace }: { workspace: any }) {
 
                 {currentTab === 'activity' && (
                     <div id="activity" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="w-full bg-surface border border-almost-black/10 p-8 text-center flex flex-col items-center justify-center text-on-background/50 gap-2">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background/70">Activity Log</h3>
-                            <p className="text-xs">Activity tracking and audit logs will appear here.</p>
+                        <div className="w-full bg-surface border border-almost-black/10">
+                            <div className="px-6 py-4 border-b border-almost-black/10">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Activity Log</h3>
+                            </div>
+                            <div className="divide-y divide-almost-black/5">
+                                {workspace.recent_activity.map((log: any) => (
+                                    <div key={log.id} className="p-4 flex items-center justify-between group">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-on-background">{log.action}</span>
+                                            <span className="text-xs text-on-background/50 font-mono">By {log.user}</span>
+                                        </div>
+                                        <span className="text-xs text-on-background/50 font-mono">
+                                            {log.created_at}
+                                        </span>
+                                    </div>
+                                ))}
+                                {workspace.recent_activity.length === 0 && (
+                                    <div className="p-8 text-center text-on-background/50 text-sm">
+                                        No activity recorded yet.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
             </ControlEntityLayout>
-        </ControlLayout>
+        </>
     );
 }

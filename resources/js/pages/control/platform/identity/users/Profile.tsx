@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
-import ControlLayout from '@/layouts/control/ControlLayout';
+
 import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
 import { Mail, Ban, KeySquare, LogOut, CheckCircle2 } from 'lucide-react';
 
@@ -38,7 +38,7 @@ export default function UserProfile({ user }: { user: any }) {
     ];
 
     return (
-        <ControlLayout>
+        <>
             <ControlEntityLayout
                 title={user.name}
                 breadcrumbs={breadcrumbs}
@@ -132,9 +132,80 @@ export default function UserProfile({ user }: { user: any }) {
 
                 {currentTab === 'security' && (
                     <div id="security" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="w-full bg-surface border border-almost-black/10 p-8 text-center flex flex-col items-center justify-center text-on-background/50 gap-2">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background/70">Security Options</h3>
-                            <p className="text-xs">MFA, password reset, and session logs will appear here.</p>
+                        <div className="grid grid-cols-1 gap-6">
+                            <div className="p-6 bg-surface border border-almost-black/10">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Security Settings</h3>
+                                <div className="mt-4 flex flex-col gap-4">
+                                    <div className="flex justify-between items-center py-2 border-b border-almost-black/5">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-on-background/70">Two-Factor Authentication</span>
+                                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.has_2fa ? 'bg-green-500/10 text-green-500' : 'bg-almost-black/5 text-on-background/70'}`}>
+                                            {user.has_2fa ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-almost-black/5">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-on-background/70">Email Verified</span>
+                                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.is_verified ? 'bg-green-500/10 text-green-500' : 'bg-almost-black/5 text-on-background/70'}`}>
+                                            {user.is_verified ? 'Verified' : 'Unverified'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {currentTab === 'billing' && (
+                    <div id="billing" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-6 bg-surface border border-almost-black/10 flex flex-col gap-4">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Current Subscription</h3>
+                                <div className="flex items-center gap-4 mt-2">
+                                    <span className="text-2xl font-black font-heading text-primary">{user.subscription.plan}</span>
+                                    <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.subscription.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-almost-black/5 text-on-background/70'}`}>
+                                        {user.subscription.status}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div className="p-6 bg-surface border border-almost-black/10 flex flex-col gap-4">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Free Trials</h3>
+                                {user.subscription.trials.length > 0 ? (
+                                    <div className="divide-y divide-almost-black/5 mt-2">
+                                        {user.subscription.trials.map((trial: any) => (
+                                            <div key={trial.id} className="py-2 flex justify-between items-center">
+                                                <span className="text-xs font-bold uppercase tracking-wider text-on-background/70">{trial.status}</span>
+                                                <span className="text-xs font-mono text-on-background/50">{trial.date}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-xs text-on-background/50 mt-2">No trial history recorded.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="w-full bg-surface border border-almost-black/10">
+                            <div className="px-6 py-4 border-b border-almost-black/10">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Subscription History</h3>
+                            </div>
+                            <div className="divide-y divide-almost-black/5">
+                                {user.subscription.history.map((sub: any) => (
+                                    <div key={sub.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-on-background">{sub.plan}</span>
+                                            <span className="text-xs text-on-background/50 font-mono">Started: {sub.started_at} {sub.cancelled_at && `• Cancelled: ${sub.cancelled_at}`}</span>
+                                        </div>
+                                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider self-start md:self-auto ${sub.status === 'active' ? 'bg-green-500/10 text-green-500' : sub.status === 'cancelled' ? 'bg-destructive/10 text-destructive' : 'bg-almost-black/5 text-on-background/70'}`}>
+                                            {sub.status}
+                                        </span>
+                                    </div>
+                                ))}
+                                {user.subscription.history.length === 0 && (
+                                    <div className="p-8 text-center text-on-background/50 text-sm">
+                                        No subscription history found.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -157,6 +228,6 @@ export default function UserProfile({ user }: { user: any }) {
                     </div>
                 )}
             </ControlEntityLayout>
-        </ControlLayout>
+        </>
     );
 }

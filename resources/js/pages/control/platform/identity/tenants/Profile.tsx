@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, router } from '@inertiajs/react';
-import ControlLayout from '@/layouts/control/ControlLayout';
+
 import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
 import { Settings, Ban, LogOut } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
     ];
 
     return (
-        <ControlLayout>
+        <>
             <ControlEntityLayout
                 title={tenant.name}
                 breadcrumbs={breadcrumbs}
@@ -130,13 +130,16 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                             </div>
                             <div className="divide-y divide-almost-black/5">
                                 {tenant.recent_users.map((user: any) => (
-                                    <div key={user.id} className="p-4 flex items-center justify-between group">
+                                    <div key={user.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between group gap-4">
                                         <div className="flex flex-col">
                                             <a href={`/platform/users/${user.uuid}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
                                                 {user.name}
                                             </a>
                                             <span className="text-xs text-on-background/50 font-mono">{user.email}</span>
                                         </div>
+                                        <span className="text-xs text-on-background/50 font-mono">
+                                            Joined {user.created_at}
+                                        </span>
                                     </div>
                                 ))}
                                 {tenant.recent_users.length === 0 && (
@@ -151,13 +154,32 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
 
                 {currentTab === 'billing' && (
                     <div id="billing" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="w-full bg-surface border border-almost-black/10 p-8 text-center flex flex-col items-center justify-center text-on-background/50 gap-2">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background/70">Billing Information</h3>
-                            <p className="text-xs">Invoices, payment methods, and subscription details will appear here.</p>
+                        <div className="w-full bg-surface border border-almost-black/10">
+                            <div className="px-6 py-4 border-b border-almost-black/10 flex items-center justify-between">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Organization Subscriptions</h3>
+                            </div>
+                            <div className="divide-y divide-almost-black/5">
+                                {tenant.subscriptions.map((sub: any) => (
+                                    <div key={sub.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-on-background">{sub.plan}</span>
+                                            <span className="text-xs text-on-background/50 font-mono">Subscribed by {sub.user_name} • Started: {sub.started_at} {sub.cancelled_at && `• Cancelled: ${sub.cancelled_at}`}</span>
+                                        </div>
+                                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider self-start md:self-auto ${sub.status === 'active' ? 'bg-green-500/10 text-green-500' : sub.status === 'cancelled' ? 'bg-destructive/10 text-destructive' : 'bg-almost-black/5 text-on-background/70'}`}>
+                                            {sub.status}
+                                        </span>
+                                    </div>
+                                ))}
+                                {tenant.subscriptions.length === 0 && (
+                                    <div className="p-8 text-center text-on-background/50 text-sm">
+                                        No subscriptions found for this tenant.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
             </ControlEntityLayout>
-        </ControlLayout>
+        </>
     );
 }

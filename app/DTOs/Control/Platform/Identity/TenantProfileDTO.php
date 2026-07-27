@@ -15,6 +15,7 @@ readonly class TenantProfileDTO
         public array $metrics,
         public array $workspaces,
         public array $recent_users,
+        public array $subscriptions,
         public string $created_at
     ) {}
 
@@ -37,12 +38,23 @@ readonly class TenantProfileDTO
                 'status' => $team->status ?? 'active',
                 'user_count' => $team->members_count ?? 0,
             ])->toArray(),
-            recent_users: $tenant->users->map(fn ($user) => [
+            recent_users: $tenant->users->take(10)->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'uuid' => $user->tenant_scope_id,
+                'created_at' => $user->created_at->format('M j, Y'),
             ])->toArray(),
+            subscriptions: $tenant->users->flatMap(function ($user) {
+                return $user->subscriptions->map(fn ($sub) => [
+                    'id' => $sub->id,
+                    'user_name' => $user->name,
+                    'plan' => $sub->plan_id,
+                    'status' => $sub->cancelled_at ? 'cancelled' : ($sub->is_active ? 'active' : 'inactive'),
+                    'started_at' => $sub->starts_at?->format('M j, Y'),
+                    'cancelled_at' => $sub->cancelled_at?->format('M j, Y'),
+                ]);
+            })->sortByDesc('started_at')->values()->toArray(),
             created_at: $tenant->created_at->format('M j, Y')
         );
     }

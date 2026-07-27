@@ -69,7 +69,7 @@ class UserQueryService
     public function getProfile(string $uuid): \App\DTOs\Control\Platform\Identity\UserProfileDTO
     {
         $query = User::query()
-            ->with(['tenant', 'subscriptions', 'teams' => function ($q) {
+            ->with(['tenant', 'subscriptions.plan', 'freeTrialEvents', 'teams' => function ($q) {
                 $q->withCount('memories');
             }])
             ->withCount(['teams', 'apiKeys']);

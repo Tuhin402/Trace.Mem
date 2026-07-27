@@ -11,7 +11,7 @@ class OperationalCommunicationLogPolicy
      */
     public function send(User $user): bool
     {
-        return in_array($user->platform_role, ['owner', 'admin']);
+        return in_array($user->platform_role, ['owner', 'admin', 'super_admin']);
     }
 
     /**
@@ -19,6 +19,6 @@ class OperationalCommunicationLogPolicy
      */
     public function view(User $user): bool
     {
-        return in_array($user->platform_role, ['owner', 'admin', 'support']);
+        return in_array($user->platform_role, ['owner', 'admin', 'super_admin', 'support']);
     }
 }

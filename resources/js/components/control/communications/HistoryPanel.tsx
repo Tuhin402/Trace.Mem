@@ -29,7 +29,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
         setLoading(true);
         setError(false);
         try {
-            const res = await axios.get(`/control/platform/communications/history/${recipientType}/${recipientId}`);
+            const res = await axios.get(`/platform/communications/history/${recipientType}/${recipientId}`);
             setHistory(res.data.history);
         } catch (e) {
             console.error(e);
@@ -58,7 +58,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
     if (history.length === 0) return <div className="text-sm text-muted-foreground">No recent communications found.</div>;
 
     return (
-        <div className="h-[250px] overflow-y-auto rounded-md border p-2">
+        <div className="w-full">
             <div className="space-y-3">
                 {history.map((log) => (
                     <Card key={log.id} className="p-3 shadow-sm text-sm">
@@ -78,15 +78,19 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
                             <Dialog>
                                 <DialogTrigger asChild>
                                     <button className="flex items-center gap-1 hover:text-primary transition-colors">
-                                        <Eye className="h-3 w-3" /> View Source
+                                        <Eye className="h-3 w-3" /> Preview
                                     </button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-3xl h-[80vh] flex flex-col">
+                                <DialogContent className="max-w-3xl h-[80vh] flex flex-col overflow-hidden">
                                     <DialogHeader>
-                                        <DialogTitle>View Rendered Body</DialogTitle>
+                                        <DialogTitle>View Rendered Email</DialogTitle>
                                     </DialogHeader>
-                                    <div className="flex-1 overflow-y-auto mt-4 p-4 bg-muted rounded-md font-mono text-sm whitespace-pre-wrap">
-                                        {log.body}
+                                    <div className="flex-1 overflow-y-auto mt-4 rounded-md border [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                        <iframe
+                                            srcDoc={log.body}
+                                            title="Email Preview"
+                                            className="w-full h-full min-h-[600px] border-0"
+                                        />
                                     </div>
                                 </DialogContent>
                             </Dialog>

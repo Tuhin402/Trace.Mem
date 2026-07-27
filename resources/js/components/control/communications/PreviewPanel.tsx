@@ -24,7 +24,7 @@ export function PreviewPanel({ subject, body }: PreviewPanelProps) {
     const fetchPreview = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('/control/platform/communications/preview', {
+            const response = await axios.post('/platform/communications/preview', {
                 subject,
                 body,
             });
@@ -38,21 +38,21 @@ export function PreviewPanel({ subject, body }: PreviewPanelProps) {
     };
 
     return (
-        <div className="relative border rounded-md bg-white min-h-[400px]">
+        <div className="relative border rounded-xl bg-white h-full flex flex-col overflow-hidden">
             {loading && (
                 <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
             )}
-            <div className="h-[500px] overflow-y-auto">
+            <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {html ? (
                     <iframe
                         srcDoc={html}
                         title="Email Preview"
-                        className="w-full h-[800px] border-0"
+                        className="w-full h-full min-h-[800px] border-0"
                     />
                 ) : (
-                    <div className="p-8 text-center text-muted-foreground">
+                    <div className="p-8 text-center text-muted-foreground mt-10">
                         Type a message to see the preview.
                     </div>
                 )}

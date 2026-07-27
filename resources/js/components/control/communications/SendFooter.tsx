@@ -14,7 +14,7 @@ export function SendFooter({ onCancel, onSend, isSending, disabled }: SendFooter
             <Button variant="outline" onClick={onCancel} disabled={isSending}>
                 Cancel
             </Button>
-            <Button onClick={onSend} disabled={isSending || disabled}>
+            <Button onClick={onSend} disabled={isSending || disabled} className="text-white">
                 {isSending ? (
                     <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

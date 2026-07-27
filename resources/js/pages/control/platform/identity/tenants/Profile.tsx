@@ -2,9 +2,12 @@ import React from 'react';
 import { Head, router } from '@inertiajs/react';
 
 import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
-import { Settings, Ban, LogOut } from 'lucide-react';
+import { Settings, Ban, LogOut, Mail } from 'lucide-react';
+import { EmailComposerModal } from '@/components/control/communications/EmailComposerModal';
+import { HistoryPanel } from '@/components/control/communications/HistoryPanel';
 
 export default function TenantProfile({ tenant }: { tenant: any }) {
+    const [composerOpen, setComposerOpen] = React.useState(false);
     const breadcrumbs = [
         { label: 'Identity' },
         { label: 'Tenants', url: '/platform/tenants' },
@@ -21,6 +24,7 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
     ];
 
     const actions = [
+        { label: 'Email Tenant', icon: <Mail className="h-4 w-4" />, onClick: () => setComposerOpen(true) },
         { label: 'Edit Tenant', icon: <Settings className="h-4 w-4" />, onClick: () => alert('Edit tenant coming soon') },
         { label: 'Suspend All', icon: <Ban className="h-4 w-4" />, destructive: true, onClick: () => alert('Suspend tenant coming soon') },
     ];
@@ -31,7 +35,8 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
         { label: 'Overview', id: 'overview' },
         { label: 'Workspaces', id: 'workspaces' },
         { label: 'Users', id: 'users' },
-        { label: 'Billing', id: 'billing' }
+        { label: 'Billing', id: 'billing' },
+        { label: 'Communications', id: 'communications' }
     ];
 
     return (
@@ -179,7 +184,24 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                         </div>
                     </div>
                 )}
+                {currentTab === 'communications' && (
+                    <div id="communications" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="w-full bg-surface border border-almost-black/10 p-6">
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background mb-4">Recent Communications</h3>
+                            <HistoryPanel recipientType="tenant" recipientId={tenant.slug} />
+                        </div>
+                    </div>
+                )}
             </ControlEntityLayout>
+
+            <EmailComposerModal 
+                open={composerOpen}
+                onOpenChange={setComposerOpen}
+                recipientName={tenant.name}
+                recipientEmail={`support@${tenant.slug}.tracemem.one`} // Placeholder if tenant email is not directly available
+                recipientType="tenant"
+                recipientId={tenant.slug}
+            />
         </>
     );
 }

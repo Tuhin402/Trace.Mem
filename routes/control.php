@@ -46,6 +46,13 @@ Route::middleware(['web', 'control.admin'])->group(function () {
         Route::get('/workspaces', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'index'])->name('workspaces');
         Route::get('/workspaces/{tenant_slug}/{workspace_slug}', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'show'])->name('workspaces.show');
 
+        // Communications API
+        Route::prefix('communications')->name('communications.')->group(function () {
+            Route::post('/send', [\App\Http\Controllers\Control\Communications\CommunicationController::class, 'send'])->name('send');
+            Route::post('/preview', [\App\Http\Controllers\Control\Communications\CommunicationController::class, 'preview'])->name('preview');
+            Route::get('/history/{type}/{id}', [\App\Http\Controllers\Control\Communications\CommunicationController::class, 'history'])->name('history');
+        });
+
         Route::inertia('/api-keys', 'control/Scaffold')->name('api-keys');
         Route::inertia('/memory', 'control/Scaffold')->name('memory');
         Route::inertia('/subscriptions', 'control/Scaffold')->name('subscriptions');

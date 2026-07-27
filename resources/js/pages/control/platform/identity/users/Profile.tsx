@@ -3,8 +3,11 @@ import { Head } from '@inertiajs/react';
 
 import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
 import { Mail, Ban, KeySquare, LogOut, CheckCircle2 } from 'lucide-react';
+import { EmailComposerModal } from '@/components/control/communications/EmailComposerModal';
+import { HistoryPanel } from '@/components/control/communications/HistoryPanel';
 
 export default function UserProfile({ user }: { user: any }) {
+    const [composerOpen, setComposerOpen] = React.useState(false);
     const breadcrumbs = [
         { label: 'Identity' },
         { label: 'Users', url: '/platform/users' },
@@ -23,7 +26,7 @@ export default function UserProfile({ user }: { user: any }) {
     ];
 
     const actions = [
-        { label: 'Email User', icon: <Mail className="h-4 w-4" />, onClick: () => alert('Email functionality coming soon') },
+        { label: 'Email User', icon: <Mail className="h-4 w-4" />, onClick: () => setComposerOpen(true) },
         { label: 'Reset Sessions', icon: <LogOut className="h-4 w-4" />, onClick: () => alert('Session reset coming soon') },
         { label: 'Suspend', icon: <Ban className="h-4 w-4" />, destructive: true, onClick: () => alert('Suspend user coming soon') },
     ];
@@ -235,13 +238,23 @@ export default function UserProfile({ user }: { user: any }) {
 
                 {currentTab === 'communications' && (
                     <div id="communications" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="w-full bg-surface border border-almost-black/10 p-8 text-center flex flex-col items-center justify-center text-on-background/50 gap-2">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background/70">Communications</h3>
-                            <p className="text-xs">Emails sent to this user and notification preferences will appear here.</p>
+                        <div className="w-full bg-surface border border-almost-black/10 p-6">
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background mb-4">Recent Communications</h3>
+                            <HistoryPanel recipientType="user" recipientId={user.uuid} />
                         </div>
                     </div>
                 )}
             </ControlEntityLayout>
+
+            <EmailComposerModal 
+                open={composerOpen}
+                onOpenChange={setComposerOpen}
+                recipientName={user.name}
+                recipientEmail={user.email}
+                recipientType="user"
+                recipientId={user.uuid}
+                tenantName={user.tenant.name}
+            />
         </>
     );
 }

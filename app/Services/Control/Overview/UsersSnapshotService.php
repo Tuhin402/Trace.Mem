@@ -12,6 +12,7 @@ class UsersSnapshotService extends BaseOverviewService
             return User::latest()->take(5)->get()->map(function ($user) {
                 return [
                     'id' => $user->id,
+                    'uuid' => $user->tenant_scope_id,
                     'name' => $user->name,
                     'email' => $user->email,
                     'status' => 'Active',

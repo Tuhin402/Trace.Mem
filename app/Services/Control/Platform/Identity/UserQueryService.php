@@ -68,14 +68,20 @@ class UserQueryService
      */
     public function getProfile(string $uuid): \App\DTOs\Control\Platform\Identity\UserProfileDTO
     {
-        $user = User::query()
+        $query = User::query()
             ->with(['tenant', 'subscriptions', 'teams' => function ($q) {
                 $q->withCount('memories');
             }])
-            ->withCount(['teams', 'apiKeys'])
-            ->where('tenant_scope_id', $uuid)
-            ->orWhere('id', $uuid) // Support legacy ID routing just in case
-            ->firstOrFail();
+            ->withCount(['teams', 'apiKeys']);
+
+        if (\Illuminate\Support\Str::isUuid($uuid)) {
+            $query->where('tenant_scope_id', $uuid);
+        } else {
+            $id = str_replace('legacy-', '', $uuid);
+            $query->where('id', $id);
+        }
+
+        $user = $query->firstOrFail();
 
         return \App\DTOs\Control\Platform\Identity\UserProfileDTO::fromModel($user);
     }

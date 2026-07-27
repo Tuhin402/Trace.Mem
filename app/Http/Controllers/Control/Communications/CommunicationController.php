@@ -11,6 +11,7 @@ use App\Services\Email\EmailTheme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 
 class CommunicationController extends Controller
 {
@@ -20,7 +21,7 @@ class CommunicationController extends Controller
 
     public function send(Request $request)
     {
-        $this->authorize('send', OperationalCommunicationLog::class);
+        Gate::authorize('send', OperationalCommunicationLog::class);
 
         $validated = $request->validate([
             'recipient_uuid' => 'required|string',
@@ -73,7 +74,7 @@ class CommunicationController extends Controller
 
     public function preview(Request $request)
     {
-        $this->authorize('send', OperationalCommunicationLog::class);
+        Gate::authorize('send', OperationalCommunicationLog::class);
 
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
@@ -97,7 +98,7 @@ class CommunicationController extends Controller
 
     public function history(Request $request, string $type, string $id)
     {
-        $this->authorize('view', OperationalCommunicationLog::class);
+        Gate::authorize('view', OperationalCommunicationLog::class);
 
         if (!in_array($type, ['user', 'tenant'])) {
             abort(404);

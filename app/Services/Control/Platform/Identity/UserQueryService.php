@@ -16,54 +16,50 @@ class UserQueryService
      */
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
-        $cacheKey = 'control:users:list:' . md5($request->fullUrl());
+        $query = User::query()
+            ->with(['tenant']) // Used for organization badge
+            ->withCount(['teams as workspaces_count']); 
 
-        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($request) {
-            $query = User::query()
-                ->with(['tenant']) // Used for organization badge
-                ->withCount(['teams as workspaces_count']); 
-
-            // Search
-            if ($search = $request->input('search')) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('id', 'like', "%{$search}%")
-                      ->orWhere('tenant_scope_id', 'like', "%{$search}%");
-                });
-            }
-
-            // Filters
-            if ($status = $request->input('status')) {
-                $query->where('status', $status);
-            }
-
-            if ($role = $request->input('role')) {
-                $query->where('platform_role', $role);
-            }
-
-            // Sorting
-            $sortField = $request->input('sort', 'created_at');
-            $sortDirection = $request->input('direction', 'desc');
-
-            // Whitelist sort fields
-            $allowedSorts = ['name', 'email', 'created_at', 'last_login_at'];
-            if (in_array($sortField, $allowedSorts)) {
-                $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
-            }
-
-            // Pagination
-            $perPage = (int) $request->input('per_page', 25);
-            
-            $paginator = $query->paginate($perPage)->withQueryString();
-
-            // Transform collection to DTOs
-            $paginator->getCollection()->transform(function ($user) {
-                return UserListDTO::fromModel($user);
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('id', 'like', "%{$search}%")
+                  ->orWhere('tenant_scope_id', 'like', "%{$search}%");
             });
+        }
 
-            return $paginator;
+        // Filters
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        if ($role = $request->input('role')) {
+            $query->where('platform_role', $role);
+        }
+
+        // Sorting
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
+
+        // Whitelist sort fields
+        $allowedSorts = ['name', 'email', 'created_at', 'last_login_at'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
+        }
+
+        // Pagination
+        $perPage = (int) $request->input('per_page', 25);
+        
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        // Transform collection to DTOs
+        $paginator->getCollection()->transform(function ($user) {
+            return UserListDTO::fromModel($user);
         });
+
+        return $paginator;
     }
 
     /**

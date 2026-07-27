@@ -16,52 +16,48 @@ class TenantQueryService
      */
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
-        $cacheKey = 'control:tenants:list:' . md5($request->fullUrl());
+        $query = Tenant::query()
+            ->withCount(['users', 'workspaces']); // Assuming relationships exist for users and workspaces
 
-        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($request) {
-            $query = Tenant::query()
-                ->withCount(['users', 'workspaces']); // Assuming relationships exist for users and workspaces
-
-            // Search
-            if ($search = $request->input('search')) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('slug', 'like', "%{$search}%")
-                      ->orWhere('id', 'like', "%{$search}%");
-                });
-            }
-
-            // Filters
-            if ($status = $request->input('status')) {
-                $query->where('status', $status);
-            }
-
-            if ($plan = $request->input('plan')) {
-                $query->where('plan', $plan);
-            }
-
-            // Sorting
-            $sortField = $request->input('sort', 'created_at');
-            $sortDirection = $request->input('direction', 'desc');
-
-            // Whitelist sort fields
-            $allowedSorts = ['name', 'created_at', 'status', 'plan'];
-            if (in_array($sortField, $allowedSorts)) {
-                $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
-            }
-
-            // Pagination
-            $perPage = (int) $request->input('per_page', 25);
-            
-            $paginator = $query->paginate($perPage)->withQueryString();
-
-            // Transform collection to DTOs
-            $paginator->getCollection()->transform(function ($tenant) {
-                return TenantListDTO::fromModel($tenant);
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('id', 'like', "%{$search}%");
             });
+        }
 
-            return $paginator;
+        // Filters
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        if ($plan = $request->input('plan')) {
+            $query->where('plan', $plan);
+        }
+
+        // Sorting
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
+
+        // Whitelist sort fields
+        $allowedSorts = ['name', 'created_at', 'status', 'plan'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
+        }
+
+        // Pagination
+        $perPage = (int) $request->input('per_page', 25);
+        
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        // Transform collection to DTOs
+        $paginator->getCollection()->transform(function ($tenant) {
+            return TenantListDTO::fromModel($tenant);
         });
+
+        return $paginator;
     }
 
     /**

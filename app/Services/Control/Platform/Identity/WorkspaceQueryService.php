@@ -16,59 +16,55 @@ class WorkspaceQueryService
      */
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
-        $cacheKey = 'control:workspaces:list:' . md5($request->fullUrl());
+        $query = Team::query()
+            ->with(['tenant'])
+            ->withCount(['members']);
 
-        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($request) {
-            $query = Team::query()
-                ->with(['tenant'])
-                ->withCount(['members']);
-
-            // Search
-            if ($search = $request->input('search')) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('slug', 'like', "%{$search}%")
-                      ->orWhere('tenant_scope_id', 'like', "%{$search}%");
-                });
-            }
-
-            // Filters
-            if ($status = $request->input('status')) {
-                $query->where('status', $status);
-            }
-
-            if ($tenant = $request->input('tenant')) {
-                $query->whereHas('tenant', function ($q) use ($tenant) {
-                    $q->where('slug', $tenant)->orWhere('id', $tenant);
-                });
-            }
-
-            if ($environment = $request->input('environment')) {
-                $query->where('environment', $environment);
-            }
-
-            // Sorting
-            $sortField = $request->input('sort', 'created_at');
-            $sortDirection = $request->input('direction', 'desc');
-
-            // Whitelist sort fields
-            $allowedSorts = ['name', 'created_at', 'status', 'environment'];
-            if (in_array($sortField, $allowedSorts)) {
-                $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
-            }
-
-            // Pagination
-            $perPage = (int) $request->input('per_page', 25);
-            
-            $paginator = $query->paginate($perPage)->withQueryString();
-
-            // Transform collection to DTOs
-            $paginator->getCollection()->transform(function ($team) {
-                return WorkspaceListDTO::fromModel($team);
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('tenant_scope_id', 'like', "%{$search}%");
             });
+        }
 
-            return $paginator;
+        // Filters
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        if ($tenant = $request->input('tenant')) {
+            $query->whereHas('tenant', function ($q) use ($tenant) {
+                $q->where('slug', $tenant)->orWhere('id', $tenant);
+            });
+        }
+
+        if ($environment = $request->input('environment')) {
+            $query->where('environment', $environment);
+        }
+
+        // Sorting
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
+
+        // Whitelist sort fields
+        $allowedSorts = ['name', 'created_at', 'status', 'environment'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
+        }
+
+        // Pagination
+        $perPage = (int) $request->input('per_page', 25);
+        
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        // Transform collection to DTOs
+        $paginator->getCollection()->transform(function ($team) {
+            return WorkspaceListDTO::fromModel($team);
         });
+
+        return $paginator;
     }
 
     /**

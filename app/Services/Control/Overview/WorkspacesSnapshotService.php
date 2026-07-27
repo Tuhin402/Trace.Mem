@@ -9,7 +9,7 @@ class WorkspacesSnapshotService extends BaseOverviewService
     public function getWorkspaces(): array
     {
         return $this->execute('overview:workspaces_snapshot', CacheTiers::NEAR_REAL_TIME, function () {
-            return Team::latest()->take(4)->get()->map(function ($team) {
+            return Team::with('tenant')->latest()->take(4)->get()->map(function ($team) {
                 return [
                     'id' => $team->id,
                     'slug' => $team->slug,

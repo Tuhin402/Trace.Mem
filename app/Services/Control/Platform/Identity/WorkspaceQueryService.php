@@ -6,6 +6,8 @@ use App\DTOs\Control\Platform\Identity\WorkspaceListDTO;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
+use App\Services\Control\Overview\CacheTiers;
 
 class WorkspaceQueryService
 {
@@ -14,55 +16,59 @@ class WorkspaceQueryService
      */
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
-        $query = Team::query()
-            ->with(['tenant'])
-            ->withCount(['members']);
+        $cacheKey = 'control:workspaces:list:' . md5($request->fullUrl());
 
-        // Search
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%")
-                  ->orWhere('tenant_scope_id', 'like', "%{$search}%");
+        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($request) {
+            $query = Team::query()
+                ->with(['tenant'])
+                ->withCount(['members']);
+
+            // Search
+            if ($search = $request->input('search')) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('slug', 'like', "%{$search}%")
+                      ->orWhere('tenant_scope_id', 'like', "%{$search}%");
+                });
+            }
+
+            // Filters
+            if ($status = $request->input('status')) {
+                $query->where('status', $status);
+            }
+
+            if ($tenant = $request->input('tenant')) {
+                $query->whereHas('tenant', function ($q) use ($tenant) {
+                    $q->where('slug', $tenant)->orWhere('id', $tenant);
+                });
+            }
+
+            if ($environment = $request->input('environment')) {
+                $query->where('environment', $environment);
+            }
+
+            // Sorting
+            $sortField = $request->input('sort', 'created_at');
+            $sortDirection = $request->input('direction', 'desc');
+
+            // Whitelist sort fields
+            $allowedSorts = ['name', 'created_at', 'status', 'environment'];
+            if (in_array($sortField, $allowedSorts)) {
+                $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
+            }
+
+            // Pagination
+            $perPage = (int) $request->input('per_page', 25);
+            
+            $paginator = $query->paginate($perPage)->withQueryString();
+
+            // Transform collection to DTOs
+            $paginator->getCollection()->transform(function ($team) {
+                return WorkspaceListDTO::fromModel($team);
             });
-        }
 
-        // Filters
-        if ($status = $request->input('status')) {
-            $query->where('status', $status);
-        }
-
-        if ($tenant = $request->input('tenant')) {
-            $query->whereHas('tenant', function ($q) use ($tenant) {
-                $q->where('slug', $tenant)->orWhere('id', $tenant);
-            });
-        }
-
-        if ($environment = $request->input('environment')) {
-            $query->where('environment', $environment);
-        }
-
-        // Sorting
-        $sortField = $request->input('sort', 'created_at');
-        $sortDirection = $request->input('direction', 'desc');
-
-        // Whitelist sort fields
-        $allowedSorts = ['name', 'created_at', 'status', 'environment'];
-        if (in_array($sortField, $allowedSorts)) {
-            $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
-        }
-
-        // Pagination
-        $perPage = (int) $request->input('per_page', 25);
-        
-        $paginator = $query->paginate($perPage)->withQueryString();
-
-        // Transform collection to DTOs
-        $paginator->getCollection()->transform(function ($team) {
-            return WorkspaceListDTO::fromModel($team);
+            return $paginator;
         });
-
-        return $paginator;
     }
 
     /**
@@ -70,21 +76,25 @@ class WorkspaceQueryService
      */
     public function getProfile(string $tenantSlug, string $workspaceSlug): \App\DTOs\Control\Platform\Identity\WorkspaceProfileDTO
     {
-        $workspace = Team::query()
-            ->with(['tenant', 'members' => function ($q) {
-                $q->limit(10);
-            }, 'apiKeys' => function ($q) {
-                $q->latest()->limit(5);
-            }, 'auditLogs' => function ($q) {
-                $q->with('actor')->latest()->limit(20);
-            }])
-            ->withCount(['members', 'apiKeys', 'memories'])
-            ->whereHas('tenant', function ($q) use ($tenantSlug) {
-                $q->where('slug', $tenantSlug);
-            })
-            ->where('slug', $workspaceSlug)
-            ->firstOrFail();
+        $cacheKey = 'control:workspaces:profile:' . $tenantSlug . ':' . $workspaceSlug;
 
-        return \App\DTOs\Control\Platform\Identity\WorkspaceProfileDTO::fromModel($workspace);
+        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($tenantSlug, $workspaceSlug) {
+            $workspace = Team::query()
+                ->with(['tenant', 'members' => function ($q) {
+                    $q->limit(10);
+                }, 'apiKeys' => function ($q) {
+                    $q->latest()->limit(5);
+                }, 'auditLogs' => function ($q) {
+                    $q->with('actor')->latest()->limit(20);
+                }])
+                ->withCount(['members', 'apiKeys', 'memories'])
+                ->whereHas('tenant', function ($q) use ($tenantSlug) {
+                    $q->where('slug', $tenantSlug);
+                })
+                ->where('slug', $workspaceSlug)
+                ->firstOrFail();
+
+            return \App\DTOs\Control\Platform\Identity\WorkspaceProfileDTO::fromModel($workspace);
+        });
     }
 }

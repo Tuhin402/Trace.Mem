@@ -74,7 +74,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
                     currentSort={filters.sort}
                     currentDirection={filters.direction}
                     currentSearch={filters.search}
-                    onRowClick={(row) => router.visit(`/platform/tenants/${row.tenant_slug}/workspaces/${row.slug}`)}
+                    onRowClick={(row) => router.visit(`/platform/workspaces/${row.tenant_slug}/${row.slug}`)}
                 />
             </div>
         </>

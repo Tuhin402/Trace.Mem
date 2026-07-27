@@ -36,7 +36,7 @@ export default function TenantsIndex({ tenants, filters }: TenantsIndexProps) {
     ];
 
     return (
-        <ControlLayout>
+        <>
             <Head title="Tenants | Platform Identity" />
             
             <div className="w-full flex flex-col gap-6">
@@ -68,6 +68,6 @@ export default function TenantsIndex({ tenants, filters }: TenantsIndexProps) {
                     onRowClick={(row) => router.visit(`/platform/tenants/${row.slug}`)}
                 />
             </div>
-        </ControlLayout>
+        </>
     );
 }

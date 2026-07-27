@@ -32,7 +32,7 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
     ];
 
     return (
-        <ControlLayout>
+        <>
             <Head title="Users | Platform Identity" />
             
             <div className="w-full flex flex-col gap-6">
@@ -64,6 +64,6 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
                     onRowClick={(row) => router.visit(`/platform/users/${row.uuid}`)}
                 />
             </div>
-        </ControlLayout>
+        </>
     );
 }

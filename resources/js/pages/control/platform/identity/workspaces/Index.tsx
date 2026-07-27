@@ -45,7 +45,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
     ];
 
     return (
-        <ControlLayout>
+        <>
             <Head title="Workspaces | Platform Identity" />
             
             <div className="w-full flex flex-col gap-6">
@@ -55,7 +55,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
                             Workspaces
                         </h1>
                         <p className="text-on-background/60 mt-1">
-                            Manage individual workspaces within tenants.
+                            Manage all workspaces, their members, and associated quotas.
                         </p>
                     </div>
                 </div>
@@ -74,9 +74,9 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
                     currentSort={filters.sort}
                     currentDirection={filters.direction}
                     currentSearch={filters.search}
-                    onRowClick={(row) => router.visit(`/platform/workspaces/${row.tenant_slug}/${row.slug}`)}
+                    onRowClick={(row) => router.visit(`/platform/tenants/${row.tenant_slug}/workspaces/${row.slug}`)}
                 />
             </div>
-        </ControlLayout>
+        </>
     );
 }

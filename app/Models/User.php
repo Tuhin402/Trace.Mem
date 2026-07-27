@@ -97,6 +97,11 @@ class User extends Authenticatable implements MustVerifyEmail
             ->latestOfMany('starts_at');
     }
 
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(WorkspaceAuditLog::class, 'actor_user_id');
+    }
+
     // ── Email notification overrides ─────────────────────────────────────────
     // These replace Fortify's default notifications so verification and password
     // reset emails route through the unified SendEmailJob pipeline.

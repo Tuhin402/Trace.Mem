@@ -212,9 +212,23 @@ export default function UserProfile({ user }: { user: any }) {
 
                 {currentTab === 'activity' && (
                     <div id="activity" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="w-full bg-surface border border-almost-black/10 p-8 text-center flex flex-col items-center justify-center text-on-background/50 gap-2">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-on-background/70">Activity Log</h3>
-                            <p className="text-xs">User activity tracking and audit logs will appear here.</p>
+                        <div className="w-full bg-surface border border-almost-black/10">
+                            <div className="px-6 py-4 border-b border-almost-black/10">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-on-background">Recent Activity</h3>
+                            </div>
+                            <div className="divide-y divide-almost-black/5">
+                                {user.recent_activity?.map((log: any) => (
+                                    <div key={log.id} className="p-4 flex items-center justify-between">
+                                        <span className="text-sm text-on-background">{log.action}</span>
+                                        <span className="text-xs font-mono text-on-background/50">{log.created_at}</span>
+                                    </div>
+                                ))}
+                                {(!user.recent_activity || user.recent_activity.length === 0) && (
+                                    <div className="p-8 text-center text-on-background/50 text-sm">
+                                        No recent activity found.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}

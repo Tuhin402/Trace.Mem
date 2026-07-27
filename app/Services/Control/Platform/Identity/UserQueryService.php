@@ -71,6 +71,8 @@ class UserQueryService
         $query = User::query()
             ->with(['tenant', 'subscriptions.subscriptionPlan', 'freeTrialEvents', 'teams' => function ($q) {
                 $q->withCount('memories');
+            }, 'activityLogs' => function ($q) {
+                $q->latest()->limit(20);
             }])
             ->withCount(['teams', 'apiKeys']);
 

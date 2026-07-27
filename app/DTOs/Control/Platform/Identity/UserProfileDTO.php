@@ -16,6 +16,7 @@ readonly class UserProfileDTO
         public array $workspaces,
         public array $subscription,
         public array $metrics,
+        public array $recent_activity,
         public string $created_at,
         public ?string $last_login_at,
         public bool $is_verified,
@@ -58,6 +59,11 @@ readonly class UserProfileDTO
                     'date' => $trial->created_at->format('M j, Y'),
                 ])->toArray() ?? [],
             ],
+            recent_activity: $user->activityLogs?->map(fn ($log) => [
+                'id' => $log->id,
+                'action' => $log->action,
+                'created_at' => $log->created_at?->diffForHumans() ?? 'Unknown',
+            ])->toArray() ?? [],
             metrics: [
                 'api_keys' => $user->api_keys_count ?? 0,
                 'memories' => $user->teams ? $user->teams->sum('memories_count') : 0,

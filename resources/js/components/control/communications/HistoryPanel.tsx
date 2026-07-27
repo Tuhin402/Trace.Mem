@@ -67,12 +67,12 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
                                 {getStatusIcon(log.status)}
                                 {log.subject}
                             </div>
-                            <span className="text-xs font-medium text-foreground/70">{log.sent_at}</span>
+                            <span className="text-xs font-medium text-black">{log.sent_at}</span>
                         </div>
                         <div className="flex justify-between items-center text-foreground/80 text-xs mt-3">
                             <div className="flex gap-3 items-center">
-                                <Badge variant="default" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5">{log.template}</Badge>
-                                <span className="font-medium">Sent by {log.sender}</span>
+                                <Badge variant="default" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 text-white">{log.template}</Badge>
+                                <span className="font-medium text-black">Sent by {log.sender}</span>
                             </div>
                             
                             <Dialog>

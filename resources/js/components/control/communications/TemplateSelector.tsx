@@ -36,7 +36,7 @@ export function TemplateSelector({ value, onValueChange }: TemplateSelectorProps
         <div className="space-y-2">
             <Label>Email Template</Label>
             <Select value={value} onValueChange={handleChange}>
-                <SelectTrigger>
+                <SelectTrigger className="text-black">
                     <SelectValue placeholder="Select a template..." />
                 </SelectTrigger>
                 <SelectContent>

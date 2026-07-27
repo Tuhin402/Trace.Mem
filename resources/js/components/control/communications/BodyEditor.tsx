@@ -22,7 +22,7 @@ export function BodyEditor({ value, onChange, error }: BodyEditorProps) {
                 value={value} 
                 onChange={(e) => onChange(e.target.value)} 
                 placeholder="Enter email body..."
-                className={`flex w-full rounded-md border bg-transparent px-3 py-2 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[250px] font-mono text-sm resize-y ${error || value.length > maxLength ? 'border-destructive focus-visible:ring-destructive' : 'border-input focus-visible:ring-ring'}`}
+                className={`text-black flex w-full rounded-md border bg-transparent px-3 py-2 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[250px] font-mono text-sm resize-y ${error || value.length > maxLength ? 'border-destructive focus-visible:ring-destructive' : 'border-input focus-visible:ring-ring'}`}
             />
             {error && <p className="text-xs text-destructive">{error}</p>}
         </div>

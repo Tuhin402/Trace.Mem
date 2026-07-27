@@ -110,17 +110,16 @@ export function EmailComposerModal({
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="max-w-[1300px] sm:max-w-[1300px] lg:max-w-[1300px] w-[95vw] max-h-[95vh] lg:h-[95vh] flex flex-col overflow-hidden p-0 gap-0 border-none">
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-background">
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-white text-black">
                     {/* Left Column: Editor */}
-                    <div className="flex flex-col h-full lg:border-r overflow-hidden bg-card/50">
+                    <div className="flex flex-col h-full lg:border-r overflow-hidden bg-white">
                         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-6 lg:p-10">
                             <DialogHeader className="mb-10">
                                 <DialogTitle className="text-3xl font-extrabold tracking-tight">Email Details</DialogTitle>
                             </DialogHeader>
 
                             <div className="space-y-10">
-                                <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">People</Label>
+                                <div>
                                     <RecipientSummary
                                         recipientName={recipientName}
                                         recipientEmail={recipientEmail}
@@ -136,25 +135,22 @@ export function EmailComposerModal({
                                 )}
 
                                 <div className="space-y-8">
-                                    <div className="space-y-3">
-                                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Email Template</Label>
+                                    <div>
                                         <TemplateSelector value={template} onValueChange={handleTemplateChange} />
                                         {errors.template && <p className="text-xs text-destructive mt-1">{errors.template}</p>}
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Subject</Label>
+                                    <div>
                                         <SubjectInput value={subject} onChange={setSubject} error={errors.subject} />
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Message Body</Label>
+                                    <div>
                                         <BodyEditor value={body} onChange={setBody} error={errors.body} />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-6 lg:p-10 border-t bg-background shrink-0 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-10">
+                            <div className="p-6 lg:p-10 border-t bg-white shrink-0 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-10">
                                 <SendFooter
                                     onCancel={() => handleOpenChange(false)}
                                     onSend={handleSend}
@@ -166,9 +162,9 @@ export function EmailComposerModal({
                     </div>
 
                     {/* Right Column: Preview */}
-                    <div className="hidden lg:flex h-full flex-col bg-muted/30 p-6 lg:p-8 min-h-[600px] lg:min-h-0 border-t lg:border-t-0">
+                    <div className="hidden lg:flex h-full flex-col bg-white p-6 lg:p-8 min-h-[600px] lg:min-h-0 border-t lg:border-t-0">
                         <div className="flex items-center gap-2 mb-6">
-                            <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Preview</Label>
+                            <Label className="text-sm font-semibold text-black uppercase tracking-wider">Preview</Label>
                             <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full border">Live</span>
                         </div>
                         <div className="flex-1 w-full relative">

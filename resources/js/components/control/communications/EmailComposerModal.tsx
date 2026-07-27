@@ -35,14 +35,14 @@ export function EmailComposerModal({
     const [body, setBody] = useState('');
     const [isSending, setIsSending] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    
+
     const { success, error: toastError } = useControlToast();
 
     // Check for unsaved changes
     const hasUnsavedChanges = template !== '' || subject !== '' || body !== '';
 
     const handleOpenChange = (newOpen: boolean) => {
-        
+
         if (!newOpen) {
             // reset state on close
             setTemplate('');
@@ -50,7 +50,7 @@ export function EmailComposerModal({
             setBody('');
             setErrors({});
         }
-        
+
         onOpenChange(newOpen);
     };
 
@@ -73,7 +73,7 @@ export function EmailComposerModal({
 
     const handleSend = async () => {
         if (!validate()) return;
-        
+
         setIsSending(true);
         try {
             await axios.post('/platform/communications/send', {
@@ -85,14 +85,14 @@ export function EmailComposerModal({
                 subject: subject,
                 body: body,
             });
-            
+
             success('Operational Email Queued Successfully!');
             // Reset and close
             setTemplate('');
             setSubject('');
             setBody('');
             onOpenChange(false);
-            
+
         } catch (error: any) {
             console.error('Failed to send email:', error);
             if (error.response?.status === 429) {
@@ -112,57 +112,59 @@ export function EmailComposerModal({
             <DialogContent className="max-w-[1300px] sm:max-w-[1300px] lg:max-w-[1300px] w-[95vw] max-h-[95vh] lg:h-[95vh] flex flex-col overflow-hidden p-0 gap-0 border-none">
                 <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-background">
                     {/* Left Column: Editor */}
-                    <div className="flex flex-col h-full lg:border-r overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-6 lg:p-8">
-                        <DialogHeader className="mb-8">
-                            <DialogTitle className="text-2xl font-bold">Email Details</DialogTitle>
-                        </DialogHeader>
+                    <div className="flex flex-col h-full lg:border-r overflow-hidden bg-card/50">
+                        <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-6 lg:p-10">
+                            <DialogHeader className="mb-10">
+                                <DialogTitle className="text-3xl font-extrabold tracking-tight">Email Details</DialogTitle>
+                            </DialogHeader>
 
-                        <div className="space-y-8 flex-1">
-                            <div className="space-y-3">
-                                <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">People</Label>
-                                <RecipientSummary 
-                                    recipientName={recipientName}
-                                    recipientEmail={recipientEmail}
-                                    recipientType={recipientType}
-                                    tenantName={tenantName}
+                            <div className="space-y-10">
+                                <div className="space-y-3">
+                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">People</Label>
+                                    <RecipientSummary
+                                        recipientName={recipientName}
+                                        recipientEmail={recipientEmail}
+                                        recipientType={recipientType}
+                                        tenantName={tenantName}
+                                    />
+                                </div>
+
+                                {errors.email && (
+                                    <div className="text-sm text-destructive font-semibold bg-destructive/10 p-3 rounded-md">
+                                        Cannot send email: {errors.email}
+                                    </div>
+                                )}
+
+                                <div className="space-y-8">
+                                    <div className="space-y-3">
+                                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Email Template</Label>
+                                        <TemplateSelector value={template} onValueChange={handleTemplateChange} />
+                                        {errors.template && <p className="text-xs text-destructive mt-1">{errors.template}</p>}
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Subject</Label>
+                                        <SubjectInput value={subject} onChange={setSubject} error={errors.subject} />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Message Body</Label>
+                                        <BodyEditor value={body} onChange={setBody} error={errors.body} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-6 lg:p-10 border-t bg-background shrink-0 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-10">
+                                <SendFooter
+                                    onCancel={() => handleOpenChange(false)}
+                                    onSend={handleSend}
+                                    isSending={isSending}
+                                    disabled={!recipientEmail}
                                 />
                             </div>
-                            
-                            {errors.email && (
-                                <div className="text-sm text-destructive font-semibold bg-destructive/10 p-3 rounded-md">
-                                    Cannot send email: {errors.email}
-                                </div>
-                            )}
-
-                            <div className="space-y-8">
-                                <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Email Template</Label>
-                                    <TemplateSelector value={template} onValueChange={handleTemplateChange} />
-                                    {errors.template && <p className="text-xs text-destructive mt-1">{errors.template}</p>}
-                                </div>
-                                
-                                <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Subject</Label>
-                                    <SubjectInput value={subject} onChange={setSubject} error={errors.subject} />
-                                </div>
-                                
-                                <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Message Body</Label>
-                                    <BodyEditor value={body} onChange={setBody} error={errors.body} />
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="mt-8 pt-6 border-t">
-                            <SendFooter 
-                                onCancel={() => handleOpenChange(false)} 
-                                onSend={handleSend} 
-                                isSending={isSending}
-                                disabled={!recipientEmail}
-                            />
                         </div>
                     </div>
-                    
+
                     {/* Right Column: Preview */}
                     <div className="hidden lg:flex h-full flex-col bg-muted/30 p-6 lg:p-8 min-h-[600px] lg:min-h-0 border-t lg:border-t-0">
                         <div className="flex items-center gap-2 mb-6">

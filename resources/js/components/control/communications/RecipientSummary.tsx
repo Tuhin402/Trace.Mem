@@ -1,5 +1,5 @@
 import { User, Building2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface RecipientSummaryProps {
     recipientName: string;
@@ -10,24 +10,27 @@ interface RecipientSummaryProps {
 
 export function RecipientSummary({ recipientName, recipientEmail, recipientType, tenantName }: RecipientSummaryProps) {
     return (
-        <Card className="p-4 bg-muted/50 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-full text-primary">
-                    {recipientType === 'tenant' ? <Building2 className="h-5 w-5" /> : <User className="h-5 w-5" />}
+        <div className="flex items-center gap-4 py-2">
+            <div className="flex items-center justify-center p-3 rounded-full bg-primary/10 text-primary shrink-0">
+                {recipientType === 'tenant' ? <Building2 className="h-6 w-6" /> : <User className="h-6 w-6" />}
+            </div>
+            <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                    <h3 className="text-base font-bold text-foreground">{recipientName}</h3>
+                    <Badge variant="default" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 shadow-sm">
+                        {recipientType}
+                    </Badge>
                 </div>
-                <div>
-                    <h3 className="font-semibold text-foreground">{recipientName}</h3>
-                    <p className="text-sm text-foreground/80">{recipientEmail}</p>
+                <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm font-medium text-foreground/80">{recipientEmail}</p>
+                    {tenantName && (
+                        <>
+                            <span className="text-foreground/30">•</span>
+                            <p className="text-sm font-medium text-foreground/80">{tenantName}</p>
+                        </>
+                    )}
                 </div>
             </div>
-            <div className="text-right">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground uppercase tracking-wider">
-                    {recipientType}
-                </span>
-                {tenantName && (
-                    <p className="text-xs text-foreground/80 mt-1">{tenantName}</p>
-                )}
-            </div>
-        </Card>
+        </div>
     );
 }

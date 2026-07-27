@@ -61,23 +61,23 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
         <div className="w-full">
             <div className="space-y-3">
                 {history.map((log) => (
-                    <div key={log.id} className="p-4 rounded-lg border bg-muted/20 text-sm transition-colors hover:bg-muted/40">
+                    <div key={log.id} className="p-4 rounded-xl border bg-background shadow-sm transition-all hover:border-primary/50 hover:shadow-md">
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center gap-2 font-medium">
                                 {getStatusIcon(log.status)}
                                 {log.subject}
                             </div>
-                            <span className="text-xs text-muted-foreground">{log.sent_at}</span>
+                            <span className="text-xs font-medium text-foreground/70">{log.sent_at}</span>
                         </div>
-                        <div className="flex justify-between items-center text-muted-foreground text-xs mt-2">
-                            <div className="flex gap-2 items-center">
-                                <Badge variant="outline" className="text-[10px] uppercase">{log.template}</Badge>
-                                <span>Sent by {log.sender}</span>
+                        <div className="flex justify-between items-center text-foreground/80 text-xs mt-3">
+                            <div className="flex gap-3 items-center">
+                                <Badge variant="default" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5">{log.template}</Badge>
+                                <span className="font-medium">Sent by {log.sender}</span>
                             </div>
                             
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <button className="flex items-center gap-1 hover:text-primary transition-colors">
+                                    <button className="flex items-center gap-1.5 font-semibold hover:text-primary transition-colors bg-muted px-3 py-1.5 rounded-md hover:bg-primary/10">
                                         <Eye className="h-3 w-3" /> Preview
                                     </button>
                                 </DialogTrigger>

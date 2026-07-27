@@ -84,11 +84,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserSubscription::class);
     }
 
-    public function memories(): HasMany
-    {
-        return $this->hasMany(Memory::class);
-    }
-
     public function freeTrialEvents(): HasMany
     {
         return $this->hasMany(FreeTrialEvent::class);

@@ -52,7 +52,7 @@ export default function ControlEntityLayout({
                 
                 {/* 1. Breadcrumbs */}
                 <nav className="flex flex-wrap items-center gap-2 text-xs font-mono text-on-background/60 uppercase tracking-wider">
-                    <Link href="/control/platform/users" className="hover:text-primary transition-colors">Platform</Link>
+                    <Link href="/platform/users" className="hover:text-primary transition-colors">Platform</Link>
                     {breadcrumbs.map((crumb, index) => (
                         <React.Fragment key={index}>
                             <ChevronRight className="h-3 w-3" />

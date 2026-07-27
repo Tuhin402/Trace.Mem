@@ -15,7 +15,7 @@ class UserQueryService
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
         $query = User::query()
-            ->with(['tenant'])
+            ->with(['tenant', 'teams'])
             ->withCount(['teams']); // Using teams_count as proxy for workspaces
 
         // Search
@@ -69,8 +69,10 @@ class UserQueryService
     public function getProfile(string $uuid): \App\DTOs\Control\Platform\Identity\UserProfileDTO
     {
         $user = User::query()
-            ->with(['tenant', 'teams', 'subscriptions'])
-            ->withCount(['teams', 'apiKeys', 'memories'])
+            ->with(['tenant', 'subscriptions', 'teams' => function ($q) {
+                $q->withCount('memories');
+            }])
+            ->withCount(['teams', 'apiKeys'])
             ->where('tenant_scope_id', $uuid)
             ->orWhere('id', $uuid) // Support legacy ID routing just in case
             ->firstOrFail();

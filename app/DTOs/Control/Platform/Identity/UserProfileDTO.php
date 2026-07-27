@@ -47,7 +47,7 @@ readonly class UserProfileDTO
             ],
             metrics: [
                 'api_keys' => $user->api_keys_count ?? 0,
-                'memories' => $user->memories_count ?? 0,
+                'memories' => $user->teams ? $user->teams->sum('memories_count') : 0,
                 'workspaces' => $user->teams_count ?? 0,
             ],
             created_at: $user->created_at->format('M j, Y'),

@@ -144,6 +144,16 @@
     }
 }
 
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+}
+
 /* Base TraceMem Tokens to prevent FOUC */
 :root {
     --tm-bg: #0e0e0f;

@@ -55,8 +55,8 @@ function LayoutInner({ children }: ControlLayoutProps) {
                 {/* Topbar Component */}
                 <ControlTopbar />
 
-                <main className="flex-1 p-4 md:p-8 mt-16 overflow-y-auto no-scrollbar relative z-0">
-                    <div className="mx-auto w-full max-w-7xl">
+                <main className="flex-1 p-4 md:p-8 lg:p-10 mt-16 overflow-y-auto no-scrollbar relative z-0">
+                    <div className="w-full">
                         {children}
                     </div>
                 </main>

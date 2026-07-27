@@ -15,7 +15,7 @@ class TenantQueryService
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
         $query = Tenant::query()
-            ->withCount(['users', 'teams']); // Assuming relationships exist for users and teams(workspaces)
+            ->withCount(['users', 'workspaces']); // Assuming relationships exist for users and workspaces
 
         // Search
         if ($search = $request->input('search')) {
@@ -64,12 +64,12 @@ class TenantQueryService
     public function getProfile(string $slug): \App\DTOs\Control\Platform\Identity\TenantProfileDTO
     {
         $tenant = Tenant::query()
-            ->with(['teams' => function ($q) {
+            ->with(['workspaces' => function ($q) {
                 $q->withCount('members');
             }, 'users' => function ($q) {
                 $q->latest()->limit(5);
             }])
-            ->withCount(['teams', 'users'])
+            ->withCount(['workspaces', 'users'])
             ->where('slug', $slug)
             ->firstOrFail();
 

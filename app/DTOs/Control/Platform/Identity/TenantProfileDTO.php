@@ -28,9 +28,9 @@ readonly class TenantProfileDTO
             plan: $tenant->plan ?? 'Legacy',
             metrics: [
                 'users' => $tenant->users_count ?? 0,
-                'workspaces' => $tenant->teams_count ?? 0,
+                'workspaces' => $tenant->workspaces_count ?? 0,
             ],
-            workspaces: $tenant->teams->map(fn ($team) => [
+            workspaces: $tenant->workspaces->map(fn ($team) => [
                 'id' => $team->id,
                 'name' => $team->name,
                 'slug' => $team->slug,

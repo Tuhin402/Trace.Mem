@@ -27,7 +27,7 @@ readonly class TenantListDTO
             plan: $tenant->plan ?? 'Legacy',
             created_at: $tenant->created_at->format('M j, Y'),
             user_count: $tenant->users_count ?? 0,
-            workspace_count: $tenant->teams_count ?? 0 // assuming teams_count for workspaces
+            workspace_count: $tenant->workspaces_count ?? 0 // using workspaces_count
         );
     }
 }

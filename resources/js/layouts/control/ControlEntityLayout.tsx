@@ -20,6 +20,7 @@ export interface EntityTab {
     label: string;
     id: string; // The anchor hash for deep linking (e.g. 'security')
     isActive?: boolean;
+    onClick?: () => void;
 }
 
 interface ControlEntityLayoutProps {
@@ -29,6 +30,7 @@ interface ControlEntityLayoutProps {
     actions?: EntityAction[];
     tabs?: EntityTab[];
     currentTab?: string;
+    onTabChange?: (tabId: string) => void;
     children: React.ReactNode;
 }
 
@@ -39,6 +41,7 @@ export default function ControlEntityLayout({
     actions,
     tabs,
     currentTab = 'overview',
+    onTabChange,
     children,
 }: ControlEntityLayoutProps) {
     return (
@@ -110,6 +113,15 @@ export default function ControlEntityLayout({
                             <a
                                 key={tab.id}
                                 href={`#${tab.id}`}
+                                onClick={(e) => {
+                                    if (onTabChange) {
+                                        e.preventDefault();
+                                        onTabChange(tab.id);
+                                    } else if (tab.onClick) {
+                                        e.preventDefault();
+                                        tab.onClick();
+                                    }
+                                }}
                                 className={`px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${
                                     (currentTab === tab.id || tab.isActive)
                                         ? 'border-primary text-primary'

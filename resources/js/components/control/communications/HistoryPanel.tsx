@@ -61,7 +61,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
         <div className="w-full">
             <div className="space-y-3">
                 {history.map((log) => (
-                    <Card key={log.id} className="p-3 shadow-sm text-sm">
+                    <div key={log.id} className="p-4 rounded-lg border bg-muted/20 text-sm transition-colors hover:bg-muted/40">
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center gap-2 font-medium">
                                 {getStatusIcon(log.status)}
@@ -87,7 +87,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
                                     </DialogHeader>
                                     <div className="flex-1 overflow-y-auto mt-4 rounded-md border [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                         <iframe
-                                            srcDoc={log.body}
+                                            srcDoc={log.body + '<style>::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; }</style>'}
                                             title="Email Preview"
                                             className="w-full h-full min-h-[600px] border-0"
                                         />
@@ -95,7 +95,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
                                 </DialogContent>
                             </Dialog>
                         </div>
-                    </Card>
+                    </div>
                 ))}
             </div>
         </div>

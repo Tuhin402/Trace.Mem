@@ -17,7 +17,7 @@ export function RecipientSummary({ recipientName, recipientEmail, recipientType,
                 </div>
                 <div>
                     <h3 className="font-semibold text-foreground">{recipientName}</h3>
-                    <p className="text-sm text-muted-foreground">{recipientEmail}</p>
+                    <p className="text-sm text-foreground/80">{recipientEmail}</p>
                 </div>
             </div>
             <div className="text-right">
@@ -25,7 +25,7 @@ export function RecipientSummary({ recipientName, recipientEmail, recipientType,
                     {recipientType}
                 </span>
                 {tenantName && (
-                    <p className="text-xs text-muted-foreground mt-1">{tenantName}</p>
+                    <p className="text-xs text-foreground/80 mt-1">{tenantName}</p>
                 )}
             </div>
         </Card>

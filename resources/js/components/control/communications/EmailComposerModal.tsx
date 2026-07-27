@@ -42,11 +42,6 @@ export function EmailComposerModal({
     const hasUnsavedChanges = template !== '' || subject !== '' || body !== '';
 
     const handleOpenChange = (newOpen: boolean) => {
-        if (!newOpen && hasUnsavedChanges) {
-            if (!window.confirm('You have unsaved changes. Are you sure you want to close this window?')) {
-                return;
-            }
-        }
         
         if (!newOpen) {
             // reset state on close
@@ -114,17 +109,17 @@ export function EmailComposerModal({
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-[1300px] w-[95vw] h-[95vh] flex flex-col overflow-hidden p-0 gap-0 border-none">
+            <DialogContent className="max-w-[1300px] sm:max-w-[1300px] lg:max-w-[1300px] w-[95vw] max-h-[95vh] lg:h-[95vh] flex flex-col overflow-hidden p-0 gap-0 border-none">
                 <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-background">
                     {/* Left Column: Editor */}
-                    <div className="flex flex-col h-full border-r overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-6 lg:p-8 pb-32">
+                    <div className="flex flex-col h-full lg:border-r overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-6 lg:p-8">
                         <DialogHeader className="mb-8">
                             <DialogTitle className="text-2xl font-bold">Email Details</DialogTitle>
                         </DialogHeader>
 
                         <div className="space-y-8 flex-1">
                             <div className="space-y-3">
-                                <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">People</Label>
+                                <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">People</Label>
                                 <RecipientSummary 
                                     recipientName={recipientName}
                                     recipientEmail={recipientEmail}
@@ -141,24 +136,24 @@ export function EmailComposerModal({
 
                             <div className="space-y-8">
                                 <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Email Template</Label>
+                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Email Template</Label>
                                     <TemplateSelector value={template} onValueChange={handleTemplateChange} />
                                     {errors.template && <p className="text-xs text-destructive mt-1">{errors.template}</p>}
                                 </div>
                                 
                                 <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Subject</Label>
+                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Subject</Label>
                                     <SubjectInput value={subject} onChange={setSubject} error={errors.subject} />
                                 </div>
                                 
                                 <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Message Body</Label>
+                                    <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Message Body</Label>
                                     <BodyEditor value={body} onChange={setBody} error={errors.body} />
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="mt-auto pt-8">
+                        <div className="mt-8 pt-6 border-t">
                             <SendFooter 
                                 onCancel={() => handleOpenChange(false)} 
                                 onSend={handleSend} 
@@ -169,9 +164,9 @@ export function EmailComposerModal({
                     </div>
                     
                     {/* Right Column: Preview */}
-                    <div className="h-full flex flex-col bg-muted/30 p-6 lg:p-8 min-h-[600px] lg:min-h-0 border-t lg:border-t-0">
+                    <div className="hidden lg:flex h-full flex-col bg-muted/30 p-6 lg:p-8 min-h-[600px] lg:min-h-0 border-t lg:border-t-0">
                         <div className="flex items-center gap-2 mb-6">
-                            <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Preview</Label>
+                            <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">Preview</Label>
                             <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full border">Live</span>
                         </div>
                         <div className="flex-1 w-full relative">

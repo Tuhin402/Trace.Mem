@@ -23,7 +23,7 @@ export function SubjectInput({ value, onChange, error }: SubjectInputProps) {
                 value={value} 
                 onChange={(e) => onChange(e.target.value)} 
                 placeholder="Enter email subject"
-                className={error ? 'border-destructive' : ''}
+                className={error || value.length > maxLength ? 'border-destructive focus-visible:ring-destructive' : ''}
             />
             {error && <p className="text-xs text-destructive">{error}</p>}
         </div>

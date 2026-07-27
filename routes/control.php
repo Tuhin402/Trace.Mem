@@ -35,9 +35,17 @@ Route::middleware(['web', 'control.admin'])->group(function () {
 
     // Platform
     Route::prefix('platform')->name('control.platform.')->group(function () {
-        Route::inertia('/users', 'control/Scaffold')->name('users');
-        Route::inertia('/tenants', 'control/Scaffold')->name('tenants');
-        Route::inertia('/workspaces', 'control/Scaffold')->name('workspaces');
+        Route::prefix('identity')->group(function () {
+            Route::get('/users', [\App\Http\Controllers\Control\Platform\Identity\UserController::class, 'index'])->name('users.index');
+            Route::get('/users/{uuid}', [\App\Http\Controllers\Control\Platform\Identity\UserController::class, 'show'])->name('users.show');
+
+            Route::get('/tenants', [\App\Http\Controllers\Control\Platform\Identity\TenantController::class, 'index'])->name('tenants.index');
+            Route::get('/tenants/{slug}', [\App\Http\Controllers\Control\Platform\Identity\TenantController::class, 'show'])->name('tenants.show');
+
+            Route::get('/workspaces', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'index'])->name('workspaces.index');
+            Route::get('/workspaces/{tenant_slug}/{workspace_slug}', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'show'])->name('workspaces.show');
+        });
+
         Route::inertia('/api-keys', 'control/Scaffold')->name('api-keys');
         Route::inertia('/memory', 'control/Scaffold')->name('memory');
         Route::inertia('/subscriptions', 'control/Scaffold')->name('subscriptions');

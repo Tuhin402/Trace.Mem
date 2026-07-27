@@ -20,6 +20,7 @@ class Team extends Model
         'name',
         'slug',
         'is_personal',
+        'tenant_scope_id',
         // ── Workspace fields (Phase B) ────────────────────────────────────────
         'status',      // 'active' | 'archived' | 'suspended'
         'purpose',
@@ -43,7 +44,7 @@ class Team extends Model
 
         static::creating(function (Team $team) {
             if (empty($team->slug)) {
-                $team->slug = static::generateUniqueTeamSlug($team->name);
+                $team->slug = static::generateUniqueTeamSlug($team->name, null, $team->tenant_scope_id);
             }
             // Ensure all new workspaces start with 'active' status
             $team->status ??= 'active';
@@ -51,7 +52,7 @@ class Team extends Model
 
         static::updating(function (Team $team) {
             if ($team->isDirty('name')) {
-                $team->slug = static::generateUniqueTeamSlug($team->name, $team->id);
+                $team->slug = static::generateUniqueTeamSlug($team->name, $team->id, $team->tenant_scope_id);
             }
         });
     }
@@ -99,6 +100,14 @@ class Team extends Model
         return $this->members()
             ->wherePivot('role', TeamRole::Owner->value)
             ->first();
+    }
+
+    /**
+     * Get the tenant this workspace belongs to.
+     */
+    public function tenant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_scope_id', 'id');
     }
 
     /**

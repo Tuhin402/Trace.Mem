@@ -62,32 +62,25 @@ class UserQueryService
         return $paginator;
     }
 
-    /**
-     * Retrieve a highly detailed profile for a single user.
-     */
     public function getProfile(string $uuid): \App\DTOs\Control\Platform\Identity\UserProfileDTO
     {
-        $cacheKey = 'control:users:profile:' . $uuid;
+        $query = User::query()
+            ->with(['tenant', 'subscriptions.subscriptionPlan', 'freeTrialEvents', 'teams' => function ($q) {
+                $q->withCount('memories');
+            }, 'activityLogs' => function ($q) {
+                $q->latest()->limit(20);
+            }])
+            ->withCount(['teams', 'apiKeys']);
 
-        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($uuid) {
-            $query = User::query()
-                ->with(['tenant', 'subscriptions.subscriptionPlan', 'freeTrialEvents', 'teams' => function ($q) {
-                    $q->withCount('memories');
-                }, 'activityLogs' => function ($q) {
-                    $q->latest()->limit(20);
-                }])
-                ->withCount(['teams', 'apiKeys']);
+        if (\Illuminate\Support\Str::isUuid($uuid)) {
+            $query->where('tenant_scope_id', $uuid);
+        } else {
+            $id = str_replace('legacy-', '', $uuid);
+            $query->where('id', $id);
+        }
 
-            if (\Illuminate\Support\Str::isUuid($uuid)) {
-                $query->where('tenant_scope_id', $uuid);
-            } else {
-                $id = str_replace('legacy-', '', $uuid);
-                $query->where('id', $id);
-            }
+        $user = $query->firstOrFail();
 
-            $user = $query->firstOrFail();
-
-            return \App\DTOs\Control\Platform\Identity\UserProfileDTO::fromModel($user);
-        });
+        return \App\DTOs\Control\Platform\Identity\UserProfileDTO::fromModel($user);
     }
 }

@@ -67,30 +67,23 @@ class WorkspaceQueryService
         return $paginator;
     }
 
-    /**
-     * Retrieve a highly detailed profile for a single workspace.
-     */
     public function getProfile(string $tenantSlug, string $workspaceSlug): \App\DTOs\Control\Platform\Identity\WorkspaceProfileDTO
     {
-        $cacheKey = 'control:workspaces:profile:' . $tenantSlug . ':' . $workspaceSlug;
+        $workspace = Team::query()
+            ->with(['tenant', 'members' => function ($q) {
+                $q->limit(10);
+            }, 'apiKeys' => function ($q) {
+                $q->latest()->limit(5);
+            }, 'auditLogs' => function ($q) {
+                $q->with('actor')->latest()->limit(20);
+            }])
+            ->withCount(['members', 'apiKeys', 'memories'])
+            ->whereHas('tenant', function ($q) use ($tenantSlug) {
+                $q->where('slug', $tenantSlug);
+            })
+            ->where('slug', $workspaceSlug)
+            ->firstOrFail();
 
-        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($tenantSlug, $workspaceSlug) {
-            $workspace = Team::query()
-                ->with(['tenant', 'members' => function ($q) {
-                    $q->limit(10);
-                }, 'apiKeys' => function ($q) {
-                    $q->latest()->limit(5);
-                }, 'auditLogs' => function ($q) {
-                    $q->with('actor')->latest()->limit(20);
-                }])
-                ->withCount(['members', 'apiKeys', 'memories'])
-                ->whereHas('tenant', function ($q) use ($tenantSlug) {
-                    $q->where('slug', $tenantSlug);
-                })
-                ->where('slug', $workspaceSlug)
-                ->firstOrFail();
-
-            return \App\DTOs\Control\Platform\Identity\WorkspaceProfileDTO::fromModel($workspace);
-        });
+        return \App\DTOs\Control\Platform\Identity\WorkspaceProfileDTO::fromModel($workspace);
     }
 }

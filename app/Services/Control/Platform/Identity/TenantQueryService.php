@@ -60,25 +60,18 @@ class TenantQueryService
         return $paginator;
     }
 
-    /**
-     * Retrieve a highly detailed profile for a single tenant.
-     */
     public function getProfile(string $slug): \App\DTOs\Control\Platform\Identity\TenantProfileDTO
     {
-        $cacheKey = 'control:tenants:profile:' . $slug;
+        $tenant = Tenant::query()
+            ->with(['workspaces' => function ($q) {
+                $q->withCount('members');
+            }, 'users' => function ($q) {
+                $q->with('subscriptions.subscriptionPlan');
+            }])
+            ->withCount(['workspaces', 'users'])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        return Cache::remember($cacheKey, CacheTiers::NEAR_REAL_TIME->value, function () use ($slug) {
-            $tenant = Tenant::query()
-                ->with(['workspaces' => function ($q) {
-                    $q->withCount('members');
-                }, 'users' => function ($q) {
-                    $q->with('subscriptions.subscriptionPlan');
-                }])
-                ->withCount(['workspaces', 'users'])
-                ->where('slug', $slug)
-                ->firstOrFail();
-
-            return \App\DTOs\Control\Platform\Identity\TenantProfileDTO::fromModel($tenant);
-        });
+        return \App\DTOs\Control\Platform\Identity\TenantProfileDTO::fromModel($tenant);
     }
 }

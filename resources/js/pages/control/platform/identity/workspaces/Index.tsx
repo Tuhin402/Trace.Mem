@@ -48,7 +48,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
         <ControlLayout>
             <Head title="Workspaces | Platform Identity" />
             
-            <div className="w-full pb-24 space-y-8">
+            <div className="w-full flex flex-col gap-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-heading font-black tracking-tight text-on-background">

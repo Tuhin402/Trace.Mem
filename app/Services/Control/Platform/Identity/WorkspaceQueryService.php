@@ -76,7 +76,7 @@ class WorkspaceQueryService
             }, 'apiKeys' => function ($q) {
                 $q->latest()->limit(5);
             }, 'auditLogs' => function ($q) {
-                $q->with('user')->latest()->limit(20);
+                $q->with('actor')->latest()->limit(20);
             }])
             ->withCount(['members', 'apiKeys', 'memories'])
             ->whereHas('tenant', function ($q) use ($tenantSlug) {

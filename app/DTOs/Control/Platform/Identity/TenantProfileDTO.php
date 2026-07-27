@@ -49,7 +49,7 @@ readonly class TenantProfileDTO
                 return $user->subscriptions->map(fn ($sub) => [
                     'id' => $sub->id,
                     'user_name' => $user->name,
-                    'plan' => $sub->plan_id,
+                    'plan' => $sub->subscriptionPlan?->name ?? $sub->subscription_plan_id,
                     'status' => $sub->cancelled_at ? 'cancelled' : ($sub->is_active ? 'active' : 'inactive'),
                     'started_at' => $sub->starts_at?->format('M j, Y'),
                     'cancelled_at' => $sub->cancelled_at?->format('M j, Y'),

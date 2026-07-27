@@ -54,8 +54,8 @@ readonly class WorkspaceProfileDTO
             recent_activity: $team->auditLogs?->map(fn ($log) => [
                 'id' => $log->id,
                 'action' => $log->action,
-                'user' => $log->user?->name ?? 'System',
-                'created_at' => $log->created_at->diffForHumans(),
+                'user' => $log->actor?->name ?? 'System',
+                'created_at' => $log->created_at?->diffForHumans() ?? 'Unknown',
             ])->toArray() ?? [],
             created_at: $team->created_at->format('M j, Y')
         );

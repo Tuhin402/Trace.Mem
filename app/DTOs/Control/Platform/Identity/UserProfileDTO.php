@@ -46,11 +46,11 @@ readonly class UserProfileDTO
                 'status' => $user->currentSubscription?->is_active ? 'active' : 'inactive',
                 'history' => $user->subscriptions?->map(fn ($sub) => [
                     'id' => $sub->id,
-                    'plan' => $sub->plan_id,
+                    'plan' => $sub->subscriptionPlan?->name ?? $sub->subscription_plan_id,
                     'status' => $sub->cancelled_at ? 'cancelled' : ($sub->is_active ? 'active' : 'inactive'),
                     'started_at' => $sub->starts_at?->format('M j, Y'),
                     'cancelled_at' => $sub->cancelled_at?->format('M j, Y'),
-                    'price' => $sub->plan?->price ?? 0,
+                    'price' => $sub->subscriptionPlan?->price_monthly ?? 0,
                 ])->toArray() ?? [],
                 'trials' => $user->freeTrialEvents?->map(fn ($trial) => [
                     'id' => $trial->id,

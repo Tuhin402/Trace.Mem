@@ -7,7 +7,7 @@ import { Settings, Ban, LogOut } from 'lucide-react';
 export default function TenantProfile({ tenant }: { tenant: any }) {
     const breadcrumbs = [
         { label: 'Identity' },
-        { label: 'Tenants', url: '/control/platform/identity/tenants' },
+        { label: 'Tenants', url: '/platform/tenants' },
         { label: tenant.name }
     ];
 
@@ -89,7 +89,7 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                                 {tenant.workspaces.map((ws: any) => (
                                     <div key={ws.id} className="p-4 flex items-center justify-between group">
                                         <div className="flex flex-col">
-                                            <a href={`/control/platform/identity/workspaces/${tenant.slug}/${ws.slug}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
+                                            <a href={`/platform/workspaces/${tenant.slug}/${ws.slug}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
                                                 {ws.name}
                                             </a>
                                             <span className="text-xs text-on-background/50 font-mono">{ws.slug}</span>
@@ -120,7 +120,7 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                                 {tenant.recent_users.map((user: any) => (
                                     <div key={user.id} className="p-4 flex items-center justify-between group">
                                         <div className="flex flex-col">
-                                            <a href={`/control/platform/identity/users/${user.uuid}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
+                                            <a href={`/platform/users/${user.uuid}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
                                                 {user.name}
                                             </a>
                                             <span className="text-xs text-on-background/50 font-mono">{user.email}</span>

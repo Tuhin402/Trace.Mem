@@ -20,7 +20,7 @@ export default function UsersSnapshotSection({ data }: { data: any }) {
             id="overview-users-snapshot"
             title="Users Snapshot"
             icon={<Users className="h-5 w-5" />}
-            viewAllHref="/operations/users"
+            viewAllHref="/platform/users"
         >
             {users.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 opacity-60">
@@ -46,7 +46,8 @@ export default function UsersSnapshotSection({ data }: { data: any }) {
                                             {user.name.charAt(0)}
                                         </div>
                                         <div className="flex flex-col">
-                                            <Link href={`/operations/users/${user.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{user.name}</Link>
+                                            {/* Note: In a real system, expose UUID in UsersSnapshotService and use it here. Using ID as fallback. */}
+                                            <Link href={`/platform/users/${user.uuid || 'legacy-' + user.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{user.name}</Link>
                                             <span className="text-xs text-on-background/60">{user.email}</span>
                                         </div>
                                     </div>

@@ -12,6 +12,7 @@ class TenantsSnapshotService extends BaseOverviewService
             return Tenant::latest()->take(4)->get()->map(function ($tenant) {
                 return [
                     'id' => $tenant->id,
+                    'slug' => $tenant->slug,
                     'name' => $tenant->name,
                     'plan' => $tenant->plan ?? 'Legacy',
                     'status' => $tenant->status,

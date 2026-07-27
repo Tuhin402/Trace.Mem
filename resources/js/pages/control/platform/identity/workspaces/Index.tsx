@@ -41,7 +41,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
     ];
 
     const actions: RowAction<any>[] = [
-        { label: 'View Workspace', onClick: (row) => router.visit(`/control/platform/identity/workspaces/${row.tenant_slug}/${row.slug}`) },
+        { label: 'View Workspace', onClick: (row) => router.visit(`/platform/workspaces/${row.tenant_slug}/${row.slug}`) },
     ];
 
     return (
@@ -55,7 +55,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
                             Workspaces
                         </h1>
                         <p className="text-on-background/60 mt-1">
-                            Manage isolated environments within tenants.
+                            Manage individual workspaces within tenants.
                         </p>
                     </div>
                 </div>
@@ -74,7 +74,7 @@ export default function WorkspacesIndex({ workspaces, filters }: WorkspacesIndex
                     currentSort={filters.sort}
                     currentDirection={filters.direction}
                     currentSearch={filters.search}
-                    onRowClick={(row) => router.visit(`/control/platform/identity/workspaces/${row.tenant_slug}/${row.slug}`)}
+                    onRowClick={(row) => router.visit(`/platform/workspaces/${row.tenant_slug}/${row.slug}`)}
                 />
             </div>
         </ControlLayout>

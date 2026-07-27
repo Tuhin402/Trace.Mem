@@ -35,16 +35,16 @@ Route::middleware(['web', 'control.admin'])->group(function () {
 
     // Platform
     Route::prefix('platform')->name('control.platform.')->group(function () {
-        Route::prefix('identity')->group(function () {
-            Route::get('/users', [\App\Http\Controllers\Control\Platform\Identity\UserController::class, 'index'])->name('users.index');
-            Route::get('/users/{uuid}', [\App\Http\Controllers\Control\Platform\Identity\UserController::class, 'show'])->name('users.show');
+        // We use domain-driven controllers in App\Http\Controllers\Control\Platform\Identity
+        // But the URLs and Route names remain flat to match navigation.config.ts and frontend router
+        Route::get('/users', [\App\Http\Controllers\Control\Platform\Identity\UserController::class, 'index'])->name('users');
+        Route::get('/users/{uuid}', [\App\Http\Controllers\Control\Platform\Identity\UserController::class, 'show'])->name('users.show');
 
-            Route::get('/tenants', [\App\Http\Controllers\Control\Platform\Identity\TenantController::class, 'index'])->name('tenants.index');
-            Route::get('/tenants/{slug}', [\App\Http\Controllers\Control\Platform\Identity\TenantController::class, 'show'])->name('tenants.show');
+        Route::get('/tenants', [\App\Http\Controllers\Control\Platform\Identity\TenantController::class, 'index'])->name('tenants');
+        Route::get('/tenants/{slug}', [\App\Http\Controllers\Control\Platform\Identity\TenantController::class, 'show'])->name('tenants.show');
 
-            Route::get('/workspaces', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'index'])->name('workspaces.index');
-            Route::get('/workspaces/{tenant_slug}/{workspace_slug}', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'show'])->name('workspaces.show');
-        });
+        Route::get('/workspaces', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'index'])->name('workspaces');
+        Route::get('/workspaces/{tenant_slug}/{workspace_slug}', [\App\Http\Controllers\Control\Platform\Identity\WorkspaceController::class, 'show'])->name('workspaces.show');
 
         Route::inertia('/api-keys', 'control/Scaffold')->name('api-keys');
         Route::inertia('/memory', 'control/Scaffold')->name('memory');

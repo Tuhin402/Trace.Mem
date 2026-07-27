@@ -20,7 +20,7 @@ export default function TenantsSnapshotSection({ data }: { data: any }) {
             id="overview-tenants-snapshot"
             title="Tenants Snapshot"
             icon={<Database className="h-5 w-5" />}
-            viewAllHref="/operations/tenants"
+            viewAllHref="/platform/tenants"
         >
             {tenants.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 opacity-60">
@@ -42,7 +42,7 @@ export default function TenantsSnapshotSection({ data }: { data: any }) {
                             <tr key={tenant.id} className="group hover:bg-almost-black/5 transition-colors">
                                 <td className="py-3">
                                     <div className="flex flex-col">
-                                        <Link href={`/operations/tenants/${tenant.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{tenant.name}</Link>
+                                        <Link href={`/platform/tenants/${tenant.slug || tenant.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{tenant.name}</Link>
                                         <span className="text-xs text-on-background/50 font-mono">ID: {tenant.id.substring(0, 8)}...</span>
                                     </div>
                                 </td>

@@ -28,7 +28,7 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
     ];
 
     const actions: RowAction<any>[] = [
-        { label: 'View Profile', onClick: (row) => router.visit(`/control/platform/identity/users/${row.uuid}`) },
+        { label: 'View Profile', onClick: (row) => router.visit(`/platform/users/${row.uuid}`) },
     ];
 
     return (
@@ -61,7 +61,7 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
                     currentSort={filters.sort}
                     currentDirection={filters.direction}
                     currentSearch={filters.search}
-                    onRowClick={(row) => router.visit(`/control/platform/identity/users/${row.uuid}`)}
+                    onRowClick={(row) => router.visit(`/platform/users/${row.uuid}`)}
                 />
             </div>
         </ControlLayout>

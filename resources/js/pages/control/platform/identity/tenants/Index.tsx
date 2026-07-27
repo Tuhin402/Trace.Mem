@@ -32,7 +32,7 @@ export default function TenantsIndex({ tenants, filters }: TenantsIndexProps) {
     ];
 
     const actions: RowAction<any>[] = [
-        { label: 'View Tenant', onClick: (row) => router.visit(`/control/platform/identity/tenants/${row.slug}`) },
+        { label: 'View Tenant', onClick: (row) => router.visit(`/platform/tenants/${row.slug}`) },
     ];
 
     return (
@@ -46,7 +46,7 @@ export default function TenantsIndex({ tenants, filters }: TenantsIndexProps) {
                             Tenants
                         </h1>
                         <p className="text-on-background/60 mt-1">
-                            Manage organizations and top-level billing entities.
+                            Manage organizations, workspaces, and isolation boundaries.
                         </p>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ export default function TenantsIndex({ tenants, filters }: TenantsIndexProps) {
                     currentSort={filters.sort}
                     currentDirection={filters.direction}
                     currentSearch={filters.search}
-                    onRowClick={(row) => router.visit(`/control/platform/identity/tenants/${row.slug}`)}
+                    onRowClick={(row) => router.visit(`/platform/tenants/${row.slug}`)}
                 />
             </div>
         </ControlLayout>

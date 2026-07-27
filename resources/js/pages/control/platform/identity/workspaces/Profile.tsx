@@ -7,8 +7,8 @@ import { Settings, Ban, Key } from 'lucide-react';
 export default function WorkspaceProfile({ workspace }: { workspace: any }) {
     const breadcrumbs = [
         { label: 'Identity' },
-        { label: 'Workspaces', url: '/control/platform/identity/workspaces' },
-        { label: workspace.tenant.name, url: `/control/platform/identity/tenants/${workspace.tenant.slug}` },
+        { label: 'Workspaces', url: '/platform/workspaces' },
+        { label: workspace.tenant.name, url: `/platform/tenants/${workspace.tenant.slug}` },
         { label: workspace.name }
     ];
 
@@ -54,7 +54,7 @@ export default function WorkspaceProfile({ workspace }: { workspace: any }) {
                             <h3 className="text-xs font-bold uppercase tracking-wider text-on-background/50">Details</h3>
                             <div className="flex flex-col gap-1 mt-2">
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50">Tenant</span>
-                                <a href={`/control/platform/identity/tenants/${workspace.tenant.slug}`} className="text-sm font-bold text-primary hover:underline">
+                                <a href={`/platform/tenants/${workspace.tenant.slug}`} className="text-sm font-bold text-primary hover:underline">
                                     {workspace.tenant.name}
                                 </a>
                             </div>
@@ -100,7 +100,7 @@ export default function WorkspaceProfile({ workspace }: { workspace: any }) {
                                 {workspace.members.map((member: any) => (
                                     <div key={member.id} className="p-4 flex items-center justify-between group">
                                         <div className="flex flex-col">
-                                            <a href={`/control/platform/identity/users/${member.uuid}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
+                                            <a href={`/platform/users/${member.uuid}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
                                                 {member.name}
                                             </a>
                                             <span className="text-xs text-on-background/50 font-mono">{member.email}</span>

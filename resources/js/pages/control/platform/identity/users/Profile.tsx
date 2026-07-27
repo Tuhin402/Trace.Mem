@@ -7,7 +7,7 @@ import { Mail, Ban, KeySquare, LogOut, CheckCircle2 } from 'lucide-react';
 export default function UserProfile({ user }: { user: any }) {
     const breadcrumbs = [
         { label: 'Identity' },
-        { label: 'Users', url: '/control/platform/identity/users' },
+        { label: 'Users', url: '/platform/users' },
         { label: user.name }
     ];
 
@@ -65,7 +65,7 @@ export default function UserProfile({ user }: { user: any }) {
                         <div className="p-6 bg-surface border border-almost-black/10 flex flex-col gap-4">
                             <h3 className="text-xs font-bold uppercase tracking-wider text-on-background/50">Organization</h3>
                             <div className="flex flex-col gap-1">
-                                <a href={`/control/platform/identity/tenants/${user.tenant.slug}`} className="text-sm font-bold text-primary hover:underline">
+                                <a href={`/platform/tenants/${user.tenant.slug}`} className="text-sm font-bold text-primary hover:underline">
                                     {user.tenant.name}
                                 </a>
                                 <span className="text-xs text-on-background/50 font-mono">Tenant ID: {user.tenant.id}</span>
@@ -106,7 +106,7 @@ export default function UserProfile({ user }: { user: any }) {
                             {user.workspaces.map((ws: any) => (
                                 <div key={ws.id} className="p-4 flex items-center justify-between group">
                                     <div className="flex flex-col">
-                                        <a href={`/control/platform/identity/workspaces/${user.tenant.slug}/${ws.slug}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
+                                        <a href={`/platform/workspaces/${user.tenant.slug}/${ws.slug}`} className="text-sm font-bold text-on-background group-hover:text-primary transition-colors">
                                             {ws.name}
                                         </a>
                                         <span className="text-xs text-on-background/50 font-mono">{ws.slug}</span>

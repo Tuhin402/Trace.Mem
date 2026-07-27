@@ -20,7 +20,7 @@ export default function WorkspacesSnapshotSection({ data }: { data: any }) {
             id="overview-workspaces-snapshot"
             title="Workspaces Snapshot"
             icon={<Zap className="h-5 w-5" />}
-            viewAllHref="/operations/workspaces"
+            viewAllHref="/platform/workspaces"
         >
             {workspaces.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 opacity-60">
@@ -42,7 +42,7 @@ export default function WorkspacesSnapshotSection({ data }: { data: any }) {
                             <tr key={ws.id} className="group hover:bg-almost-black/5 transition-colors">
                                 <td className="py-3">
                                     <div className="flex flex-col">
-                                        <Link href={`/operations/workspaces/${ws.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{ws.name}</Link>
+                                        <Link href={ws.slug && ws.tenant_slug ? `/platform/workspaces/${ws.tenant_slug}/${ws.slug}` : `/platform/workspaces`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{ws.name}</Link>
                                     </div>
                                 </td>
                                 <td className="py-3 hidden sm:table-cell">

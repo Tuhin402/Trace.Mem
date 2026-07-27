@@ -12,6 +12,8 @@ class WorkspacesSnapshotService extends BaseOverviewService
             return Team::latest()->take(4)->get()->map(function ($team) {
                 return [
                     'id' => $team->id,
+                    'slug' => $team->slug,
+                    'tenant_slug' => $team->tenant?->slug ?? 'legacy',
                     'name' => $team->name,
                     'status' => $team->status,
                     'environment' => $team->environment ?? 'Production',

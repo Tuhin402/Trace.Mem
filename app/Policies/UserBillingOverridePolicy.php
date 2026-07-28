@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Policies\Control\Billing;
+namespace App\Policies;
 
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;

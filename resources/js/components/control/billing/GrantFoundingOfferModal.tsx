@@ -83,8 +83,8 @@ export function GrantFoundingOfferModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-[600px] border-destructive shadow-lg overflow-hidden flex flex-col gap-0 p-0">
-                <div className="bg-destructive/10 border-b border-destructive/20 p-6 lg:p-8 shrink-0">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] md:max-h-[85vh] border-destructive shadow-lg overflow-hidden flex flex-col gap-0 p-0">
+                <div className="bg-destructive/10 border-b border-destructive/20 p-4 lg:p-6 shrink-0">
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-extrabold tracking-tight text-destructive">
                             Administrative Billing Override
@@ -95,36 +95,36 @@ export function GrantFoundingOfferModal({
                     </p>
                 </div>
 
-                <div className="p-6 lg:p-8 space-y-8 flex-1 overflow-y-auto">
+                <div className="p-4 lg:p-6 space-y-6 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {/* Context Notice */}
                     {isTenantContext && (
-                        <div className="p-4 border rounded-md bg-muted/30">
-                            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">Context</Label>
-                            <p className="text-sm font-semibold text-foreground">This operation applies to the Tenant Owner.</p>
-                            <p className="text-sm text-foreground/80 mt-1">
+                        <div className="p-4 border rounded-md bg-muted/20">
+                            <Label className="text-xs font-bold uppercase tracking-wider text-black block mb-2">Context</Label>
+                            <p className="text-sm font-semibold text-black">This operation applies to the Tenant Owner.</p>
+                            <p className="text-sm text-black mt-1">
                                 The Founding Offer is attached to the owner's account and billing identity.
                             </p>
                         </div>
                     )}
 
                     <div className="space-y-4">
-                        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block border-b pb-2">Target Account</Label>
+                        <Label className="text-xs font-bold uppercase tracking-wider text-black block border-b pb-2">Target Account</Label>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <Label className="text-xs text-muted-foreground">Owner</Label>
-                                <p className="text-sm font-bold text-foreground">{userName}</p>
+                                <Label className="text-xs text-black">Owner</Label>
+                                <p className="text-sm font-bold text-primary">{userName}</p>
                             </div>
                             <div>
-                                <Label className="text-xs text-muted-foreground">Email</Label>
-                                <p className="text-sm font-bold text-foreground">{userEmail}</p>
+                                <Label className="text-xs text-black">Email</Label>
+                                <p className="text-sm font-bold text-primary">{userEmail}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-6 bg-muted/10 p-5 rounded-lg border">
                         <div>
-                            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-3">Current Status</Label>
-                            <ul className="text-sm space-y-2 text-foreground/80">
+                            <Label className="text-xs font-bold uppercase tracking-wider text-black block mb-3">Current Status</Label>
+                            <ul className="text-sm space-y-2 text-black">
                                 <li>• Subscription: Dependent on Razorpay</li>
                                 <li>• Free Trial: Consumed or Null</li>
                                 <li>• Override: <span className="font-semibold">None / Inactive</span></li>
@@ -132,7 +132,7 @@ export function GrantFoundingOfferModal({
                         </div>
                         <div className="border-l pl-6">
                             <Label className="text-xs font-bold uppercase tracking-wider text-primary block mb-3">Result After Override</Label>
-                            <ul className="text-sm space-y-2 text-foreground/80">
+                            <ul className="text-sm space-y-2 text-black">
                                 <li>• Subscription: Unchanged</li>
                                 <li>• Free Trial: <span className="text-primary font-semibold">Eligible (Reset)</span></li>
                                 <li>• Override: <span className="text-primary font-semibold">Active</span></li>
@@ -147,38 +147,38 @@ export function GrantFoundingOfferModal({
                     )}
 
                     <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">
+                        <Label className="text-sm font-semibold text-black uppercase tracking-wider">
                             Reason for Override <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             placeholder="e.g., Customer support goodwill, Manual migration..."
-                            className={`min-h-[100px] text-foreground ${errors.reason ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                            className={`min-h-[100px] text-black ${errors.reason ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                             disabled={isSubmitting}
                         />
                         {errors.reason && <p className="text-xs text-destructive">{errors.reason}</p>}
                     </div>
 
                     <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">
+                        <Label className="text-sm font-semibold text-black uppercase tracking-wider">
                             Confirmation <span className="text-destructive">*</span>
                         </Label>
-                        <p className="text-xs text-muted-foreground mb-2">
-                            To proceed, please type exactly <strong className="text-foreground">CONSENT</strong> below.
+                        <p className="text-xs text-black mb-2">
+                            To proceed, please type exactly <strong className="text-black">CONSENT</strong> below.
                         </p>
                         <Input
                             value={consent}
                             onChange={(e) => setConsent(e.target.value)}
                             placeholder="Type CONSENT"
-                            className={`font-mono text-foreground ${errors.consent ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                            className={`font-mono text-black ${errors.consent ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                             disabled={isSubmitting}
                         />
                         {errors.consent && <p className="text-xs text-destructive">{errors.consent}</p>}
                     </div>
                 </div>
 
-                <div className="p-6 lg:p-8 bg-muted/20 border-t flex justify-end gap-3 shrink-0">
+                <div className="p-4 lg:p-6 bg-muted/20 border-t flex justify-end gap-3 shrink-0">
                     <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
                         Cancel
                     </Button>

@@ -223,8 +223,8 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
             <EmailComposerModal 
                 open={composerOpen}
                 onOpenChange={setComposerOpen}
-                recipientName={tenant.name}
-                recipientEmail={`support@${tenant.slug}.tracemem.one`} // Placeholder if tenant email is not directly available
+                recipientName={tenant.owner_name || tenant.name}
+                recipientEmail={tenant.owner_email || `support@${tenant.slug}.tracemem.one`} 
                 recipientType="tenant"
                 recipientId={tenant.slug}
             />

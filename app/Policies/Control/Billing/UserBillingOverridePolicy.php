@@ -5,7 +5,7 @@ namespace App\Policies\Control\Billing;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class BillingOverridePolicy
+class UserBillingOverridePolicy
 {
     use HandlesAuthorization;
 

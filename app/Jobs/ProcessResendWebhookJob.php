@@ -126,7 +126,7 @@ class ProcessResendWebhookJob implements ShouldQueue
         $log = EmailLog::where('provider_message_id', $messageId)->first();
 
         if (! $log) {
-            Log::warning('ProcessResendWebhookJob: no EmailLog found for email_id', [
+            Log::info('ProcessResendWebhookJob: no EmailLog found for email_id (could be operational communication)', [
                 'email_id'   => $messageId,
                 'event_type' => $this->payload['type'] ?? 'unknown',
             ]);

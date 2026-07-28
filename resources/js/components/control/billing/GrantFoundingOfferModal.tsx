@@ -58,7 +58,7 @@ export function GrantFoundingOfferModal({
         setErrors({});
 
         try {
-            const response = await axios.post(`/control/platform/billing/users/${userId}/founding-offer-override`, {
+            const response = await axios.post(`/platform/billing/users/${userId}/founding-offer-override`, {
                 reason: reason.trim(),
                 consent,
             });

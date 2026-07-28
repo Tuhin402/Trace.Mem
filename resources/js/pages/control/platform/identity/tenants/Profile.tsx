@@ -199,10 +199,10 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                             <div className="p-6 flex flex-col gap-4">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border border-destructive/20 rounded bg-destructive/5">
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-sm font-bold text-foreground">Administrative Billing Override</span>
-                                        <span className="text-xs text-foreground/70">Applies to Tenant Owner. Manually grant or re-enable the Founding Offer. This bypasses normal eligibility rules.</span>
+                                        <span className="text-sm font-bold text-black">Administrative Billing Override</span>
+                                        <span className="text-xs text-black">Applies to Tenant Owner. Manually grant or re-enable the Founding Offer. This bypasses normal eligibility rules.</span>
                                     </div>
-                                    <button onClick={() => setOverrideModalOpen(true)} className="px-4 py-2 bg-destructive text-destructive-foreground text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-destructive/90 transition-colors">
+                                    <button onClick={() => setOverrideModalOpen(true)} className="px-4 py-2 bg-destructive text-white text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-destructive/90 transition-colors">
                                         Grant Founding Offer
                                     </button>
                                 </div>

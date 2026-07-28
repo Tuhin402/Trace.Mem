@@ -30,7 +30,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
         setError(false);
         try {
             const res = await axios.get(`/platform/communications/history/${recipientType}/${recipientId}`);
-            setHistory(res.data.history);
+            setHistory(Array.isArray(res.data.history) ? res.data.history : []);
         } catch (e) {
             console.error(e);
             setError(true);
@@ -55,7 +55,7 @@ export function HistoryPanel({ recipientType, recipientId }: HistoryPanelProps) 
 
     if (loading) return <div className="text-sm text-muted-foreground">Loading history...</div>;
     if (error) return <div className="text-sm text-destructive">Failed to load communication history.</div>;
-    if (history.length === 0) return <div className="text-sm text-muted-foreground">No recent communications found.</div>;
+    if (!history || history.length === 0) return <div className="text-sm text-muted-foreground">No recent communications found.</div>;
 
     return (
         <div className="w-full">

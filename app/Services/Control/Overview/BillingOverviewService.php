@@ -3,15 +3,18 @@
 namespace App\Services\Control\Overview;
 
 use App\Models\BillingTransaction;
+use App\Services\Control\Billing\BillingQueryService;
 
 class BillingOverviewService extends BaseOverviewService
 {
+
+    public function __construct(private readonly BillingQueryService $billing) {}
     public function getBilling(): array
     {
         return $this->execute('overview:billing', CacheTiers::AGGREGATED, function () {
-            // Note: Since this is a massive platform, this requires a BillingTransaction model or similar
-            // which we know exists from earlier checks.
-            return BillingTransaction::latest()->take(4)->get()->map(function ($tx) {
+            $stats = $this->billing->getGlobalStats();
+
+            $transactions = BillingTransaction::latest()->take(4)->get()->map(function ($tx) {
                 return [
                     'id' => $tx->id,
                     'amount' => '$' . number_format($tx->amount / 100, 2),
@@ -20,6 +23,17 @@ class BillingOverviewService extends BaseOverviewService
                     'time' => $tx->created_at->diffForHumans(),
                 ];
             })->toArray();
+
+            return [
+                'active_plans' => $stats['active_plans'],
+                'draft_plans' => $stats['draft_plans'],
+                'archived_plans' => $stats['archived_plans'],
+                'total_subscribers' => $stats['total'],
+                'monthly_subscribers' => $stats['monthly'],
+                'quarterly_subscribers' => $stats['quarterly'],
+                'yearly_subscribers' => $stats['yearly'],
+                'recent_transactions' => $transactions,
+            ];
         });
     }
 }

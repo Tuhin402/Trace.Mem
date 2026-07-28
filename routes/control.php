@@ -55,12 +55,23 @@ Route::middleware(['web', 'control.admin'])->group(function () {
 
         Route::prefix('billing')->name('billing.')->group(function () {
             Route::post('/users/{user}/founding-offer-override', [\App\Http\Controllers\Control\Billing\FoundingOfferOverrideController::class, 'store'])->name('override.store');
+
+            Route::prefix('catalog')->name('catalog.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'index'])->name('index');
+                Route::post('/', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'store'])->name('store');
+                Route::get('/impact', [\App\Http\Controllers\Control\Billing\CatalogPricingController::class, 'impact'])->name('pricing.impact');
+                Route::post('/pricing', [\App\Http\Controllers\Control\Billing\CatalogPricingController::class, 'store'])->name('pricing.store');
+                Route::get('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'show'])->name('show');
+                Route::put('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'update'])->name('update');
+                Route::post('/{id}/archive', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'archive'])->name('archive');
+                Route::post('/{id}/restore', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'restore'])->name('restore');
+                Route::delete('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'destroy'])->name('destroy');
+            });
         });
 
         Route::inertia('/api-keys', 'control/Scaffold')->name('api-keys');
         Route::inertia('/memory', 'control/Scaffold')->name('memory');
         Route::inertia('/subscriptions', 'control/Scaffold')->name('subscriptions');
-        Route::inertia('/billing', 'control/Scaffold')->name('billing');
     });
 
     // Operations

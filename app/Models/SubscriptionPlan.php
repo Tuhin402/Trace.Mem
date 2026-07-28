@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SubscriptionPlan extends Model
 {
@@ -29,6 +30,12 @@ class SubscriptionPlan extends Model
         'price_yearly',
         'is_active',
         'razorpay_plan_ids', // JSON: {monthly: 'plan_xxx', quarterly: 'plan_yyy', yearly: 'plan_zzz'}
+        'status',
+        'visibility',
+        'sort_order',
+        'metadata',
+        'notes',
+        'archived_at',
     ];
     
     protected $casts = [
@@ -50,10 +57,65 @@ class SubscriptionPlan extends Model
         'price_yearly' => 'decimal:2',
         'is_active'         => 'boolean',
         'razorpay_plan_ids' => 'array',
+        'sort_order' => 'integer',
+        'metadata' => 'array',
+        'archived_at' => 'datetime',
     ];
 
     public function features()
     {
         return $this->hasMany(SubscriptionPlanFeature::class);
+    }
+
+    public function pricingHistories(): HasMany
+    {
+        return $this->hasMany(PlanPricingHistory::class)->latest('created_at');
+    }
+
+    public function userSubscriptions(): HasMany
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', 'draft');
+    }
+
+    public function scopeArchived($query)
+    {
+        return $query->where('status', 'archived');
+    }
+
+    public function scopePublic($query)
+    {
+        return $query->where('visibility', 'public');
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === 'draft';
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->status === 'archived';
+    }
+
+    /** A plan may be hard deleted only before it has affected billing history. */
+    public function canBePhysicallyDeleted(): bool
+    {
+        return ! $this->userSubscriptions()->exists()
+            && ! $this->pricingHistories()->exists();
     }
 }

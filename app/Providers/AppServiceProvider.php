@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\SubscriptionPlan;
+use App\Policies\Control\CatalogPolicy;
 use App\Providers\EmailServiceProvider;
 use App\Services\Auth\SubscriptionCacheService;
 use App\Services\Auth\SubscriptionEntitlementService;
@@ -17,6 +19,7 @@ use App\Services\Workspace\WorkspaceService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -104,6 +107,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(SubscriptionPlan::class, CatalogPolicy::class);
+
         $this->configureDefaults();
 
         // Isolate session for control console to prevent conflicts with the main app

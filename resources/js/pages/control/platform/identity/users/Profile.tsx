@@ -5,9 +5,11 @@ import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
 import { Mail, Ban, KeySquare, LogOut, CheckCircle2 } from 'lucide-react';
 import { EmailComposerModal } from '@/components/control/communications/EmailComposerModal';
 import { HistoryPanel } from '@/components/control/communications/HistoryPanel';
+import { GrantFoundingOfferModal } from '@/components/control/billing/GrantFoundingOfferModal';
 
 export default function UserProfile({ user }: { user: any }) {
     const [composerOpen, setComposerOpen] = React.useState(false);
+    const [overrideModalOpen, setOverrideModalOpen] = React.useState(false);
     const breadcrumbs = [
         { label: 'Identity' },
         { label: 'Users', url: '/platform/users' },
@@ -21,6 +23,11 @@ export default function UserProfile({ user }: { user: any }) {
         user.is_verified && (
             <span key="verified" className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 border border-blue-500/20">
                 <CheckCircle2 className="h-3 w-3" /> Verified
+            </span>
+        ),
+        user.active_billing_override && (
+            <span key="override" className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                Manual Override
             </span>
         )
     ];
@@ -79,7 +86,14 @@ export default function UserProfile({ user }: { user: any }) {
                                 </div>
                                 <div className="flex flex-col gap-1 mt-2">
                                     <span className="text-[10px] font-bold uppercase tracking-wider text-on-background/50">Subscription</span>
-                                    <span className="text-sm font-bold text-on-background">{user.subscription.plan}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-bold text-on-background">{user.subscription.plan}</span>
+                                        {user.active_billing_override && (
+                                            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                                                Override
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -210,6 +224,25 @@ export default function UserProfile({ user }: { user: any }) {
                                 )}
                             </div>
                         </div>
+
+                        {/* Danger Zone */}
+                        <div className="w-full bg-surface border border-destructive/30 mt-6">
+                            <div className="px-6 py-4 border-b border-destructive/20 bg-destructive/5 flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-destructive animate-pulse"></span>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-destructive">Danger Zone</h3>
+                            </div>
+                            <div className="p-6 flex flex-col gap-4">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border border-destructive/20 rounded bg-destructive/5">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-sm font-bold text-foreground">Administrative Billing Override</span>
+                                        <span className="text-xs text-foreground/70">Manually grant or re-enable the Founding Offer. This bypasses normal eligibility rules.</span>
+                                    </div>
+                                    <button onClick={() => setOverrideModalOpen(true)} className="px-4 py-2 bg-destructive text-destructive-foreground text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-destructive/90 transition-colors">
+                                        Grant Founding Offer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -254,6 +287,14 @@ export default function UserProfile({ user }: { user: any }) {
                 recipientType="user"
                 recipientId={user.uuid}
                 tenantName={user.tenant.name}
+            />
+
+            <GrantFoundingOfferModal
+                isOpen={overrideModalOpen}
+                onClose={() => setOverrideModalOpen(false)}
+                userId={user.id}
+                userName={user.name}
+                userEmail={user.email}
             />
         </>
     );

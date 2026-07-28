@@ -66,7 +66,9 @@ class TenantQueryService
             ->with(['workspaces' => function ($q) {
                 $q->withCount('members');
             }, 'users' => function ($q) {
-                $q->with('subscriptions.subscriptionPlan');
+                $q->with(['subscriptions.subscriptionPlan', 'billingOverrides' => function ($q2) {
+                    $q2->where('is_active', true);
+                }]);
             }])
             ->withCount(['workspaces', 'users'])
             ->where('slug', $slug)

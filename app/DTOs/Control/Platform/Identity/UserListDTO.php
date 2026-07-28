@@ -20,7 +20,8 @@ readonly class UserListDTO
         public string $created_at,
         public bool $is_verified,
         public bool $has_2fa,
-        public int $workspace_count
+        public int $workspace_count,
+        public bool $has_billing_override = false
     ) {}
 
     public static function fromModel(User $user): self
@@ -38,7 +39,8 @@ readonly class UserListDTO
             created_at: $user->created_at->format('M j, Y'),
             is_verified: $user->email_verified_at !== null,
             has_2fa: !empty($user->two_factor_secret),
-            workspace_count: $user->teams_count ?? 0
+            workspace_count: $user->teams_count ?? 0,
+            has_billing_override: $user->relationLoaded('billingOverrides') && $user->billingOverrides->isNotEmpty()
         );
     }
 }

@@ -5,9 +5,11 @@ import ControlEntityLayout from '@/layouts/control/ControlEntityLayout';
 import { Settings, Ban, LogOut, Mail } from 'lucide-react';
 import { EmailComposerModal } from '@/components/control/communications/EmailComposerModal';
 import { HistoryPanel } from '@/components/control/communications/HistoryPanel';
+import { GrantFoundingOfferModal } from '@/components/control/billing/GrantFoundingOfferModal';
 
 export default function TenantProfile({ tenant }: { tenant: any }) {
     const [composerOpen, setComposerOpen] = React.useState(false);
+    const [overrideModalOpen, setOverrideModalOpen] = React.useState(false);
     const breadcrumbs = [
         { label: 'Identity' },
         { label: 'Tenants', url: '/platform/tenants' },
@@ -20,7 +22,12 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
         </span>,
         <span key="plan" className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
             {tenant.plan}
-        </span>
+        </span>,
+        tenant.active_billing_override && (
+            <span key="override" className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                Manual Override
+            </span>
+        )
     ];
 
     const actions = [
@@ -182,6 +189,25 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                                 )}
                             </div>
                         </div>
+
+                        {/* Danger Zone */}
+                        <div className="w-full bg-surface border border-destructive/30 mt-6">
+                            <div className="px-6 py-4 border-b border-destructive/20 bg-destructive/5 flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-destructive animate-pulse"></span>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-destructive">Danger Zone</h3>
+                            </div>
+                            <div className="p-6 flex flex-col gap-4">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border border-destructive/20 rounded bg-destructive/5">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-sm font-bold text-foreground">Administrative Billing Override</span>
+                                        <span className="text-xs text-foreground/70">Applies to Tenant Owner. Manually grant or re-enable the Founding Offer. This bypasses normal eligibility rules.</span>
+                                    </div>
+                                    <button onClick={() => setOverrideModalOpen(true)} className="px-4 py-2 bg-destructive text-destructive-foreground text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-destructive/90 transition-colors">
+                                        Grant Founding Offer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
                 {currentTab === 'communications' && (
@@ -201,6 +227,15 @@ export default function TenantProfile({ tenant }: { tenant: any }) {
                 recipientEmail={`support@${tenant.slug}.tracemem.one`} // Placeholder if tenant email is not directly available
                 recipientType="tenant"
                 recipientId={tenant.slug}
+            />
+
+            <GrantFoundingOfferModal
+                isOpen={overrideModalOpen}
+                onClose={() => setOverrideModalOpen(false)}
+                userId={tenant.owner_id} // Mapping to tenant owner
+                userName={tenant.owner_name || 'Tenant Owner'}
+                userEmail={tenant.owner_email || 'owner@example.com'}
+                isTenantContext={true}
             />
         </>
     );

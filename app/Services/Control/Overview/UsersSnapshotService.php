@@ -9,7 +9,9 @@ class UsersSnapshotService extends BaseOverviewService
     public function getUsers(): array
     {
         return $this->execute('overview:users_snapshot', CacheTiers::NEAR_REAL_TIME, function () {
-            return User::latest()->take(5)->get()->map(function ($user) {
+            return User::with(['billingOverrides' => function ($q) {
+                $q->where('is_active', true);
+            }])->latest()->take(5)->get()->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'uuid' => $user->tenant_scope_id,
@@ -18,6 +20,7 @@ class UsersSnapshotService extends BaseOverviewService
                     'status' => 'Active',
                     'role' => $user->platform_role ?? 'User',
                     'time' => $user->created_at->diffForHumans(),
+                    'has_billing_override' => $user->relationLoaded('billingOverrides') && $user->billingOverrides->isNotEmpty(),
                 ];
             })->toArray();
         });

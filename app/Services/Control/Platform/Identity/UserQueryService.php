@@ -17,7 +17,9 @@ class UserQueryService
     public function getPaginatedList(Request $request): LengthAwarePaginator
     {
         $query = User::query()
-            ->with(['tenant']) // Used for organization badge
+            ->with(['tenant', 'billingOverrides' => function ($q) {
+                $q->where('is_active', true);
+            }]) // Used for organization badge & override badge
             ->withCount(['teams as workspaces_count']); 
 
         // Search
@@ -65,7 +67,9 @@ class UserQueryService
     public function getProfile(string $uuid): \App\DTOs\Control\Platform\Identity\UserProfileDTO
     {
         $query = User::query()
-            ->with(['tenant', 'subscriptions.subscriptionPlan', 'freeTrialEvents', 'teams' => function ($q) {
+            ->with(['tenant', 'subscriptions.subscriptionPlan', 'freeTrialEvents', 'billingOverrides' => function ($q) {
+                $q->where('is_active', true);
+            }, 'teams' => function ($q) {
                 $q->withCount('memories');
             }, 'activityLogs' => function ($q) {
                 $q->latest()->limit(20);

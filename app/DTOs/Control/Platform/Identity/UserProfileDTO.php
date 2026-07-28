@@ -20,7 +20,8 @@ readonly class UserProfileDTO
         public string $created_at,
         public ?string $last_login_at,
         public bool $is_verified,
-        public bool $has_2fa
+        public bool $has_2fa,
+        public ?array $active_billing_override = null
     ) {}
 
     public static function fromModel(User $user): self
@@ -72,7 +73,14 @@ readonly class UserProfileDTO
             created_at: $user->created_at->format('M j, Y'),
             last_login_at: $user->last_login_at?->diffForHumans() ?? 'Never',
             is_verified: $user->email_verified_at !== null,
-            has_2fa: !empty($user->two_factor_secret)
+            has_2fa: !empty($user->two_factor_secret),
+            active_billing_override: $user->relationLoaded('billingOverrides') && $user->billingOverrides->isNotEmpty() 
+                ? [
+                    'type' => $user->billingOverrides->first()->type,
+                    'reason' => $user->billingOverrides->first()->reason,
+                    'granted_at' => $user->billingOverrides->first()->created_at->format('M j, Y')
+                ] 
+                : null
         );
     }
 }

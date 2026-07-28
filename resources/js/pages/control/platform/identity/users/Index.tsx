@@ -10,7 +10,16 @@ interface UsersIndexProps {
 
 export default function UsersIndex({ users, filters }: UsersIndexProps) {
     const columns: ColumnDef<any>[] = [
-        { key: 'name', header: 'Name', sortable: true, render: (row) => <span className="font-bold">{row.name}</span> },
+        { key: 'name', header: 'Name', sortable: true, render: (row) => (
+            <div className="flex items-center gap-2">
+                <span className="font-bold">{row.name}</span>
+                {row.has_billing_override && (
+                    <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 whitespace-nowrap">
+                        Override
+                    </span>
+                )}
+            </div>
+        ) },
         { key: 'email', header: 'Email', sortable: true },
         { key: 'tenant_name', header: 'Tenant', sortable: false, render: (row) => (
             <div className="flex flex-col">

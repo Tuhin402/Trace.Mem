@@ -102,6 +102,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(WorkspaceAuditLog::class, 'actor_user_id');
     }
 
+    /**
+     * @return HasMany<UserBillingOverride, $this>
+     */
+    public function billingOverrides(): HasMany
+    {
+        return $this->hasMany(UserBillingOverride::class, 'user_id');
+    }
+
     // ── Email notification overrides ─────────────────────────────────────────
     // These replace Fortify's default notifications so verification and password
     // reset emails route through the unified SendEmailJob pipeline.

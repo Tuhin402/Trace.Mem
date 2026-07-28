@@ -46,8 +46,14 @@ export default function UsersSnapshotSection({ data }: { data: any }) {
                                             {user.name.charAt(0)}
                                         </div>
                                         <div className="flex flex-col">
-                                            {/* Note: In a real system, expose UUID in UsersSnapshotService and use it here. Using ID as fallback. */}
-                                            <Link href={`/platform/users/${user.uuid || 'legacy-' + user.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{user.name}</Link>
+                                            <div className="flex items-center gap-2">
+                                                <Link href={`/platform/users/${user.uuid || 'legacy-' + user.id}`} className="text-sm font-bold text-primary group-hover:underline cursor-pointer">{user.name}</Link>
+                                                {user.has_billing_override && (
+                                                    <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                                                        Override
+                                                    </span>
+                                                )}
+                                            </div>
                                             <span className="text-xs text-on-background/60">{user.email}</span>
                                         </div>
                                     </div>

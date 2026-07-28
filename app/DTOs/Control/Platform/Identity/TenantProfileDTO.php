@@ -16,11 +16,17 @@ readonly class TenantProfileDTO
         public array $workspaces,
         public array $recent_users,
         public array $subscriptions,
-        public string $created_at
+        public string $created_at,
+        public ?string $owner_id = null,
+        public ?string $owner_name = null,
+        public ?string $owner_email = null,
+        public ?array $active_billing_override = null
     ) {}
 
     public static function fromModel(Tenant $tenant): self
     {
+        $owner = $tenant->users->sortBy('created_at')->first();
+
         return new self(
             id: $tenant->id,
             name: $tenant->name,
@@ -55,7 +61,17 @@ readonly class TenantProfileDTO
                     'cancelled_at' => $sub->cancelled_at?->format('M j, Y'),
                 ]);
             })->sortByDesc('started_at')->values()->toArray(),
-            created_at: $tenant->created_at->format('M j, Y')
+            created_at: $tenant->created_at->format('M j, Y'),
+            owner_id: $owner?->id,
+            owner_name: $owner?->name,
+            owner_email: $owner?->email,
+            active_billing_override: $owner && $owner->relationLoaded('billingOverrides') && $owner->billingOverrides->isNotEmpty() 
+                ? [
+                    'type' => $owner->billingOverrides->first()->type,
+                    'reason' => $owner->billingOverrides->first()->reason,
+                    'granted_at' => $owner->billingOverrides->first()->created_at->format('M j, Y')
+                ] 
+                : null
         );
     }
 }

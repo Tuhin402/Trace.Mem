@@ -4,6 +4,9 @@ namespace App\Services\Billing;
 
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\Billing\Eligibility\Contracts\EligibilitySource;
+use App\Services\Billing\Eligibility\Sources\AdministrativeOverrideSource;
+use App\Services\Billing\Eligibility\Sources\NormalEligibilitySource;
 use Carbon\CarbonImmutable;
 
 /**
@@ -33,19 +36,38 @@ class FreeTrialEligibilityService
     /**
      * Can this user ever receive the Founding Offer?
      *
-     * Returns true ONLY when:
-     *   - free_trial_status is null (offer never touched)
-     *   - User has zero subscription rows of any kind
+     * Evaluates registered EligibilitySource implementations in a deterministic order.
      */
     public function isEligible(User $user): bool
     {
-        // Freshly loaded check — avoid stale model cache
-        if ($user->free_trial_status !== null) {
-            return false;
+        return $this->getEligibilityDetails($user)['eligible'];
+    }
+
+    /**
+     * Get detailed eligibility info, including which source granted it.
+     */
+    public function getEligibilityDetails(User $user): array
+    {
+        // Define sources in deterministic order.
+        // Administrative overrides take precedence over normal logic.
+        $sources = [
+            new AdministrativeOverrideSource(),
+            new NormalEligibilitySource(),
+        ];
+
+        foreach ($sources as $source) {
+            if ($source->evaluate($user)) {
+                return [
+                    'eligible' => true,
+                    'source' => $source->name(),
+                ];
+            }
         }
 
-        // Check if user has EVER had ANY subscription (any plan, any status)
-        return ! $user->subscriptions()->exists();
+        return [
+            'eligible' => false,
+            'source' => null,
+        ];
     }
 
     /**

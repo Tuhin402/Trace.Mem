@@ -53,6 +53,10 @@ Route::middleware(['web', 'control.admin'])->group(function () {
             Route::get('/history/{type}/{id}', [\App\Http\Controllers\Control\Communications\CommunicationController::class, 'history'])->name('history');
         });
 
+        Route::prefix('billing')->name('billing.')->group(function () {
+            Route::post('/users/{user}/founding-offer-override', [\App\Http\Controllers\Control\Billing\FoundingOfferOverrideController::class, 'store'])->name('override.store');
+        });
+
         Route::inertia('/api-keys', 'control/Scaffold')->name('api-keys');
         Route::inertia('/memory', 'control/Scaffold')->name('memory');
         Route::inertia('/subscriptions', 'control/Scaffold')->name('subscriptions');

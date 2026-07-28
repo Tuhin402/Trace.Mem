@@ -76,15 +76,17 @@ class GrantFoundingOfferOverrideAction
 
             // 7. Record Keeping - Audit Log
             AdminAuditLog::create([
-                'admin_user_id' => $admin->id,
+                'user_id' => $admin->id,
                 'action' => 'billing.override.founding_offer.granted',
-                'description' => "Granted Founding Offer Override to User #{$lockedUser->id}",
+                'entity_type' => User::class,
+                'entity_id' => $lockedUser->id,
                 'ip_address' => $ip,
-                'metadata' => [
-                    'target_user_id' => $lockedUser->id,
+                'old_values' => [
+                    'free_trial_status' => $oldTrialStatus,
+                    'free_trial_ends_at' => $oldTrialEndsAt,
+                ],
+                'new_values' => [
                     'reason' => $reason,
-                    'previous_status' => $oldTrialStatus,
-                    'previous_ends_at' => $oldTrialEndsAt,
                     'override_id' => $override->id,
                 ],
             ]);

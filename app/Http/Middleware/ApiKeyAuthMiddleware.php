@@ -23,6 +23,11 @@ class ApiKeyAuthMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
+        // Capture the request start time once so every execution path
+        // (success, failure, rate limit, policy violation, exception)
+        // measures latency from the same point.
+        $requestStartedAt = microtime(true);
+
         $plainKey = $request->bearerToken();
 
         if (blank($plainKey)) {
@@ -60,7 +65,7 @@ class ApiKeyAuthMiddleware
             $isPostman = str_contains($userAgent, 'postman');
             $isHttps   = $request->isSecure();
 
-            $this->logUsage($apiKey->id, $request, 403, microtime(true), [
+            $this->logUsage($apiKey->id, $request, 403, $requestStartedAt, [
                 'reason' => 'sandbox_environment_violation',
             ]);
 
@@ -99,7 +104,7 @@ class ApiKeyAuthMiddleware
         if (RateLimiter::tooManyAttempts($rateKey, (int) $apiKey->rate_limit_max_requests)) {
             $seconds = RateLimiter::availableIn($rateKey);
 
-            $this->logUsage($apiKey->id, $request, 429, 0, [
+            $this->logUsage($apiKey->id, $request, 429, $requestStartedAt, [
                 'reason' => 'rate_limited',
             ]);
 
@@ -119,17 +124,16 @@ class ApiKeyAuthMiddleware
         ]);
         // $request->attributes->set('memory_mode', $apiKey->isTest() ? 'semantic_only' : $apiKey->mode);
         $request->attributes->set('memory_mode', $apiKey->isSandbox() ? 'semantic_only' : $apiKey->mode);
-        $startedAt = microtime(true);
 
         try {
             $response = $next($request);
             $status = $response->getStatusCode();
-            $this->logUsage($apiKey->id, $request, $status, $startedAt);
+            $this->logUsage($apiKey->id, $request, $status, $requestStartedAt);
             $this->apiKeys->touchUsage($apiKey);
 
             return $response;
         } catch (Throwable $e) {
-            $this->logUsage($apiKey->id, $request, 500, $startedAt, [
+            $this->logUsage($apiKey->id, $request, 500, $requestStartedAt, [
                 'exception' => $e->getMessage(),
             ]);
 
@@ -198,30 +202,37 @@ class ApiKeyAuthMiddleware
         int $apiKeyId,
         Request $request,
         int $statusCode,
-        float $startedAt,
+        float $requestStartedAt,
         array $metadata = []
     ): void {
-        $latencyMs = max(0, (int) round((microtime(true) - $startedAt) * 1000));
+        $latencyMs = max(0, (int) round((microtime(true) - $requestStartedAt) * 1000));
         $host = $request->getHost();
         $origin = $request->headers->get('Origin') ?: $request->headers->get('Referer');
 
-        ApiUsageLog::create([
-            'api_key_id' => $apiKeyId,
-            'endpoint' => $request->path(),
-            'method' => $request->method(),
-            'status_code' => $statusCode,
-            'latency_ms' => $latencyMs,
-            'tokens_used' => (int) ($request->attributes->get('tokens_used') ?? 0),
-            'ip_address' => $request->ip(),
-            'request_host' => $host,
-            'request_origin' => $origin,
-            'is_sandbox' => (bool) ($request->attributes->get('memory_mode') === 'semantic_only'),
-            'is_localhost' => in_array($host, ['localhost', '127.0.0.1'], true) || str_ends_with($host, '.local'),
-            'user_agent' => $request->userAgent(),
-            'request_id' => $request->header('X-Request-Id', (string) Str::uuid()),
-            'requested_at' => now(),
-            'metadata' => $metadata,
-        ]);
+        try {
+            ApiUsageLog::create([
+                'api_key_id' => $apiKeyId,
+                'endpoint' => $request->path(),
+                'method' => $request->method(),
+                'status_code' => $statusCode,
+                'latency_ms' => $latencyMs,
+                'tokens_used' => (int) ($request->attributes->get('tokens_used') ?? 0),
+                'ip_address' => $request->ip(),
+                'request_host' => $host,
+                'request_origin' => $origin,
+                'is_sandbox' => (bool) ($request->attributes->get('memory_mode') === 'semantic_only'),
+                'is_localhost' => in_array($host, ['localhost', '127.0.0.1'], true) || str_ends_with($host, '.local'),
+                'user_agent' => $request->userAgent(),
+                'request_id' => $request->header('X-Request-Id', (string) Str::uuid()),
+                'requested_at' => now(),
+                'metadata' => $metadata,
+            ]);
+        } catch (Throwable $e) {
+            // Fail-open: a transient cache or DB error must not lock paying users out.
+            Log::warning('Failed to write API usage log', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

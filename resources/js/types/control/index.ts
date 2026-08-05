@@ -6,6 +6,8 @@ export type ControlPermission =
     | 'platform.memory.read'
     | 'platform.subscriptions.read'
     | 'platform.billing.read'
+    | 'platform.billing.catalog.read'
+    | 'platform.billing.catalog.write'
     | 'operations.notifications.read'
     | 'operations.jobs.read'
     | 'operations.audit-logs.read'
@@ -23,6 +25,8 @@ export type ControlPermission =
     | 'developer.logs.read'
     | 'developer.queues.read'
     | 'developer.background-tasks.read';
+
+export * from './billing';
 
 export interface NavigationItem {
     route_name: string;

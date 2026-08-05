@@ -33,6 +33,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'price_quarterly' => 549.00,
                 'price_yearly' => 1999.00,
                 'is_active' => true,
+                'status' => 'active',
+                'visibility' => 'public',
+                'sort_order' => 10,
             ]
         );
 
@@ -59,6 +62,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'price_quarterly' => 1399.00,
                 'price_yearly' => 4999.00,
                 'is_active' => true,
+                'status' => 'active',
+                'visibility' => 'public',
+                'sort_order' => 20,
             ]
         );
 

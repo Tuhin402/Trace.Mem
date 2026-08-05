@@ -97,16 +97,16 @@ export const navigationItems: NavigationItem[] = [
         breadcrumb: 'Platform / Subscriptions'
     },
     {
-        route_name: 'control.platform.billing',
-        title: 'Billing',
-        description: 'Track revenue, invoices, and trials.',
+        route_name: 'control.platform.billing.catalog.index',
+        title: 'Billing Catalog',
+        description: 'Manage pricing plans and subscribers.',
         icon: 'CreditCard',
         group: 'platform',
-        permission: 'platform.billing.read',
+        permission: 'platform.billing.catalog.read',
         searchable: true,
         pinnable: true,
         mobileVisibility: true,
-        breadcrumb: 'Platform / Billing'
+        breadcrumb: 'Platform / Billing Catalog'
     },
 
     // Operations

@@ -43,13 +43,13 @@ class CatalogController extends Controller
         ]);
     }
 
-    public function show(Request $request, int $id): Response
+    public function show(Request $request, string $id): Response
     {
         $plan = SubscriptionPlan::query()->findOrFail($id);
         Gate::forUser($request->user())->authorize('view', $plan);
 
         return Inertia::render('control/billing/catalog/Show', [
-            'plan' => $this->catalog->getPlan($id),
+            'plan' => $this->catalog->getPlan((int) $id),
             'can_manage' => $request->user()->can('update', $plan),
             'is_super_admin' => $request->user()->platform_role === 'super_admin',
         ]);
@@ -69,7 +69,7 @@ class CatalogController extends Controller
         return to_route('control.platform.billing.catalog.show', $plan->id)->with('success', 'Plan created.');
     }
 
-    public function update(UpdatePlanRequest $request, int $id, UpdatePlanAction $action): RedirectResponse
+    public function update(UpdatePlanRequest $request, string $id, UpdatePlanAction $action): RedirectResponse
     {
         $data = $request->validated();
         $plan = $action->execute($request->user(), SubscriptionPlan::query()->findOrFail($id), new UpdatePlanData(
@@ -82,21 +82,21 @@ class CatalogController extends Controller
         return to_route('control.platform.billing.catalog.show', $plan->id)->with('success', 'Plan updated.');
     }
 
-    public function archive(Request $request, int $id, ArchivePlanAction $action): RedirectResponse
+    public function archive(Request $request, string $id, ArchivePlanAction $action): RedirectResponse
     {
         $plan = $action->execute($request->user(), SubscriptionPlan::query()->findOrFail($id), $request->ip());
 
         return to_route('control.platform.billing.catalog.show', $plan->id)->with('success', 'Plan archived.');
     }
 
-    public function restore(Request $request, int $id, RestorePlanAction $action): RedirectResponse
+    public function restore(Request $request, string $id, RestorePlanAction $action): RedirectResponse
     {
         $plan = $action->execute($request->user(), SubscriptionPlan::query()->findOrFail($id), $request->ip());
 
         return to_route('control.platform.billing.catalog.show', $plan->id)->with('success', 'Plan restored.');
     }
 
-    public function destroy(Request $request, int $id, DeletePlanAction $action): RedirectResponse
+    public function destroy(Request $request, string $id, DeletePlanAction $action): RedirectResponse
     {
         $action->execute($request->user(), SubscriptionPlan::query()->findOrFail($id), $request->ip());
 

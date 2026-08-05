@@ -61,11 +61,11 @@ Route::middleware(['web', 'control.admin'])->group(function () {
                 Route::post('/', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'store'])->name('store');
                 Route::get('/impact', [\App\Http\Controllers\Control\Billing\CatalogPricingController::class, 'impact'])->name('pricing.impact');
                 Route::post('/pricing', [\App\Http\Controllers\Control\Billing\CatalogPricingController::class, 'store'])->name('pricing.store');
-                Route::get('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'show'])->name('show');
-                Route::put('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'update'])->name('update');
-                Route::post('/{id}/archive', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'archive'])->name('archive');
-                Route::post('/{id}/restore', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'restore'])->name('restore');
-                Route::delete('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'destroy'])->name('destroy');
+                Route::get('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'show'])->name('show')->whereNumber('id');
+                Route::put('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'update'])->name('update')->whereNumber('id');
+                Route::post('/{id}/archive', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'archive'])->name('archive')->whereNumber('id');
+                Route::post('/{id}/restore', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'restore'])->name('restore')->whereNumber('id');
+                Route::delete('/{id}', [\App\Http\Controllers\Control\Billing\CatalogController::class, 'destroy'])->name('destroy')->whereNumber('id');
             });
         });
 

@@ -38,7 +38,7 @@ class BillingQueryService
 
     public function getTotalActiveSubscribers(): int
     {
-        return $this->getGlobalStats()['total'];
+        return $this->getGlobalStats()['total_subscribers'];
     }
 
     public function getGlobalStats(): array
@@ -61,13 +61,13 @@ class BillingQueryService
                 ->all();
 
             return [
-                'total' => array_sum($subscribers),
-                'monthly' => $subscribers['monthly'] ?? 0,
-                'quarterly' => $subscribers['quarterly'] ?? 0,
-                'yearly' => $subscribers['yearly'] ?? 0,
-                'active_plans' => $plans['active'] ?? 0,
-                'draft_plans' => $plans['draft'] ?? 0,
-                'archived_plans' => $plans['archived'] ?? 0,
+                'total_subscribers'     => array_sum($subscribers),
+                'monthly_subscribers'   => $subscribers['monthly'] ?? 0,
+                'quarterly_subscribers' => $subscribers['quarterly'] ?? 0,
+                'yearly_subscribers'    => $subscribers['yearly'] ?? 0,
+                'active_plans'          => $plans['active'] ?? 0,
+                'draft_plans'           => $plans['draft'] ?? 0,
+                'archived_plans'        => $plans['archived'] ?? 0,
             ];
         });
     }

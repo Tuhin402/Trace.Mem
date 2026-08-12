@@ -61,12 +61,12 @@ export function PlanEditModal({ plan, open, onClose, canManage }: PlanEditModalP
     const selectCls = "w-full px-3 py-2 border border-almost-black/20 bg-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer";
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-16 px-4 pb-4">
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={processing ? undefined : handleClose} />
 
-            {/* Modal */}
-            <div className="relative z-10 w-full max-w-4xl bg-background border border-almost-black/20 shadow-2xl my-4">
+            {/* Modal — scrolls internally so it never overflows the viewport */}
+            <div className="relative z-10 w-full max-w-4xl bg-background border border-almost-black/20 shadow-2xl flex flex-col max-h-[calc(100vh-5rem)]">
                 {/* Header */}
                 <div className="flex items-start justify-between p-6 border-b border-almost-black/10">
                     <div>
@@ -87,8 +87,8 @@ export function PlanEditModal({ plan, open, onClose, canManage }: PlanEditModalP
                     )}
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="p-6">
+                <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
+                    <div className="p-6 overflow-y-auto flex-1">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Left Column — Plan Information */}
                             <div className="space-y-5">
@@ -224,7 +224,7 @@ export function PlanEditModal({ plan, open, onClose, canManage }: PlanEditModalP
                         </div>
                     </div>
 
-                    {/* Footer */}
+                    {/* Footer — always pinned at bottom */}
                     <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-almost-black/10 bg-almost-black/[0.02]">
                         <button
                             type="button"

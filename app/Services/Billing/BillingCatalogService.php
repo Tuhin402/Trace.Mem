@@ -25,6 +25,7 @@ class BillingCatalogService
     {
         $rows = $this->cache->rememberPricing(fn () => SubscriptionPlan::query()
             ->where('is_active', true)
+            ->where('visibility', 'public')
             ->with('features')
             ->orderBy('price_monthly')
             ->get()

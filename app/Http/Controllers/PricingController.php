@@ -16,6 +16,7 @@ class PricingController extends Controller
     {
         $plans = SubscriptionPlan::query()
             ->where('is_active', true)
+            ->where('visibility', 'public')
             ->with('features')
             ->orderBy('price_monthly', 'asc')
             ->get()

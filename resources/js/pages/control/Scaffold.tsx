@@ -12,10 +12,15 @@ export default function Scaffold() {
     // Find metadata from navigation config based on URL path matching 
     // (since Inertia does not pass route_name by default, though we can match segments)
     // As a simple match:
-    const item = navigationItems.find(nav => 
-        url.includes(nav.route_name.replace('control.', '').replaceAll('.', '/')) ||
-        (nav.route_name === 'control.overview' && url === '/overview')
-    );
+    const actionSuffixes = ['.index', '.show', '.create', '.store', '.edit', '.update', '.destroy'];
+    const item = navigationItems.find(nav => {
+        const normalizedName = actionSuffixes.reduce(
+            (name, suffix) => name.endsWith(suffix) ? name.slice(0, -suffix.length) : name,
+            nav.route_name
+        );
+        const pathSegment = normalizedName.replace('control.', '').replaceAll('.', '/');
+        return url.includes(`/${pathSegment}`) || (nav.route_name === 'control.overview' && url === '/overview');
+    });
 
     const title = item?.title || 'Unknown Module';
     const description = item?.description || 'This module is under development.';
